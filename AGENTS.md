@@ -4,8 +4,8 @@ The app is used to keep track of players and organize tournaments in a racket sp
 
 ## Rules
 
-- Use Conventional Commits when creating commit messages
-- Use Conventional Branch when creating branches
+- Always use Conventional Commits when creating commit messages
+- Always use Conventional Branch when creating branches
 
 ## Tech Stack
 
