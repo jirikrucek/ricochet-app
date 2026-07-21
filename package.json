@@ -8,9 +8,17 @@
     "scripts": {
         "build": "npm run build --workspaces --if-present",
         "dev": "npm run dev -w @ricochet/web",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
         "typecheck": "tsc -b"
     },
     "devDependencies": {
-        "typescript": "^5.8.0"
+        "@eslint/js": "^9.0.0",
+        "eslint": "^9.0.0",
+        "eslint-plugin-react-hooks": "^5.0.0",
+        "eslint-plugin-react-refresh": "^0.4.0",
+        "globals": "^15.0.0",
+        "typescript": "^5.8.0",
+        "typescript-eslint": "^8.0.0"
     }
 }
