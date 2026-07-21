@@ -23,3 +23,17 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - user interface: React
 - database: Supabase
 - hosting: Vercel
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues are the tracking system for this repo. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The default triage vocabulary is `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context layout with one root CONTEXT file and ADRs under docs/adr. See `docs/agents/domain.md`.
