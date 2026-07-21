@@ -1,0 +1,9 @@
+node_modules/
+**/dist/
+**/coverage/
+**/.vite/
+package-lock.json
+.agents/
+.github/prompts/
+docs/
+skills-lock.json
