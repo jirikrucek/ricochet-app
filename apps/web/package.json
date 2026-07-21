@@ -1,0 +1,10 @@
+{
+    "name": "@ricochet/web",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "typecheck": "tsc -p tsconfig.json --noEmit"
+    }
+}

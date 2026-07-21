@@ -1,0 +1,12 @@
+{
+    "name": "ricochet-app",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "npm run build --workspaces --if-present",
+        "typecheck": "tsc -b"
+    }
+}
