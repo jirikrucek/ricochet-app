@@ -12,16 +12,22 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - package manager: npm
 - build tool: Vite
 - unit and integration testing: Vitest
-- e2e testing: Playground
+- e2e testing: Playwright
 - static analysis: ESLint
 - code formatting: Prettier
 - spec driven development: OpenSpec
 
 ## Tech Stack
 
+- frontend framework: React (SPA/CSR)
 - programming language: TypeScript
-- user interface: React
-- database: Supabase
+- routing: TanStack Router (type-safe, file-based)
+- server state: TanStack Query
+- client ui state: Zustand
+- forms and validation: React Hook Form + Zod
+- table and virtualization: TanStack Table (+ TanStack Virtual when needed)
+- design system and styling: Shadcn UI + Tailwind CSS + CSS design tokens
+- backend platform: Supabase (PostgreSQL, Auth, Realtime, RLS)
 - hosting: Vercel
 
 ## Agent skills
