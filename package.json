@@ -7,6 +7,10 @@
     ],
     "scripts": {
         "build": "npm run build --workspaces --if-present",
+        "dev": "npm run dev -w @ricochet/web",
         "typecheck": "tsc -b"
+    },
+    "devDependencies": {
+        "typescript": "^5.8.0"
     }
 }
