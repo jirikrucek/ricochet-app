@@ -1,28 +1,31 @@
 {
-    "name": "ricochet-app",
-    "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
-    "scripts": {
-        "build": "npm run build --workspaces --if-present",
-        "dev": "npm run dev -w @ricochet/web",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "format": "prettier . --write",
-        "format:check": "prettier . --check",
-        "typecheck": "tsc -b"
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.0.0",
-        "eslint": "^9.0.0",
-        "eslint-config-prettier": "^10.0.0",
-        "eslint-plugin-react-hooks": "^5.0.0",
-        "eslint-plugin-react-refresh": "^0.4.0",
-        "globals": "^15.0.0",
-        "prettier": "^3.0.0",
-        "typescript": "^5.8.0",
-        "typescript-eslint": "^8.0.0"
-    }
+  "name": "ricochet-app",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev -w @ricochet/web",
+    "prepare": "husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "typecheck": "tsc -b"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "globals": "^15.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.0.0"
+  }
 }

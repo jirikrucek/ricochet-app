@@ -1,0 +1,19 @@
+{
+  "package.json": ["prettier --write"],
+  "apps/web/package.json": ["prettier --write"],
+  "packages/*/package.json": ["prettier --write"],
+  "eslint.config.mjs": ["prettier --write"],
+  ".prettierrc.json": ["prettier --write"],
+  ".prettierignore": ["prettier --write"],
+  ".lintstagedrc.json": ["prettier --write"],
+  "tsconfig.json": ["prettier --write"],
+  "tsconfig.base.json": ["prettier --write"],
+  "apps/web/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,css,html}": [
+    "prettier --write",
+    "eslint --fix"
+  ],
+  "packages/*/src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,css,html}": [
+    "prettier --write",
+    "eslint --fix"
+  ]
+}
