@@ -6,6 +6,7 @@ The app is used to keep track of players and organize tournaments in a racket sp
 
 - Always use Conventional Commits when creating commit messages
 - Always use Conventional Branch when creating branches
+- Always save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
 
 ## Dev Tools
 
@@ -21,6 +22,7 @@ The app is used to keep track of players and organize tournaments in a racket sp
 
 - frontend framework: React (SPA/CSR)
 - programming language: TypeScript
+- localization: i18next + react-i18next
 - routing: TanStack Router (type-safe, file-based)
 - server state: TanStack Query
 - client ui state: Zustand

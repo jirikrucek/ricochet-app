@@ -12,3 +12,17 @@ body {
 main {
   padding: 2rem;
 }
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+select {
+  margin-bottom: 1.5rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #ffffff;
+}
