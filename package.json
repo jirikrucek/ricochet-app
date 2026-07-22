@@ -12,6 +12,7 @@
     "test:run": "npm run test:run -w @ricochet/web",
     "test:unit": "npm run test:unit -w @ricochet/web",
     "test:integration": "npm run test:integration -w @ricochet/web",
+    "test:e2e": "npm run test:e2e -w @ricochet/web",
     "prepare": "husky",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
