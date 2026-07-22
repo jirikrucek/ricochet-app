@@ -19,3 +19,5 @@ pnpm-debug.log*
 !.env.example
 .idea/
 .vscode/
+**/routeTree.gen.ts
+**/routeTree.gen.d.ts

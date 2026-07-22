@@ -14,6 +14,8 @@
     "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright install chromium"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.170.18",
+    "@tanstack/router-plugin": "^1.168.23",
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",
     "react": "^19.0.0",

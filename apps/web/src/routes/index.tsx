@@ -1,8 +1,9 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { supportedLanguages } from './localization/languages';
+import { supportedLanguages } from '../localization/languages';
 
-export default function App() {
+function IndexPage() {
   const { i18n, t } = useTranslation();
 
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
@@ -31,3 +32,7 @@ export default function App() {
     </main>
   );
 }
+
+export const Route = createFileRoute('/')({
+  component: IndexPage,
+});
