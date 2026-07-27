@@ -4,6 +4,13 @@ const hu = {
     bootstrapReady: 'A munkaterület inicializálása készen áll.',
     languageLabel: 'Nyelv',
   },
+  nav: {
+    players: 'Játékosok',
+    tournaments: 'Tornák',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'Angol',
     cs: 'Cseh',

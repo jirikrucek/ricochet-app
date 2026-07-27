@@ -4,6 +4,13 @@ const cs = {
     bootstrapReady: 'Základní příprava pracovního prostoru je hotová.',
     languageLabel: 'Jazyk',
   },
+  nav: {
+    players: 'Hráči',
+    tournaments: 'Turnaje',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'Angličtina',
     cs: 'Čeština',

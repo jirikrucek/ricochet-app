@@ -4,6 +4,13 @@ const nl = {
     bootstrapReady: 'De werkruimte-initialisatie is klaar.',
     languageLabel: 'Taal',
   },
+  nav: {
+    players: 'Spelers',
+    tournaments: 'Toernooien',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'Engels',
     cs: 'Tsjechisch',

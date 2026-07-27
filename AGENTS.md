@@ -7,6 +7,8 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - Always use Conventional Commits when creating commit messages
 - Always use Conventional Branch when creating branches
 - Always save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
+- Always run unit, integration, and end-to-end (E2E) tests after finishing your work to ensure that nothing in the app has broken
+- Never commit any changes
 
 ## Dev Tools
 
@@ -45,3 +47,34 @@ The default triage vocabulary is `needs-triage`, `needs-info`, `ready-for-agent`
 ### Domain docs
 
 This repo uses a single-context layout with one root CONTEXT file and ADRs under docs/adr. See `docs/agents/domain.md`.
+
+### Design system
+
+This project uses a design system defined in DESIGN.md.
+
+For all UI work:
+- Read DESIGN.md before generating any component or style
+- Use the color tokens exactly as specified. No custom hex values.
+- Apply the type scale to all text elements
+- Use the spacing scale for margins, padding, and gaps
+- Do not introduce new design decisions without a reason
+
+#### Setup status
+
+Tailwind CSS v4 and Shadcn UI are **installed and configured**:
+- Tailwind v4 is wired via `@tailwindcss/vite` in `apps/web/vite.config.ts`
+- All DESIGN.md tokens are defined as CSS custom properties in `apps/web/src/styles.css` under `@theme`
+- The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`
+- Shadcn UI components live in `src/components/ui/`; the `cn()` utility is at `src/lib/utils.ts`
+- Inter is loaded from Google Fonts as the type system substitute for Airbnb Cereal VF
+
+#### Token naming convention
+
+| DESIGN.md reference | CSS custom property |
+|---|---|
+| `{colors.primary}` | `var(--color-primary)` |
+| `{spacing.base}` | `var(--spacing-base)` |
+| `{rounded.sm}` | `var(--radius-sm)` |
+| `{typography.body-md}` | `var(--text-body-md)` |
+
+Always apply tokens via `style={{ ... }}` or Tailwind utilities — never hardcode hex values or pixel sizes.

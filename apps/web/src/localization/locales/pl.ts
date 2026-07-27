@@ -4,6 +4,13 @@ const pl = {
     bootstrapReady: 'Inicjalizacja przestrzeni roboczej jest gotowa.',
     languageLabel: 'Język',
   },
+  nav: {
+    players: 'Gracze',
+    tournaments: 'Turnieje',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'Angielski',
     cs: 'Czeski',

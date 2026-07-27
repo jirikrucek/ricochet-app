@@ -4,6 +4,13 @@ const en = {
     bootstrapReady: 'Workspace bootstrap is ready.',
     languageLabel: 'Language',
   },
+  nav: {
+    players: 'Players',
+    tournaments: 'Tournaments',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'English',
     cs: 'Czech',

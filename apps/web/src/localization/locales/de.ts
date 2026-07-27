@@ -4,6 +4,13 @@ const de = {
     bootstrapReady: 'Die Initialisierung des Workspaces ist bereit.',
     languageLabel: 'Sprache',
   },
+  nav: {
+    players: 'Spieler',
+    tournaments: 'Turniere',
+  },
+  footer: {
+    legal: '© {{year}} Ricochet App',
+  },
   languages: {
     en: 'Englisch',
     cs: 'Tschechisch',

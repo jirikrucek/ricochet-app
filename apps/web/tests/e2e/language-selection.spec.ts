@@ -6,11 +6,19 @@ test('changes the app language from the selector', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Ricochet App' }),
   ).toBeVisible();
-  await expect(page.getByLabel('Language')).toBeVisible();
 
-  await page.getByLabel('Language').selectOption('de');
+  // The language selector is a Shadcn Select (combobox button + listbox popup)
+  const trigger = page.getByRole('combobox', { name: 'Language' });
+  await expect(trigger).toBeVisible();
 
-  await expect(page.getByText('Ricochet App')).toBeVisible();
+  // Open the dropdown and choose German
+  await trigger.click();
+  await page.getByRole('option', { name: 'German' }).click();
+
+  // UI should now render in German
+  await expect(
+    page.getByRole('heading', { name: 'Ricochet App' }),
+  ).toBeVisible();
   await expect(page.getByText('Sprache')).toBeVisible();
   await expect(
     page.getByText('Die Initialisierung des Workspaces ist bereit.'),
