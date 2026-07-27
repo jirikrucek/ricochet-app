@@ -26,7 +26,7 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - routing: TanStack Router (type-safe, file-based)
 - server state: TanStack Query
 - client ui state: Zustand
-- forms and validation: React Hook Form + Zod
+- form state management and validation: React Hook Form + Zod
 - table and virtualization: TanStack Table (+ TanStack Virtual when needed)
 - design system and styling: Shadcn UI + Tailwind CSS + CSS design tokens
 - backend platform: Supabase (PostgreSQL, Auth, Realtime, RLS)

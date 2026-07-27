@@ -29,3 +29,7 @@ Run tests from the repository root:
 - `npm run test:integration` for integration tests.
 
 The localization coverage test ensures every supported locale includes all translation keys defined in the default language.
+
+## Forms and validation
+
+The web app uses React Hook Form for form state management and Zod for schema validation.
