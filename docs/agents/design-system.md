@@ -27,3 +27,7 @@ Tailwind CSS v4 and Shadcn UI are **installed and configured**:
 | `{typography.body-md}` | `var(--text-body-md)` |
 
 Always apply tokens via `style={{ ... }}` or Tailwind utilities — never hardcode hex values or pixel sizes.
+
+## Validation
+
+Always validate the DESIGN.md file for structural correctness using `npx @google/design.md lint DESIGN.md` after making changes to it.
