@@ -6,6 +6,7 @@ description: A warm, generous app anchored on a clean white canvas and the brand
 colors:
   primary: "#ff385c"
   primary-active: "#e00b41"
+  primary-aa: "#c9003b"
   primary-disabled: "#ffd1da"
   primary-error-text: "#c13515"
   primary-error-text-hover: "#b32505"
@@ -161,7 +162,7 @@ spacing:
 
 components:
   button-primary:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.primary-aa}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button-md}"
     rounded: "{rounded.sm}"
@@ -173,7 +174,7 @@ components:
     rounded: "{rounded.sm}"
   button-primary-disabled:
     backgroundColor: "{colors.primary-disabled}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.sm}"
   button-secondary:
     backgroundColor: "{colors.canvas}"
@@ -183,17 +184,17 @@ components:
     padding: 13px 23px
     height: 48px
   button-tertiary-text:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.button-md}"
   button-pill-primary:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.primary-aa}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button-sm}"
     rounded: "{rounded.full}"
     padding: 10px 20px
   search-orb:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.primary-aa}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.full}"
     height: 48px
@@ -213,12 +214,12 @@ components:
     typography: "{typography.nav-link}"
     height: 80px
   product-tab-active:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.nav-link}"
     rounded: "{rounded.none}"
   product-tab-inactive:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.muted}"
     typography: "{typography.nav-link}"
   search-bar-pill:
@@ -229,7 +230,7 @@ components:
     padding: 14px 24px
     height: 64px
   search-field-segment:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.caption}"
     padding: 8px 24px
@@ -238,12 +239,12 @@ components:
     textColor: "{colors.muted}"
     typography: "{typography.button-sm}"
   category-tab-active:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.button-sm}"
     rounded: "{rounded.none}"
   property-card:
-    backgroundColor: "{colors.canvas}"
+    backgroundColor: "{colors.surface-card}"
     textColor: "{colors.ink}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.md}"
@@ -255,11 +256,11 @@ components:
     typography: "{typography.title-md}"
     rounded: "{rounded.md}"
   city-link-block:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.title-sm}"
   rating-display-card:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.rating-display}"
   guest-favorite-badge:
@@ -275,13 +276,13 @@ components:
     rounded: "{rounded.full}"
     padding: 2px 6px
   amenity-row:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.body-md}"
     padding: 12px 0
   reviews-card:
-    backgroundColor: transparent
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.body}"
     typography: "{typography.body-sm}"
   host-card:
     backgroundColor: "{colors.canvas}"
@@ -296,7 +297,7 @@ components:
     rounded: "{rounded.md}"
     padding: 24px
   date-picker-day:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.full}"
@@ -317,13 +318,68 @@ components:
     typography: "{typography.body-sm}"
     padding: 48px 80px
   footer-link:
-    backgroundColor: transparent
+    backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.body-sm}"
   legal-band:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.muted}"
     typography: "{typography.caption-sm}"
+  legal-anchor:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.legal-link}"
+    typography: "{typography.caption-sm}"
+  form-error-text:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.primary-error-text}"
+    typography: "{typography.caption}"
+  form-error-link:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.primary-error-text-hover}"
+    typography: "{typography.caption}"
+  luxe-badge:
+    backgroundColor: "{colors.luxe}"
+    textColor: "{colors.on-dark}"
+    typography: "{typography.badge}"
+    rounded: "{rounded.full}"
+    padding: 4px 10px
+  plus-badge:
+    backgroundColor: "{colors.plus}"
+    textColor: "{colors.on-dark}"
+    typography: "{typography.badge}"
+    rounded: "{rounded.full}"
+    padding: 4px 10px
+  filter-chip:
+    backgroundColor: "{colors.surface-soft}"
+    textColor: "{colors.ink}"
+    typography: "{typography.button-sm}"
+    rounded: "{rounded.full}"
+    padding: 8px 16px
+  star-icon:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.star-rating}"
+  modal-backdrop:
+    backgroundColor: "{colors.scrim}"
+    textColor: "{colors.on-dark}"
+  heart-saved:
+    backgroundColor: "{colors.primary}"
+    rounded: "{rounded.full}"
+    size: 32px
+  chip-inactive:
+    backgroundColor: "{colors.muted-soft}"
+    textColor: "{colors.ink}"
+    typography: "{typography.button-sm}"
+    rounded: "{rounded.full}"
+    padding: 8px 16px
+  section-separator:
+    backgroundColor: "{colors.hairline}"
+    height: 1px
+  section-separator-soft:
+    backgroundColor: "{colors.hairline-soft}"
+    height: 1px
+  input-border-focused:
+    backgroundColor: "{colors.border-strong}"
+    height: 2px
 ---
 
 ## Overview
