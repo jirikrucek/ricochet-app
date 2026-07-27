@@ -6,13 +6,7 @@ function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col">
       <TopNav />
-      <main
-        className="mx-auto w-full max-w-[1280px] flex-1"
-        style={{
-          paddingInline: 'var(--spacing-base)',
-          paddingBlock: 'var(--spacing-section)',
-        }}
-      >
+      <main className="mx-auto w-full max-w-app-shell flex-1 px-base py-section">
         <Outlet />
       </main>
       <AppFooter />

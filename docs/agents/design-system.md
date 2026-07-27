@@ -13,7 +13,8 @@ For all UI work:
 
 Tailwind CSS v4 and Shadcn UI are **installed and configured**:
 - Tailwind v4 is wired via `@tailwindcss/vite` in `apps/web/vite.config.ts`
-- All DESIGN.md tokens are defined as CSS custom properties in `apps/web/src/styles.css` under `@theme`
+- DESIGN.md tokens and typography primitives live in `apps/web/src/styles.css`
+- `apps/web/src/styles.css` owns both the Tailwind theme tokens and the app-level base styles because the project only has one frontend surface
 - The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`
 - Shadcn UI components live in `src/components/ui/`; the `cn()` utility is at `src/lib/utils.ts`
 
@@ -21,12 +22,29 @@ Tailwind CSS v4 and Shadcn UI are **installed and configured**:
 
 | DESIGN.md reference | CSS custom property |
 |---|---|
-| `{colors.primary}` | `var(--color-primary)` |
-| `{spacing.base}` | `var(--spacing-base)` |
-| `{rounded.sm}` | `var(--radius-sm)` |
-| `{typography.body-md}` | `var(--text-body-md)` |
+| `{colors.primary}` | `var(--color-primary)` / `text-primary` / `bg-primary` |
+| `{spacing.base}` | `var(--spacing-base)` / `px-base` / `gap-base` |
+| `{rounded.sm}` | `var(--radius-sm)` / `rounded-sm` |
+| `{typography.body-md}` | `var(--text-body-md)` / `text-body-md` / `type-body-md` |
 
-Always apply tokens via `style={{ ... }}` or Tailwind utilities — never hardcode hex values or pixel sizes.
+Prefer Tailwind classes backed by the theme tokens. Inline `style={{ ... }}` is only acceptable when a CSS property cannot be expressed cleanly with Tailwind utilities or the shared typography primitives.
+
+## Typography primitives
+
+Reusable typography classes are defined in `apps/web/src/styles.css`:
+
+- `type-display-xl`
+- `type-display-sm`
+- `type-body-md`
+- `type-caption`
+- `type-caption-sm`
+- `type-nav-link`
+
+Use them instead of repeating font size, weight, line-height, and tracking in component files.
+
+## Dark mode
+
+Dark mode is **not currently supported**. Do not add `dark:*` classes or dark-theme token overrides until the product explicitly adopts a dark theme.
 
 ## Validation
 

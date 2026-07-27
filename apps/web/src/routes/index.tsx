@@ -45,44 +45,16 @@ function IndexPage() {
   }, [activeLanguage, i18n, selectedLanguage]);
 
   return (
-    <div className="flex flex-col" style={{ gap: 'var(--spacing-xl)' }}>
-      <div className="flex flex-col" style={{ gap: 'var(--spacing-sm)' }}>
-        <h1
-          style={{
-            fontSize: 'var(--text-display-xl)',
-            fontWeight: 700,
-            lineHeight: 1.43,
-            color: 'var(--color-ink)',
-            margin: 0,
-          }}
-        >
-          {t('app.title')}
-        </h1>
-        <p
-          style={{
-            fontSize: 'var(--text-body-md)',
-            lineHeight: 1.5,
-            color: 'var(--color-muted)',
-            margin: 0,
-          }}
-        >
-          {t('app.bootstrapReady')}
-        </p>
+    <div className="flex flex-col gap-xl">
+      <div className="flex flex-col gap-sm">
+        <h1 className="type-display-xl m-0 text-ink">{t('app.title')}</h1>
+        <p className="type-body-md m-0 text-muted">{t('app.bootstrapReady')}</p>
       </div>
 
-      <div
-        className="flex flex-col"
-        style={{ gap: 'var(--spacing-xs)', maxWidth: '240px' }}
-      >
+      <div className="flex max-w-form-field flex-col gap-xs">
         <label
           htmlFor="language-trigger"
-          style={{
-            display: 'block',
-            fontSize: 'var(--text-caption)',
-            fontWeight: 500,
-            color: 'var(--color-muted)',
-            lineHeight: 1.29,
-          }}
+          className="type-caption block text-muted"
         >
           {t('app.languageLabel')}
         </label>
@@ -92,17 +64,7 @@ function IndexPage() {
             if (value) setValue('language', value as SupportedLanguage);
           }}
         >
-          <SelectTrigger
-            id="language-trigger"
-            style={{
-              width: '100%',
-              height: '56px',
-              borderRadius: 'var(--radius-sm)',
-              borderColor: 'var(--color-hairline)',
-              fontSize: 'var(--text-body-md)',
-              color: 'var(--color-ink)',
-            }}
-          >
+          <SelectTrigger id="language-trigger" size="lg" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

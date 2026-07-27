@@ -3,6 +3,7 @@
 The app is used to keep track of players and organize tournaments in a racket sport called ricochet.
 
 ## Rules
+
 - ALWAYS use Conventional Commits when creating commit messages
 - ALWAYS use Conventional Branch when creating branches
 - ALWAYS save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
@@ -48,4 +49,4 @@ This repo uses a single-context layout with one root CONTEXT file and ADRs under
 
 ### Design system
 
-When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. See `docs/agents/design-system.md`.
+When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. Tailwind theme tokens and typography primitives live in `apps/web/src/styles.css`. See `docs/agents/design-system.md`.
