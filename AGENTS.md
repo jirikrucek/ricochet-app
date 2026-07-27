@@ -3,12 +3,11 @@
 The app is used to keep track of players and organize tournaments in a racket sport called ricochet.
 
 ## Rules
-
-- Always use Conventional Commits when creating commit messages
-- Always use Conventional Branch when creating branches
-- Always save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
-- Always run unit, integration, and end-to-end (E2E) tests after finishing your work to ensure that nothing in the app has broken
-- Never commit any changes
+- ALWAYS use Conventional Commits when creating commit messages
+- ALWAYS use Conventional Branch when creating branches
+- ALWAYS save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
+- ALWAYS run unit, integration, and end-to-end (E2E) tests after finishing your work to ensure that nothing in the app has broken
+- NEVER automatically commit changes. It is up to the user to commit changes manually.
 
 ## Dev Tools
 
@@ -66,7 +65,6 @@ Tailwind CSS v4 and Shadcn UI are **installed and configured**:
 - All DESIGN.md tokens are defined as CSS custom properties in `apps/web/src/styles.css` under `@theme`
 - The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`
 - Shadcn UI components live in `src/components/ui/`; the `cn()` utility is at `src/lib/utils.ts`
-- Inter is loaded from Google Fonts as the type system substitute for Airbnb Cereal VF
 
 #### Token naming convention
 
