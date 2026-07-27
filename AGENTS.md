@@ -7,7 +7,6 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - ALWAYS use Conventional Branch when creating branches
 - ALWAYS save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
 - ALWAYS run unit, integration, and end-to-end (E2E) tests after finishing your work to ensure that nothing in the app has broken
-- NEVER automatically commit changes. It is up to the user to commit changes manually.
 
 ## Dev Tools
 
