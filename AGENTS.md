@@ -48,4 +48,4 @@ This repo uses a single-context layout with one root CONTEXT file and ADRs under
 
 ### Design system
 
-This repo uses a design system described in one root DESIGN file. See `docs/agents/design-system.md`.
+When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. See `docs/agents/design-system.md`.
