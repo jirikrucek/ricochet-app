@@ -7,7 +7,8 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - ALWAYS use Conventional Commits when creating commit messages
 - ALWAYS use Conventional Branch when creating branches
 - ALWAYS save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
-- ALWAYS run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after finishing your work to ensure that nothing in the app has broken
+- ALWAYS run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after any changes in the codebase to ensure that nothing in the app has broken
+- ALWAYS update documentation after any changes in the codebase
 
 ## Dev Tools
 
