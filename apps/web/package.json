@@ -8,7 +8,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:unit": "vitest run --config vitest.unit.config.ts --passWithNoTests",
+    "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright test",
     "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright install chromium"
