@@ -2,24 +2,6 @@
 
 The app is used to keep track of players and organize tournaments in a racket sport called ricochet.
 
-## Rules
-
-- ALWAYS use Conventional Commits when creating commit messages
-- ALWAYS use Conventional Branch when creating branches
-- ALWAYS save information intended for app users in README.md, and information intended for AI agents in AGENTS.md
-- ALWAYS run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after any changes in the codebase to ensure that nothing in the app has broken
-- ALWAYS update documentation after any changes in the codebase
-
-## Dev Tools
-
-- package manager: npm
-- build tool: Vite
-- unit and integration testing: Vitest
-- e2e testing: Playwright
-- static analysis: ESLint
-- code formatting: Prettier
-- spec driven development: OpenSpec
-
 ## Tech Stack
 
 - frontend framework: React (SPA/CSR)
@@ -33,6 +15,34 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - design system and styling: Shadcn UI + Tailwind CSS + CSS design tokens
 - backend platform: Supabase (PostgreSQL, Auth, Realtime, RLS)
 - hosting: Vercel
+
+## Dev Tools
+
+- package manager: npm
+- build tool: Vite
+- unit and integration testing: Vitest
+- e2e testing: Playwright
+- static analysis: ESLint
+- code formatting: Prettier
+- spec driven development: OpenSpec
+
+### Testing
+
+This repository uses Vitest for unit and integration testing in the web app workspace.
+
+Run tests from the repository root:
+
+- `npm run test` for watch mode.
+- `npm run test:run` for a one-off full run.
+- `npm run test:unit` for unit tests.
+- `npm run test:integration` for integration tests.
+
+## Rules
+
+- ALWAYS use Conventional Commits when creating commit messages
+- ALWAYS use Conventional Branch when creating branches
+- ALWAYS run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after any changes in the codebase to ensure that nothing in the app has broken
+- ALWAYS update documentation after any changes in the codebase
 
 ## Agent skills
 
@@ -51,3 +61,7 @@ This repo uses a single-context layout with one root CONTEXT file and ADRs under
 ### Design system
 
 When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. Tailwind theme tokens and typography primitives live in `apps/web/src/styles.css`. See `docs/agents/design-system.md`.
+
+### Deployment
+
+This repository is deployed to Vercel. See `docs/agents/deployment.md`.
