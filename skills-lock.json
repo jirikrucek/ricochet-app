@@ -113,7 +113,7 @@
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-onboard/SKILL.md",
-      "computedHash": "f4a85f6461eb5e2cfa0de5a4e531ed48054adde9be0568162698d2075f11107b"
+      "computedHash": "e69ce55dd8881f524a5ce3f9ca62b928d69e4d76bd854c72b8cbcc2fbb09b16f"
     },
     "openspec-propose": {
       "source": "fission-ai/openspec",
@@ -125,7 +125,7 @@
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-sync-specs/SKILL.md",
-      "computedHash": "deac2437dac4964354da14c38b8ccebaafc5d478c7db3ee65f979f923f677ce7"
+      "computedHash": "54176c0865053aaef5fc641d629bfe3a1ff3c1162eeb74794a5e62aa520725b1"
     },
     "openspec-update-change": {
       "source": "fission-ai/openspec",
