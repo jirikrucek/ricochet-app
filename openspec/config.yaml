@@ -6,3 +6,5 @@ rules:
         - Must include an "Out of Scope" section
     spec:
         - Must use gherkin-authoring skill
+    tasks:
+        - Must use to-tickets skill
