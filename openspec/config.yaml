@@ -11,10 +11,9 @@ schema: custom-workflow
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
+rules:
+    proposal:
+    - Must use grill-with-docs skill
+    - Must include an "Out of Scope" section
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
