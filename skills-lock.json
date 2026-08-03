@@ -31,6 +31,12 @@
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
       "computedHash": "363cb0f53b0b431e7c00086ad1f823500b7e1b70b5616ee969c979f0934e9e6e"
     },
+    "gherkin-authoring": {
+      "source": "intent-driven-dev/intent-driven-template",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gherkin-authoring/SKILL.md",
+      "computedHash": "c9e0f9b6eddc4dffb9da6e359353e4cf01a6bad73bcc4613f0528695ceff5d1d"
+    },
     "grill-me": {
       "source": "mattpocock/skills",
       "sourceType": "github",

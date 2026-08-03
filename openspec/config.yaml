@@ -15,5 +15,7 @@ rules:
     proposal:
     - Must use grill-with-docs skill
     - Must include an "Out of Scope" section
+    spec:
+    - Must use gherkin-authoring skill
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
