@@ -1,21 +1,8 @@
 schema: custom-workflow
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
 rules:
     proposal:
-    - Must use grill-with-docs skill
-    - Must include an "Out of Scope" section
+        - Must use grill-with-docs skill
+        - Must include an "Out of Scope" section
     spec:
-    - Must use gherkin-authoring skill
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+        - Must use gherkin-authoring skill
