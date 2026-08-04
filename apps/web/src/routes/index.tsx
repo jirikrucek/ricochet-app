@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
+  languageMetadata,
   resolveSupportedLanguage,
   supportedLanguages,
   type SupportedLanguage,
@@ -13,6 +14,7 @@ import {
   type LanguageSelectionValues,
   languageSelectionSchema,
 } from '../features/language-selection/languageSelectionSchema';
+import { LanguageOption } from '../features/language-selection/LanguageOption';
 import {
   Select,
   SelectContent,
@@ -65,12 +67,16 @@ function IndexPage() {
           }}
         >
           <SelectTrigger id="language-trigger" size="lg" className="w-full">
-            <SelectValue />
+            <SelectValue>
+              {(value: SupportedLanguage) => (
+                <LanguageOption {...languageMetadata[value]} />
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {supportedLanguages.map((language) => (
               <SelectItem key={language} value={language}>
-                {t(`languages.${language}`)}
+                <LanguageOption {...languageMetadata[language]} />
               </SelectItem>
             ))}
           </SelectContent>

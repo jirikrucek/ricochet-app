@@ -6,7 +6,7 @@ Users get confused when switching languages because the selector currently shows
 
 - Replace the per-locale translated `languages.*` keys with a single static map of native-language names (endonyms) that don't change with the active UI language: `en: "English"`, `cs: "Čeština"`, `de: "Deutsch"`, `pl: "Polski"`, `nl: "Nederlands"`, `hu: "Magyar"`.
 - Remove the now-dead `languages.*` translation keys from all six locale files.
-- Add a country flag icon (via the new `react-circle-flags` dependency) next to each language's native name: `cs→CZ`, `de→DE`, `pl→PL`, `nl→NL`, `hu→HU`, `en→GB`.
+- Add a country flag icon (SVGs vendored locally under `apps/web/src/assets/flags/`, no third-party CDN at runtime) next to each language's native name: `cs→CZ`, `de→DE`, `pl→PL`, `nl→NL`, `hu→HU`, `en→GB`.
 - Show the flag + native name in both the collapsed `SelectTrigger` and each `SelectItem` in the language dropdown.
 - Mark the flag SVG `aria-hidden="true"` (decorative); the visible native name remains the accessible label.
 
@@ -25,7 +25,7 @@ _None._
 - `apps/web/src/routes/index.tsx` — selector rendering (trigger + items).
 - `apps/web/src/localization/languages.ts` — add static native-name and country-code maps.
 - `apps/web/src/localization/locales/{en,cs,de,pl,nl,hu}.ts` — remove dead `languages.*` keys.
-- `apps/web/package.json` — new runtime dependency: `react-circle-flags`.
+- `apps/web/src/assets/flags/{gb,cz,de,pl,nl,hu}.svg` — vendored flag SVGs (no new runtime dependency).
 - `docs/adr/0006-language-selector-uses-native-labels-and-flags.md` — new ADR recording the native-label + flag decision, extending ADR 0005.
 
 ## Out of Scope

@@ -11,14 +11,6 @@ const cs = {
   footer: {
     legal: '© {{year}} Ricochet App',
   },
-  languages: {
-    en: 'Angličtina',
-    cs: 'Čeština',
-    de: 'Němčina',
-    pl: 'Polština',
-    nl: 'Nizozemština',
-    hu: 'Maďarština',
-  },
   errors: {
     rootContainerNotFound: 'Kořenový kontejner nebyl nalezen',
   },

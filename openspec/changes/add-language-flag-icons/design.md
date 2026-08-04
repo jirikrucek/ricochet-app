@@ -11,7 +11,7 @@ See proposal.md for the "why" (Angličtina-when-Czech-is-active confusion) and s
 - Flag rendering shared between trigger and list via one small presentational component, so the aria-hidden/decorative behavior is enforced in one place.
 
 **Non-Goals:**
-- Abstracting flag rendering behind a provider-agnostic interface — `react-circle-flags` is the only renderer needed.
+- Abstracting flag rendering behind a provider-agnostic interface — a plain `<img>` over a local asset map is the only renderer needed.
 - Changing `SupportedLanguage`, `resolveSupportedLanguage`, or language-detection/persistence logic.
 
 ## Decisions
@@ -20,16 +20,16 @@ See proposal.md for the "why" (Angličtina-when-Czech-is-active confusion) and s
 Add `languageMetadata: Record<SupportedLanguage, { nativeName: string; countryCode: string }>` next to `supportedLanguages` in `apps/web/src/localization/languages.ts`. Alternative considered: keep native names in each locale file under a non-translated `languages.*` key — rejected because that reintroduces per-locale duplication of data that is by definition locale-invariant, which is the exact bug this change fixes.
 
 **A small `LanguageOption` presentational component renders flag + name together.**
-Add `apps/web/src/features/language-selection/LanguageOption.tsx` (or similar) rendering `<CircleFlag countryCode={...} aria-hidden="true" height="1em" /> {nativeName}`. Used both inside each `SelectItem` and inside `SelectValue`'s render function (looking up the currently selected language). Alternative considered: inline the JSX at both call sites — rejected, would duplicate the aria-hidden/layout logic and risk drifting between trigger and list.
+Add `apps/web/src/features/language-selection/LanguageOption.tsx` rendering `<img src={flagsByCountryCode[countryCode]} alt="" aria-hidden="true" className="size-4 shrink-0" /> {nativeName}`. Used both inside each `SelectItem` and inside `SelectValue`'s render function (looking up the currently selected language). Alternative considered: inline the JSX at both call sites — rejected, would duplicate the aria-hidden/layout logic and risk drifting between trigger and list.
 
-**`react-circle-flags` is used directly, no wrapper abstraction.**
-It's a single-purpose, actively maintained SVG flag component (`<CircleFlag countryCode="cz" />`) with no other project dependency competing for the same role. Alternative considered: bundle local SVG assets — rejected as more maintenance for no behavioral benefit (proposal already rejected building a custom composite flag).
+**Flag SVGs are vendored locally under `apps/web/src/assets/flags/`, no CDN dependency.**
+Only six flags are needed (`gb, cz, de, pl, nl, hu`), sourced from the MIT-licensed `circle-flags` project and committed to the repo, imported as Vite assets. Alternative considered: `react-circle-flags`, a wrapper component that fetches SVGs from `react-circle-flags.pages.dev` at runtime — rejected because a third-party CDN dependency for a fixed set of six flags is an unnecessary availability, privacy, and CSP risk with no behavioral benefit; vendoring is no more maintenance for a closed set of six codes that isn't expected to grow (see Non-Goals).
 
 **Locale key removal is mechanical.**
 Delete the `languages` object from each of the six locale files (`en, cs, de, pl, nl, hu`) and the `t(\`languages.${language}\`)` call site in `index.tsx`, replaced by a direct lookup into `languageMetadata`.
 
 ## Risks / Trade-offs
 
-- **New runtime dependency (`react-circle-flags`)** → small, focused package (SVG flags only); acceptable given no existing flag-rendering capability in the project.
-- **Flag SVGs add visual weight to a previously text-only control** → mitigated by using the library's compact circular flag size (`height="1em"`) inline with text, no layout restructuring needed beyond the trigger's already-present flex/gap classes.
+- **Vendored SVGs go stale if flag designs change upstream** → acceptable: only six fixed, rarely-changing national flags; no ongoing sync process needed.
+- **Flag SVGs add visual weight to a previously text-only control** → mitigated by sizing the flag with the codebase's existing icon-size convention (Tailwind `size-4`, matching the chevron/check icons in `select.tsx`) inline with text, no layout restructuring needed beyond the trigger's already-present flex/gap classes.
 - **Missed accessible-name regression if `aria-hidden` is forgotten on either render site (trigger vs. list)** → mitigated by centralizing rendering in one `LanguageOption` component (Decisions, above) so the attribute is set once.
