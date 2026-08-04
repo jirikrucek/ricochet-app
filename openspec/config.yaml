@@ -3,8 +3,8 @@ schema: custom-workflow
 rules:
     proposal:
         - Must use grill-with-docs skill
+        - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
         - Must include an "Out of Scope" section
         - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
     spec:
-        - Must use gherkin-authoring skill
-        - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
+        - Must use gherkin-authoring skill        
