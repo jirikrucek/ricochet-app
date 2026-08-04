@@ -7,6 +7,6 @@ rules:
         - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
     spec:
         - Must use gherkin-authoring skill
-        - Must organize specs by feature area, see apps/web/src/features
+        - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
     tasks:
         - Must use to-tickets skill
