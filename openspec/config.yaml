@@ -8,5 +8,3 @@ rules:
     spec:
         - Must use gherkin-authoring skill
         - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
-    tasks:
-        - Must use to-tickets skill
