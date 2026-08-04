@@ -1,4 +1,4 @@
-name: custom-workflow
+name: feature-workflow
 version: 1
 description: Custom OpenSpec workflow
 artifacts:
