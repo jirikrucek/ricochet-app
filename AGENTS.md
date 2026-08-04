@@ -42,7 +42,7 @@ Run tests from the repository root:
 - Must use Conventional Commits when creating commit messages
 - Must use Conventional Branch when creating branches
 - Must run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after any changes in the codebase to ensure that nothing in the app has broken
-- Must update documentation after any changes in the codebase
+- Must update documentation in `docs/` after any changes in the codebase
 
 ## Agent skills
 
