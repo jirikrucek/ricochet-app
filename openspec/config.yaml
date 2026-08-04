@@ -10,4 +10,3 @@ rules:
         - Must use gherkin-authoring skill
     tasks:
         - Must cover each spec scenario by an E2E test
-        - Must include the Definition of Done criteria checks specified in AGENTS.md
