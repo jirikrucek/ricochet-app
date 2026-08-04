@@ -10,3 +10,8 @@ rules:
         - Must use gherkin-authoring skill
     tasks:
         - Must cover each spec scenario by an E2E test
+
+operations:
+    apply:
+        guidance:
+            - Must use tdd skill
