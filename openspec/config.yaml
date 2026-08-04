@@ -4,6 +4,7 @@ rules:
     proposal:
         - Must use grill-with-docs skill
         - Must include an "Out of Scope" section
+        - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
     spec:
         - Must use gherkin-authoring skill
     tasks:

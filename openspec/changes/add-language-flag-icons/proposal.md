@@ -34,3 +34,7 @@ _None._
 - RTL layout support.
 - Changing language-detection logic or order (browser detection, `localStorage` caching remain unchanged).
 - A custom composite GB/US flag asset for English — considered and rejected in favor of the standard GB flag (see ADR 0006).
+
+## Traceability
+
+- Issue: https://github.com/jirikrucek/ricochet-app/issues/1
