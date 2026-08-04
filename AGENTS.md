@@ -26,23 +26,36 @@ The app is used to keep track of players and organize tournaments in a racket sp
 - code formatting: Prettier
 - spec driven development: OpenSpec
 
-### Testing
-
-This repository uses Vitest for unit and integration testing in the web app workspace.
-
-Run tests from the repository root:
-
-- `npm run test` for watch mode.
-- `npm run test:run` for a one-off full run.
-- `npm run test:unit` for unit tests.
-- `npm run test:integration` for integration tests.
-
 ## Rules
 
 - Must use Conventional Commits when creating commit messages
 - Must use Conventional Branch when creating branches
-- Must run unit, integration, and end-to-end (E2E) tests using `npm run test:all` after any changes in the codebase to ensure that nothing in the app has broken
-- Must update documentation in `docs/` after any changes in the codebase
+
+### Definition of Done
+
+Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
+
+### Phase 1: Architecture
+- Check code against relevant `docs/adr/` files. Align code to comply with rules.
+
+### Phase 2: Automated Verification
+- Run `npm run typecheck` (must pass 0 errors).
+- Run `npm run build` (must pass clean).
+- Run `npm run test:all` (must pass 100%).
+- *Self-correction:* On error, parse stderr, fix code, and retry until clean.
+
+### Phase 3: Anti-Ghost Test Audit
+- Inspect newly added or modified test files only.
+- Validate new tests have non-trivial assertions (no `expect(true).toBe(true)` or empty blocks).
+- Ensure unit under test is not mocked out (mock external I/O only).
+- Confirm zero skipped tests (`it.skip`/`describe.skip`).
+
+### Phase 4: Definition of Done Final Report
+Output concise status:
+- ADR: [OK / NOK]
+- Typecheck: [OK / NOK]
+- Build: [OK / NOK]
+- Tests & Anti-Ghost Audit: [OK / NOK]
 
 ## Agent skills
 

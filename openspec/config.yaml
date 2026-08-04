@@ -7,4 +7,7 @@ rules:
         - Must include an "Out of Scope" section
         - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
     spec:
-        - Must use gherkin-authoring skill        
+        - Must use gherkin-authoring skill
+    tasks:
+        - Must cover each spec scenario by an E2E test
+        - Must include the Definition of Done criteria checks specified in AGENTS.md
