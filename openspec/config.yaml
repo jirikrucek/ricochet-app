@@ -1,19 +1,17 @@
 schema: custom-workflow
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
 rules:
     proposal:
-    - Must use grill-with-docs skill
-    - Must include an "Out of Scope" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+        - Must use grill-with-docs skill
+        - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
+        - Must include an "Out of Scope" section
+        - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
+    spec:
+        - Must use gherkin-authoring skill
+    tasks:
+        - Must cover each spec scenario by an E2E test
+
+operations:
+    apply:
+        guidance:
+            - Must use tdd skill

@@ -11,14 +11,6 @@ const hu = {
   footer: {
     legal: '© {{year}} Ricochet App',
   },
-  languages: {
-    en: 'Angol',
-    cs: 'Cseh',
-    de: 'Német',
-    pl: 'Lengyel',
-    nl: 'Holland',
-    hu: 'Magyar',
-  },
   errors: {
     rootContainerNotFound: 'A gyökér konténer nem található',
   },
