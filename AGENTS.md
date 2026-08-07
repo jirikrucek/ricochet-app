@@ -59,19 +59,19 @@ Output concise status:
 - Build: [OK / NOK]
 - Tests & Anti-Ghost Audit: [OK / NOK]
 
-## Agent skills
+## Reference docs
 
 ### Issue tracker
 
-GitHub Issues are the tracking system for this repo. See `docs/agents/issue-tracker.md`.
+When creating, reading, updating, or triaging an issue or PR, use the `gh` CLI per `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-The default triage vocabulary is `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
+When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Full mapping in `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-This repo uses a single-context layout with one root CONTEXT file and ADRs under docs/adr. See `docs/agents/domain.md`.
+Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `CONTEXT.md` and `docs/adr/`.
 
 ### Design system
 
@@ -79,4 +79,4 @@ When creating or modifying ANY UI (components, pages, layouts, styles), read and
 
 ### Deployment
 
-This repository is deployed to Vercel. See `docs/agents/deployment.md`.
+When touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/agents/deployment.md`.
