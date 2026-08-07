@@ -1,17 +1,22 @@
 schema: feature-workflow
 
 rules:
-  proposal:
+  proposal: |
     - Must use grill-with-docs skill
-    - Must organize specs by feature area in accordance with the apps/web/src/features folder structure
+    - Must organize specs by feature area
     - Must include an "Out of Scope" section
     - Must include a "Traceability" section with a link to a relevant issue in the issue tracker
-  spec:
+  spec: |
     - Must use gherkin-authoring skill
-  tasks:
+  tasks: |
+    - Must break the work into tracer bullets, small pieces of functionality that get built end-to-end, following these rules:
+      - Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests) — vertical, NOT a horizontal slice of one layer
+      - A completed slice is demoable or verifiable on its own
+      - Each slice is sized to fit in a single fresh context window
+      - Any prefactoring should be done first
     - Must cover each spec scenario by an E2E test
 
 operations:
   apply:
-    guidance:
-      - Must use tdd skill
+    guidance: |
+      - Must use implement skill
