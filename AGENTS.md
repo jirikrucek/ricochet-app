@@ -33,25 +33,25 @@
 
 Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
 
-### Phase 1: Standards
+#### Phase 1: Standards
 - Check code against relevant `docs/standards/` files. Align code to comply with the standards.
 
-### Phase 2: ADRs
+#### Phase 2: ADRs
 - Check code against relevant `docs/adr/` files. Align code to comply with the architecture decision records.
 
-### Phase 3: Automated Verification
+#### Phase 3: Automated Verification
 - Run `npm run typecheck` (must pass 0 errors).
 - Run `npm run build` (must pass clean).
 - Run `npm run test:all` (must pass 100%).
 - *Self-correction:* On error, parse stderr, fix code, and retry until clean.
 
-### Phase 4: Anti-Ghost Test Audit
+#### Phase 4: Anti-Ghost Test Audit
 - Inspect newly added or modified test files only.
 - Validate new tests have non-trivial assertions (no `expect(true).toBe(true)` or empty blocks).
 - Ensure unit under test is not mocked out (mock external I/O only).
 - Confirm zero skipped tests (`it.skip`/`describe.skip`).
 
-### Phase 5: Definition of Done Final Report
+#### Phase 5: Definition of Done Final Report
 Output concise status:
 - Standards: [OK / NOK]
 - ADRs: [OK / NOK]
@@ -63,7 +63,7 @@ Output concise status:
 
 ### Design system
 
-When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. Tailwind theme tokens and typography primitives live in `apps/web/src/styles.css`. See `docs/standards/design-system.md`.
+When creating or modifying UI (components, pages, layouts, styles), read `docs/standards/design-system.md` first.
 
 ## Playbooks
 
