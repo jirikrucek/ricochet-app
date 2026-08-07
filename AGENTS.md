@@ -14,7 +14,7 @@
 - backend platform: Supabase (PostgreSQL, Auth, Realtime, RLS)
 - hosting: Vercel
 
-## Dev Tools
+## Tool Stack
 
 - package manager: npm
 - build tool: Vite
@@ -33,11 +33,11 @@
 
 Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
 
-### Phase 1: Architecture
-- Check code against relevant `docs/adr/` files. Align code to comply with rules.
+### Phase 1: Standards
+- Check code against relevant `docs/standards/` files. Align code to comply with the standards.
 
-### Phase 2: Standards
-- Check code against relevant `docs/agents/` files. Align code to comply with rules.
+### Phase 2: ADRs
+- Check code against relevant `docs/adr/` files. Align code to comply with the architecture decision records.
 
 ### Phase 3: Automated Verification
 - Run `npm run typecheck` (must pass 0 errors).
@@ -53,13 +53,19 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 ### Phase 5: Definition of Done Final Report
 Output concise status:
-- ADR: [OK / NOK]
 - Standards: [OK / NOK]
+- ADRs: [OK / NOK]
 - Typecheck: [OK / NOK]
 - Build: [OK / NOK]
 - Tests & Anti-Ghost Audit: [OK / NOK]
 
-## Reference docs
+## Standards
+
+### Design system
+
+When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. Tailwind theme tokens and typography primitives live in `apps/web/src/styles.css`. See `docs/standards/design-system.md`.
+
+## Playbooks
 
 ### Issue tracker
 
@@ -72,10 +78,6 @@ When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-f
 ### Domain docs
 
 Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `CONTEXT.md` and `docs/adr/`.
-
-### Design system
-
-When creating or modifying ANY UI (components, pages, layouts, styles), read and follow `DESIGN.md` - the design system source of truth for colors, typography, spacing, radii, elevation, and component rules. Use its semantic tokens; never hardcode hex/px values that bypass them. Tailwind theme tokens and typography primitives live in `apps/web/src/styles.css`. See `docs/agents/design-system.md`.
 
 ### Deployment
 
