@@ -10,7 +10,7 @@ rules:
     - Must use gherkin-authoring skill
   tasks:
     - Must break the work into tracer bullets, small slices of functionality that get built end-to-end - each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests), vertical NOT horizontal; each slice is demoable/verifiable on its own and sized to fit in a single fresh context window; any prefactoring should be done first
-    - Must cover each spec scenario by an E2E test
+    - Must cover each spec, its all requirement scenarios, by an E2E test
 
 operations:
   apply:
