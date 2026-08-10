@@ -8,8 +8,8 @@ This repository is configured for Vercel deployment from the repo root.
 2. Keep the project Root Directory as the repository root.
 3. Confirm the detected settings from `vercel.json`:
    - Install Command: `npm install`
-   - Build Command: `npm run build -w @ricochet/web`
-   - Output Directory: `apps/web/dist`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
 
 ## SPA routing
 

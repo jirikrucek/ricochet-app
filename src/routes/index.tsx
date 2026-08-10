@@ -2,15 +2,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import type { SupportedLanguage } from '../localization/languages';
-import { useLanguageSelection } from '../features/language-selection/useLanguageSelection';
-import { LanguageOption } from '../features/language-selection/LanguageOption';
+import { useLanguageSelection } from '../localization/useLanguageSelection';
+import { LanguageOption } from '../localization/LanguageOption';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/select';
+} from '../ui/select';
 
 function IndexPage() {
   const { t } = useTranslation();

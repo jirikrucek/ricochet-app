@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { supportedLanguages } from '../../localization/languages';
+import { supportedLanguages } from './languages';
 
 export const languageSelectionSchema = z.object({
   language: z.enum(supportedLanguages),

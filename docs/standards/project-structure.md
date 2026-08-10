@@ -119,7 +119,7 @@ Rules of thumb:
 
 ## ESLint boundaries configuration
 
-Add [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) as a dev dependency and extend `eslint.config.mjs`:
+Add [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) and [`eslint-import-resolver-typescript`](https://github.com/import-js/eslint-import-resolver-typescript) as dev dependencies and extend `eslint.config.mjs`:
 
 ```js
 import boundaries from 'eslint-plugin-boundaries';
@@ -129,20 +129,37 @@ import boundaries from 'eslint-plugin-boundaries';
   files: ['src/**/*.{ts,tsx}'],
   plugins: { boundaries },
   settings: {
+    // Without this, extensionless imports ('./languages', not './languages.ts')
+    // fail to resolve and the boundaries rules silently stop checking them —
+    // no error, no warning, just no enforcement. Confirmed by testing directly
+    // against @boundaries/elements: the default resolver only handles
+    // .mjs/.js/.json/.node, never .ts/.tsx.
+    'import/resolver': {
+      typescript: true,
+    },
     'boundaries/include': ['src/**/*'],
+    // mode: 'file' + a '**' pattern matches both flat files (src/ui/select.tsx)
+    // and nested ones (src/localization/locales/en.ts). The plugin's default
+    // ('folder' mode) only classifies files nested one level under a matched
+    // subfolder — a flat file directly inside the element's own folder comes
+    // back "of unknown type" and the element-types rule has nothing to check,
+    // so it passes with zero enforcement instead of erroring. Verified directly
+    // against @boundaries/elements before settling on this shape — don't revert
+    // to bare 'src/x/*' patterns without re-testing.
     'boundaries/elements': [
-      { type: 'app', pattern: 'src/app/*' },
-      { type: 'domain', pattern: 'src/domain/*' },
-      { type: 'client-api', pattern: 'src/client-api/*' },
+      { type: 'app', pattern: 'src/app/**', mode: 'file' },
+      { type: 'domain', pattern: 'src/domain/**', mode: 'file' },
+      { type: 'client-api', pattern: 'src/client-api/**', mode: 'file' },
       {
         type: 'features',
-        pattern: 'src/features/*',
+        pattern: 'src/features/*/**',
+        mode: 'file',
         capture: ['feature'],
       },
-      { type: 'routes', pattern: 'src/routes/*' },
-      { type: 'ui', pattern: 'src/ui/*' },
-      { type: 'localization', pattern: 'src/localization/*' },
-      { type: 'lib', pattern: 'src/lib/*' },
+      { type: 'routes', pattern: 'src/routes/**', mode: 'file' },
+      { type: 'ui', pattern: 'src/ui/**', mode: 'file' },
+      { type: 'localization', pattern: 'src/localization/**', mode: 'file' },
+      { type: 'lib', pattern: 'src/lib/**', mode: 'file' },
     ],
   },
   rules: {

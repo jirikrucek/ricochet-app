@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from '@tanstack/react-router';
 import i18n from './localization/i18n';
 import { router } from './router';
-import './styles.css';
+import './styles/globals.css';
 
 const container = document.getElementById('root');
 

@@ -8,7 +8,7 @@ import {
   resolveSupportedLanguage,
   supportedLanguages,
   type SupportedLanguage,
-} from '../../localization/languages';
+} from './languages';
 import {
   type LanguageSelectionValues,
   languageSelectionSchema,

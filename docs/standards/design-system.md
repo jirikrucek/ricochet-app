@@ -12,11 +12,11 @@ For all UI work:
 ## Setup status
 
 Tailwind CSS v4 and Shadcn UI are **installed and configured**:
-- Tailwind v4 is wired via `@tailwindcss/vite` in `apps/web/vite.config.ts`
-- DESIGN.md tokens and typography primitives live in `apps/web/src/styles.css`
-- `apps/web/src/styles.css` owns both the Tailwind theme tokens and the app-level base styles because the project only has one frontend surface
+- Tailwind v4 is wired via `@tailwindcss/vite` in `vite.config.ts`
+- DESIGN.md tokens and typography primitives live in `src/styles/globals.css`
+- `src/styles/globals.css` owns both the Tailwind theme tokens and the app-level base styles because the project only has one frontend surface
 - The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`
-- Shadcn UI components live in `src/components/ui/`; the `cn()` utility is at `src/lib/utils.ts`
+- Shadcn UI components live in `src/ui/`; the `cn()` utility is at `src/lib/utils.ts`
 
 ## Token naming convention
 
@@ -31,7 +31,7 @@ Prefer Tailwind classes backed by the theme tokens. Inline `style={{ ... }}` is 
 
 ## Typography primitives
 
-Reusable typography classes are defined in `apps/web/src/styles.css`:
+Reusable typography classes are defined in `src/styles/globals.css`:
 
 - `type-display-xl`
 - `type-display-sm`
