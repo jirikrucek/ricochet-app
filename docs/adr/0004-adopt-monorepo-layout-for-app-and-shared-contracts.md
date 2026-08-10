@@ -2,7 +2,6 @@
 
 - Status: Superseded by ADR 0007
 - Date: 2026-07-21
-- Updated: 2026-07-27
 
 ## Context
 

@@ -44,3 +44,5 @@ Adopt `i18next` with `react-i18next` and browser language detection for frontend
 ## Notes
 
 This ADR extends ADR 0002 by defining how user-facing text is managed in the frontend architecture.
+
+Paths above use the `apps/web/src/...` prefix from the monorepo layout in place at the time (ADR 0004). Since ADR 0007, the same modules live at `src/localization/...` at the repository root — see `docs/standards/project-structure.md`. The decision itself (i18next, one locale file per language, translation-key discipline) is unchanged.

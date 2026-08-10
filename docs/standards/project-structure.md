@@ -119,7 +119,7 @@ Rules of thumb:
 
 ## ESLint boundaries configuration
 
-Add [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) and [`eslint-import-resolver-typescript`](https://github.com/import-js/eslint-import-resolver-typescript) as dev dependencies and extend `eslint.config.mjs`:
+The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) and [`eslint-import-resolver-typescript`](https://github.com/import-js/eslint-import-resolver-typescript), wired into `eslint.config.mjs`:
 
 ```js
 import boundaries from 'eslint-plugin-boundaries';
@@ -205,8 +205,7 @@ import boundaries from 'eslint-plugin-boundaries';
           {
             from: ['app', 'routes', 'features', 'ui', 'domain'],
             disallow: ['@supabase/supabase-js'],
-            message:
-              'Import Supabase only inside src/client-api (ADR 0003).',
+            message: 'Import Supabase only inside src/client-api (ADR 0003).',
           },
         ],
       },
@@ -219,19 +218,3 @@ Notes on the config:
 - The `features` self-rule (`['features', { feature: '${from.feature}' }]`) allows a feature to import from its own subfolder but blocks `features/players/*` from reaching into `features/tournaments/*`.
 - `domain` has an empty `allow` list beyond itself — anything it needs (Zod, branded-type helpers) should come from `domain/shared` or an external package, never from `lib`.
 - Files that sit outside every declared element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained by `boundaries/element-types`, since nothing should ever import them — they are true composition-root leaves.
-
-## Migration notes
-
-This structure replaces the two-workspace layout from ADR 0004:
-
-| Old path | New path |
-| :--- | :--- |
-| `apps/web/src/*` | `src/*` |
-| `apps/web/src/domains/*` (empty) | `src/domain/*` |
-| `apps/web/src/components/ui/*` | `src/ui/*` |
-| `apps/web/src/components/TopNav.tsx`, `AppFooter.tsx` | `src/app/layout/*` |
-| `apps/web/src/localization/*` | `src/localization/*` |
-| `apps/web/src/lib/*` | `src/lib/*` |
-| `apps/web/src/styles.css` | `src/styles/globals.css` |
-| `apps/web/tests/e2e/*` | `tests/e2e/*` |
-| `packages/shared/src/*` | `src/domain/shared/*` (contracts move into the domain layer) |
