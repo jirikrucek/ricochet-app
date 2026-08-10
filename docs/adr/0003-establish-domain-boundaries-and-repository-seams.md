@@ -33,3 +33,7 @@ Adopt explicit domain boundaries and repository seams:
 
 - Direct SDK access from components/hooks: faster to start, but weaker boundaries and more coupling.
 - Centralized repository/service interfaces per domain: chosen for long-term maintainability and replaceable infrastructure.
+
+## Notes
+
+The concrete folder mapping for these domain modules (`src/domain/*`, `src/client-api/*`) and how the boundary is enforced by lint rules are defined in ADR 0007 and `docs/standards/project-structure.md`, superseding the mapping originally in ADR 0004.

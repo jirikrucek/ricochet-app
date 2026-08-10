@@ -1,6 +1,6 @@
 # ADR 0004: Adopt Monorepo Layout for App and Shared Contracts
 
-- Status: Accepted
+- Status: Superseded by ADR 0007
 - Date: 2026-07-21
 - Updated: 2026-07-27
 

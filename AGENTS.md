@@ -65,6 +65,10 @@ Output concise status:
 
 When creating or modifying UI (components, pages, layouts, styles), read `docs/standards/design-system.md` first.
 
+### Project structure
+
+When adding, moving, or renaming files, read `docs/standards/project-structure.md` first.
+
 ## Playbooks
 
 ### Issue tracker
