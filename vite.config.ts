@@ -13,4 +13,31 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return;
+          }
+          if (id.includes('@sentry')) {
+            return 'sentry';
+          }
+          if (id.includes('@supabase')) {
+            return 'supabase';
+          }
+          if (id.includes('@tanstack')) {
+            return 'tanstack';
+          }
+          if (id.includes('i18next')) {
+            return 'i18n';
+          }
+          if (id.includes('@base-ui') || id.includes('lucide-react')) {
+            return 'ui';
+          }
+          return 'vendor';
+        },
+      },
+    },
+  },
 });
