@@ -13,6 +13,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/node_modules/**',
       '**/.playwright-browsers/**',
+      'supabase/.temp/**',
+      'supabase/.branches/**',
     ],
   },
   js.configs.recommended,
