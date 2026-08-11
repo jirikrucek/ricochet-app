@@ -8,7 +8,7 @@ import {
   resolveSupportedLanguage,
   supportedLanguages,
   type SupportedLanguage,
-} from './languages';
+} from '../languages';
 import {
   type LanguageSelectionValues,
   languageSelectionSchema,

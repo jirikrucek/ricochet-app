@@ -52,11 +52,12 @@ ricochet-app/
 │   ├── ui/                        # Shadcn UI primitives — domain-agnostic (button, dialog, table, select)
 │   ├── localization/               # i18next setup + language-selection UI (hook, schema, component)
 │   │   ├── i18n.ts
-│   │   ├── languages.ts
-│   │   ├── locales/
-│   │   ├── useLanguageSelection.ts       # used by routes/index.tsx today, app/layout/TopNav later
-│   │   ├── languageSelectionSchema.ts
-│   │   └── LanguageOption.tsx
+│   │   ├── languages.ts                  # shared by i18n.ts and language-selection/
+│   │   ├── locales/                       # per-language dictionaries + the resources.ts aggregator
+│   │   └── language-selection/            # used by routes/index.tsx today, app/layout/TopNav later
+│   │       ├── useLanguageSelection.ts
+│   │       ├── languageSelectionSchema.ts
+│   │       └── LanguageOption.tsx
 │   ├── lib/                        # Generic framework utilities (cn(), formatters) — no business rules
 │   ├── styles/                     # Tailwind directives + CSS design tokens (globals.css)
 │   └── assets/                     # Bundler-processed static assets imported by components (flags, icons)

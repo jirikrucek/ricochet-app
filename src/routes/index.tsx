@@ -2,8 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import type { SupportedLanguage } from '../localization/languages';
-import { useLanguageSelection } from '../localization/useLanguageSelection';
-import { LanguageOption } from '../localization/LanguageOption';
+import { useLanguageSelection } from '../localization/language-selection/useLanguageSelection';
+import { LanguageOption } from '../localization/language-selection/LanguageOption';
 import {
   Select,
   SelectContent,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { defaultLanguage, supportedLanguages } from './languages';
+import { defaultLanguage, supportedLanguages } from '../languages';
 import { resources } from './resources';
 
 type TranslationNode = Record<string, unknown>;
