@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelect } from './LanguageSelect';
 
 export function TopNav() {
   const { t } = useTranslation();
@@ -29,7 +30,9 @@ export function TopNav() {
           <NavLink to="/tournaments">{t('nav.tournaments')}</NavLink>
         </nav>
 
-        <div aria-hidden="true" />
+        <div className="w-40 justify-self-end">
+          <LanguageSelect className="w-full" size="sm" />
+        </div>
       </div>
     </header>
   );
