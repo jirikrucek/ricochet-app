@@ -41,6 +41,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 #### Phase 3: Automated Verification
 - Run `npm run typecheck` (must pass 0 errors).
+- Run `npm run lint` (must pass 0 errors).
 - Run `npm run build` (must pass clean).
 - Run `npm run test:all` (must pass 100%).
 - *Self-correction:* On error, parse stderr, fix code, and retry until clean.
@@ -56,6 +57,7 @@ Output concise status:
 - Standards: [OK / NOK]
 - ADRs: [OK / NOK]
 - Typecheck: [OK / NOK]
+- Lint: [OK / NOK]
 - Build: [OK / NOK]
 - Tests & Anti-Ghost Audit: [OK / NOK]
 
