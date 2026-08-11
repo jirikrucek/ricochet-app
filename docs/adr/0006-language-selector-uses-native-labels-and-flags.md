@@ -1,7 +1,7 @@
 # ADR 0006: Language Selector Uses Native-Language Labels and Country Flags
 
 - Status: Accepted
-- Date: 2026-08-03
+- Created: 2026-08-03
 
 ## Context
 

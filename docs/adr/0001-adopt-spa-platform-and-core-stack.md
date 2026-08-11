@@ -1,7 +1,7 @@
 # ADR 0001: Adopt SPA Platform and Core Stack
 
 - Status: Accepted
-- Date: 2026-07-21
+- Created: 2026-07-21
 
 ## Context
 

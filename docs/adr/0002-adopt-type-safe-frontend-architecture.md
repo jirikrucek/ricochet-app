@@ -1,7 +1,7 @@
 # ADR 0002: Adopt Type-Safe Frontend Architecture
 
 - Status: Accepted
-- Date: 2026-07-21
+- Created: 2026-07-21
 
 ## Context
 

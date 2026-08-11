@@ -1,7 +1,7 @@
 # ADR 0007: Adopt Single-Package Layout
 
 - Status: Accepted
-- Date: 2026-08-10
+- Created: 2026-08-10
 - Supersedes: ADR 0004
 
 ## Context

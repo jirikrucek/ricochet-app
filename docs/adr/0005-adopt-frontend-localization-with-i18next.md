@@ -1,7 +1,7 @@
 # ADR 0005: Adopt Frontend Localization with i18next
 
 - Status: Accepted
-- Date: 2026-07-22
+- Created: 2026-07-22
 
 ## Context
 
