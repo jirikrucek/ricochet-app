@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { LanguageSelect } from './LanguageSelect';
+import { LanguageSelect } from '../../localization/language-selection/LanguageSelect';
 
 export function TopNav() {
   const { t } = useTranslation();

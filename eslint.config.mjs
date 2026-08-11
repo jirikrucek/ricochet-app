@@ -135,7 +135,7 @@ export default tseslint.config(
             },
             { from: 'client-api', allow: ['lib'] },
             { from: 'ui', allow: ['lib'] },
-            { from: 'localization', allow: ['lib'] },
+            { from: 'localization', allow: ['ui', 'lib'] },
             { from: 'domain', allow: ['domain'] },
             { from: 'lib', allow: [] },
           ],
