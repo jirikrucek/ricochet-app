@@ -71,6 +71,10 @@ When creating or modifying UI (components, pages, layouts, styles), read `docs/s
 
 When adding, moving, or renaming files, read `docs/standards/project-structure.md` first.
 
+### Security
+
+When adding or editing a Supabase migration (tables, RLS policies), read `docs/standards/security.md` first.
+
 ## Playbooks
 
 ### Issue tracker
