@@ -19,7 +19,7 @@ ricochet-app/
 │   │
 │   ├── app/                     # Composition root: wires the app shell, owns nothing domain-specific
 │   │   ├── providers/              # AppProviders.tsx — QueryClientProvider, RouterProvider, I18next, Theme
-│   │   ├── layout/                  # Global chrome rendered by routes/__root.tsx: TopNav, AppFooter
+│   │   ├── layout/                  # Global chrome: TopNav (renders LanguageSelect), AppFooter — rendered by routes/__root.tsx
 │   │   └── store/                   # App-shell Zustand store (theme today; session store lands with auth)
 │   │
 │   ├── domain/                   # Pure business logic. No React. No Supabase. (ADR 0003)
@@ -28,23 +28,25 @@ ricochet-app/
 │   │   ├── auth/                      # Role/permission rules, session shape
 │   │   └── shared/                    # Cross-domain primitives (branded IDs, Result type, base Zod schemas)
 │   │
-│   ├── client-api/               # Supabase adapters implementing domain repository interfaces (ADR 0003)
+│   ├── client-api/               # Dumb Supabase client + raw queries. No domain knowledge. (ADR 0003)
 │   │   ├── supabaseClient.ts
 │   │   ├── database.types.ts          # Generated via `supabase gen types`
-│   │   ├── players/
+│   │   ├── players/                    # returns raw/generated row shapes, not domain types
 │   │   ├── tournaments/
 │   │   └── auth/
 │   │
 │   ├── features/                 # Feature UI slices, one subfolder per domain module
 │   │   ├── players/
-│   │   │   ├── api/                     # TanStack Query hooks wrapping client-api + domain
+│   │   │   ├── api/                     # TanStack Query hooks — the only part of a feature
+│   │   │   │                            # allowed to import client-api; maps rows to domain
+│   │   │   │                            # types via a domain mapper before returning
 │   │   │   ├── components/
 │   │   │   └── store/                    # Feature-local Zustand UI state
 │   │   ├── tournaments/
 │   │   └── auth/
 │   │
 │   ├── routes/                    # TanStack Router file-based routes + loaders
-│   │   ├── __root.tsx
+│   │   ├── __root.tsx                    # renders app/layout/{TopNav,AppFooter}
 │   │   ├── index.tsx
 │   │   ├── players/
 │   │   └── tournaments/
@@ -54,7 +56,7 @@ ricochet-app/
 │   │   ├── i18n.ts
 │   │   ├── languages.ts                  # shared by i18n.ts and language-selection/
 │   │   ├── locales/                       # per-language dictionaries + the resources.ts aggregator
-│   │   └── language-selection/            # used by routes/index.tsx today, app/layout/TopNav later
+│   │   └── language-selection/            # composed by app/layout/LanguageSelect.tsx (rendered in TopNav)
 │   │       ├── useLanguageSelection.ts
 │   │       ├── languageSelectionSchema.ts
 │   │       └── LanguageOption.tsx
@@ -85,12 +87,12 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 | Folder | Scope & allowed artifacts |
 | :--- | :--- |
 | `src/app/` | Composition root: provider wiring, global layout chrome, app-shell store. No domain logic, no feature components. |
-| `src/domain/` | Pure business logic: Zod schemas, TypeScript types, scoring/bracket/permission rules. No React, no Supabase, no `fetch`. |
-| `src/client-api/` | Supabase client setup and repository implementations satisfying `domain` interfaces. The only folder allowed to import `@supabase/supabase-js`. |
-| `src/features/` | Feature UI: components, TanStack Query hooks (`api/`), feature-local Zustand stores (`store/`). One subfolder per domain module. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
+| `src/domain/` | Pure business logic: Zod schemas, TypeScript types, scoring/bracket/permission rules, and mapper functions translating infrastructure row shapes into domain types (e.g. `toPlayer(row): Player`). No React, no Supabase, no `fetch`. |
+| `src/client-api/` | Dumb Supabase client setup and raw query/RPC wrappers. Returns raw or generated (`database.types.ts`) shapes — no domain knowledge, no mapping. The only folder allowed to import `@supabase/supabase-js`. |
+| `src/features/` | Feature UI: components, feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `client-api` — it calls the repository, runs the result through a `domain` mapper, and returns a domain type; `components/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
 | `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. |
 | `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
-| `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI itself (hook, schema, presentational component). Owning this here — rather than in `features/` — is what lets both `routes/index.tsx` (today) and `app/layout/TopNav` (once the switcher moves into the nav bar) depend on it without needing an `app → features` boundary. |
+| `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, schema, presentational component). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it (via `app/layout/LanguageSelect.tsx`) without needing an `app → features` boundary. |
 | `src/lib/` | Small generic helpers (e.g. `cn()`) with no business meaning. If a helper encodes a business rule, it belongs in `domain/` instead. |
 | `src/styles/` | Tailwind theme tokens and global CSS. No JS/TS. |
 | `src/assets/` | Static files imported by components and processed by the bundler (as opposed to `public/`, which is copied verbatim). |
@@ -100,20 +102,23 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 Layers are ordered leaf-to-root. An arrow means "is allowed to import from":
 
 ```text
-app ──────► ui, localization, lib
-routes ───► app, features, ui, localization, lib
-features ─► domain, client-api, ui, localization, lib   (never another feature)
-client-api ► domain, lib
-ui ───────► lib
-localization ► lib
-domain ───► domain (its own `shared/` submodule only)
-lib ──────► (nothing)
+app ────────────► ui, localization, lib
+routes ─────────► app, features, ui, localization, lib
+features ───────► domain, ui, localization, lib, features/*/api (own feature only)
+features/*/api ─► client-api, domain, lib                       (own feature only)
+client-api ─────► lib
+ui ─────────────► lib
+localization ───► lib
+domain ─────────► domain (its own `shared/` submodule only)
+lib ────────────► (nothing)
 ```
 
+`features/*/api` is a distinct boundary from the rest of `features` — see [ESLint boundaries](#eslint-boundaries-configuration) (`features-api` vs `features`). It is the one seam allowed to import `client-api`; everything else in a feature (`components/`, `store/`) cannot, even though both live under `src/features/`.
+
 Rules of thumb:
-- **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client.
-- **`client-api` is the only place `@supabase/supabase-js` may be imported.** UI code depends on repository interfaces from `domain`, never on the Supabase client directly (ADR 0003).
-- **`features` cannot import from other `features`.** Share code by lifting it into `domain`, `client-api`, or `ui`, not by reaching across feature folders.
+- **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client. Its mapper functions take a structurally-typed input they declare themselves, rather than importing `client-api`'s generated types — that's what lets `client-api` return raw rows without `domain` ever depending on `client-api`.
+- **`client-api` has no domain knowledge and is the only place `@supabase/supabase-js` may be imported.** It returns raw or generated shapes; translating those into domain types is `domain`'s job (via a mapper), invoked from `features/*/api` (ADR 0003).
+- **`features` cannot import from other `features`, and only `features/*/api` may import `client-api`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
 - **`ui` never imports `domain`, `client-api`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
 - **`app` does not depend on `domain` or `client-api` yet.** There's no auth implementation today, so there's nothing for an app-shell session store to bootstrap. When auth work starts, extend the `app` rule in `boundaries/element-types` (below) to allow `domain` and `client-api` — a two-item addition to one array, not a restructure.
@@ -130,27 +135,28 @@ import boundaries from 'eslint-plugin-boundaries';
   files: ['src/**/*.{ts,tsx}'],
   plugins: { boundaries },
   settings: {
-    // Without this, extensionless imports ('./languages', not './languages.ts')
-    // fail to resolve and the boundaries rules silently stop checking them —
-    // no error, no warning, just no enforcement. Confirmed by testing directly
-    // against @boundaries/elements: the default resolver only handles
-    // .mjs/.js/.json/.node, never .ts/.tsx.
     'import/resolver': {
       typescript: true,
     },
     'boundaries/include': ['src/**/*'],
-    // mode: 'file' + a '**' pattern matches both flat files (src/ui/select.tsx)
-    // and nested ones (src/localization/locales/en.ts). The plugin's default
-    // ('folder' mode) only classifies files nested one level under a matched
-    // subfolder — a flat file directly inside the element's own folder comes
-    // back "of unknown type" and the element-types rule has nothing to check,
-    // so it passes with zero enforcement instead of erroring. Verified directly
-    // against @boundaries/elements before settling on this shape — don't revert
-    // to bare 'src/x/*' patterns without re-testing.
+    // 'file' mode + '**' matches both flat files (src/ui/select.tsx) and
+    // nested ones (src/localization/locales/en.ts) — 'folder' mode (the
+    // plugin default) only matches files nested one level under a matched
+    // subfolder, so it silently fails to classify flat top-level files.
     'boundaries/elements': [
       { type: 'app', pattern: 'src/app/**', mode: 'file' },
       { type: 'domain', pattern: 'src/domain/**', mode: 'file' },
       { type: 'client-api', pattern: 'src/client-api/**', mode: 'file' },
+      // More specific than 'features' below — must be declared first,
+      // since the matcher takes the first element pattern that matches
+      // a file. This is the only part of a feature allowed to import
+      // client-api.
+      {
+        type: 'features-api',
+        pattern: 'src/features/*/api/**',
+        mode: 'file',
+        capture: ['feature'],
+      },
       {
         type: 'features',
         pattern: 'src/features/*/**',
@@ -183,14 +189,26 @@ import boundaries from 'eslint-plugin-boundaries';
             from: 'features',
             allow: [
               'domain',
-              'client-api',
               'ui',
               'localization',
               'lib',
               ['features', { feature: '${from.feature}' }],
+              ['features-api', { feature: '${from.feature}' }],
             ],
           },
-          { from: 'client-api', allow: ['domain', 'lib'] },
+          {
+            from: 'features-api',
+            // the seam: calls client-api, maps the result through a
+            // domain mapper, and returns a domain type to the rest of
+            // the feature (ADR 0003)
+            allow: [
+              'client-api',
+              'domain',
+              'lib',
+              ['features-api', { feature: '${from.feature}' }],
+            ],
+          },
+          { from: 'client-api', allow: ['lib'] },
           { from: 'ui', allow: ['lib'] },
           { from: 'localization', allow: ['lib'] },
           { from: 'domain', allow: ['domain'] },
@@ -204,9 +222,13 @@ import boundaries from 'eslint-plugin-boundaries';
         default: 'allow',
         rules: [
           {
-            from: ['app', 'routes', 'features', 'ui', 'domain'],
+            from: '*',
             disallow: ['@supabase/supabase-js'],
             message: 'Import Supabase only inside src/client-api (ADR 0003).',
+          },
+          {
+            from: 'client-api',
+            allow: ['@supabase/supabase-js'],
           },
         ],
       },
@@ -216,6 +238,10 @@ import boundaries from 'eslint-plugin-boundaries';
 ```
 
 Notes on the config:
-- The `features` self-rule (`['features', { feature: '${from.feature}' }]`) allows a feature to import from its own subfolder but blocks `features/players/*` from reaching into `features/tournaments/*`.
+- `'import/resolver': { typescript: true }` is required, not optional: without it, extensionless imports (`'./languages'`, not `'./languages.ts'`) fail to resolve and every `boundaries` rule silently stops checking them — no error, no warning, just no enforcement. The default resolver only understands `.mjs`/`.js`/`.json`/`.node`, never `.ts`/`.tsx`. Confirmed by testing directly against `@boundaries/elements`.
+- `mode: 'file'` on every element (instead of the plugin's default `'folder'` mode) is also required: `'folder'` mode only classifies files nested one level under a matched subfolder, so a flat file directly inside an element's own folder (e.g. `src/ui/select.tsx`) comes back "of unknown type" and has nothing enforced on it — it passes with zero enforcement instead of erroring. Verified directly against `@boundaries/elements` before settling on this shape; don't revert to bare `'src/x/*'` patterns without re-testing.
+- `features-api` (`src/features/*/api/**`) must be declared *before* `features` (`src/features/*/**`) in `boundaries/elements` — the matcher takes the first pattern that matches a file, and `features/*/api/**` is a strict subset of `features/*/**`. Declared in the other order, everything under `api/` would match the broader `features` pattern first and the split would silently stop working.
+- The same-feature captures (`['features', { feature: '${from.feature}' }]` and `['features-api', { feature: '${from.feature}' }]`) let `features/players/components/*` import `features/players/api/*`, but block it from reaching `features/tournaments/api/*` or `features/tournaments/components/*`.
 - `domain` has an empty `allow` list beyond itself — anything it needs (Zod, branded-type helpers) should come from `domain/shared` or an external package, never from `lib`.
+- `boundaries/external`'s `@supabase/supabase-js` rule uses `from: '*'` (disallow everywhere) plus a `client-api`-only `allow` override, rather than an explicit list of every type that should be blocked — that list would need a new entry (e.g. `features-api`) every time an element type is added. Verified directly: `from: '*'` matches every declared element type, not just untyped files.
 - Files that sit outside every declared element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained by `boundaries/element-types`, since nothing should ever import them — they are true composition-root leaves.

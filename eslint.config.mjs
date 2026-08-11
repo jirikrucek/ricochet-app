@@ -72,6 +72,16 @@ export default tseslint.config(
         { type: 'app', pattern: 'src/app/**', mode: 'file' },
         { type: 'domain', pattern: 'src/domain/**', mode: 'file' },
         { type: 'client-api', pattern: 'src/client-api/**', mode: 'file' },
+        // More specific than 'features' below — must be declared first,
+        // since the matcher takes the first element pattern that matches
+        // a file. This is the only part of a feature allowed to import
+        // client-api.
+        {
+          type: 'features-api',
+          pattern: 'src/features/*/api/**',
+          mode: 'file',
+          capture: ['feature'],
+        },
         {
           type: 'features',
           pattern: 'src/features/*/**',
@@ -104,14 +114,26 @@ export default tseslint.config(
               from: 'features',
               allow: [
                 'domain',
-                'client-api',
                 'ui',
                 'localization',
                 'lib',
                 ['features', { feature: '${from.feature}' }],
+                ['features-api', { feature: '${from.feature}' }],
               ],
             },
-            { from: 'client-api', allow: ['domain', 'lib'] },
+            {
+              from: 'features-api',
+              // the seam: calls client-api, maps the result through a
+              // domain mapper, and returns a domain type to the rest of
+              // the feature (ADR 0003)
+              allow: [
+                'client-api',
+                'domain',
+                'lib',
+                ['features-api', { feature: '${from.feature}' }],
+              ],
+            },
+            { from: 'client-api', allow: ['lib'] },
             { from: 'ui', allow: ['lib'] },
             { from: 'localization', allow: ['lib'] },
             { from: 'domain', allow: ['domain'] },
@@ -125,9 +147,13 @@ export default tseslint.config(
           default: 'allow',
           rules: [
             {
-              from: ['app', 'routes', 'features', 'ui', 'domain'],
+              from: '*',
               disallow: ['@supabase/supabase-js'],
               message: 'Import Supabase only inside src/client-api (ADR 0003).',
+            },
+            {
+              from: 'client-api',
+              allow: ['@supabase/supabase-js'],
             },
           ],
         },
