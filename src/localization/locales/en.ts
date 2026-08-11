@@ -13,6 +13,10 @@ const en = {
   },
   errors: {
     rootContainerNotFound: 'Root container not found',
+    unexpectedTitle: 'Something went wrong',
+    unexpectedDescription:
+      'An unexpected error occurred. Reloading the page usually fixes this.',
+    reload: 'Reload page',
   },
 } as const;
 

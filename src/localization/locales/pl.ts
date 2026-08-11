@@ -13,6 +13,10 @@ const pl = {
   },
   errors: {
     rootContainerNotFound: 'Nie znaleziono kontenera root',
+    unexpectedTitle: 'Coś poszło nie tak',
+    unexpectedDescription:
+      'Wystąpił nieoczekiwany błąd. Odświeżenie strony zwykle to naprawia.',
+    reload: 'Odśwież stronę',
   },
 } as const;
 

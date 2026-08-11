@@ -13,6 +13,10 @@ const hu = {
   },
   errors: {
     rootContainerNotFound: 'A gyökér konténer nem található',
+    unexpectedTitle: 'Hiba történt',
+    unexpectedDescription:
+      'Váratlan hiba történt. Az oldal újratöltése általában megoldja a problémát.',
+    reload: 'Oldal újratöltése',
   },
 } as const;
 

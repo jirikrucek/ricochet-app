@@ -13,6 +13,10 @@ const cs = {
   },
   errors: {
     rootContainerNotFound: 'Kořenový kontejner nebyl nalezen',
+    unexpectedTitle: 'Něco se pokazilo',
+    unexpectedDescription:
+      'Došlo k neočekávané chybě. Obnovení stránky obvykle problém vyřeší.',
+    reload: 'Obnovit stránku',
   },
 } as const;
 

@@ -13,6 +13,10 @@ const de = {
   },
   errors: {
     rootContainerNotFound: 'Root-Container wurde nicht gefunden',
+    unexpectedTitle: 'Etwas ist schiefgelaufen',
+    unexpectedDescription:
+      'Ein unerwarteter Fehler ist aufgetreten. Ein Neuladen der Seite behebt das meistens.',
+    reload: 'Seite neu laden',
   },
 } as const;
 

@@ -75,6 +75,10 @@ When adding, moving, or renaming files, read `docs/standards/project-structure.m
 
 When adding or editing a Supabase migration (tables, RLS policies), read `docs/standards/security.md` first.
 
+### Observability
+
+When adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability.md` first.
+
 ## Playbooks
 
 ### Issue tracker
