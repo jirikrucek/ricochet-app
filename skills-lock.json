@@ -121,6 +121,12 @@
       "skillPath": "skills/openspec-verify-change/SKILL.md",
       "computedHash": "b96855ebd586d5be033ed68d17e79863207b912268cffed6fd10cbe09454935b"
     },
+    "performance-optimization": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/performance-optimization/SKILL.md",
+      "computedHash": "cd729dc7d35b5c2d17fd574dd08f765f0a2775117f01da2f65a6b25c21e879bb"
+    },
     "prototype": {
       "source": "mattpocock/skills",
       "sourceType": "github",
