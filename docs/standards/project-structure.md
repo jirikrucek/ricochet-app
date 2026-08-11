@@ -52,13 +52,12 @@ ricochet-app/
 │   │   └── tournaments/
 │   │
 │   ├── ui/                        # Shadcn UI primitives — domain-agnostic (button, dialog, table, select)
-│   ├── localization/               # i18next setup + language-selection UI (hook, schema, component)
+│   ├── localization/               # i18next setup + language-selection UI (hook, component)
 │   │   ├── i18n.ts
 │   │   ├── languages.ts                  # shared by i18n.ts and language-selection/
 │   │   ├── locales/                       # per-language dictionaries + the resources.ts aggregator
 │   │   └── language-selection/            # composed widget rendered by app/layout/TopNav.tsx
 │   │       ├── useLanguageSelection.ts
-│   │       ├── languageSelectionSchema.ts
 │   │       ├── LanguageOption.tsx
 │   │       └── LanguageSelect.tsx          # imports ui/select — the composed public widget
 │   ├── lib/                        # Generic framework utilities (cn(), formatters) — no business rules
