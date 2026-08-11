@@ -16,7 +16,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "*.config.ts"],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
