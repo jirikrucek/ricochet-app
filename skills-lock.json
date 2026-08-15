@@ -5,7 +5,7 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/api-and-interface-design/SKILL.md",
-      "computedHash": "3cf54553433e55875c664baf78f9c769820bdfac155f09bf2989d70e20e6e147"
+      "computedHash": "26f5a9e7abfd332d7a2e5887cf19bddd3393f47514c379b36bf227c1f15cdec4"
     },
     "ask-matt": {
       "source": "mattpocock/skills",
@@ -41,7 +41,7 @@
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
-      "computedHash": "363cb0f53b0b431e7c00086ad1f823500b7e1b70b5616ee969c979f0934e9e6e"
+      "computedHash": "683744795bdc9fbfb6c0c2122c4b8119c950e2fe5bcbbf44237dd28aaea34b67"
     },
     "frontend-ui-engineering": {
       "source": "addyosmani/agent-skills",
@@ -101,49 +101,49 @@
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-apply-change/SKILL.md",
-      "computedHash": "7debf93d76b0f1651eb0a35fff5ecbbd4fae16b987916bd0fda7280b59475628"
+      "computedHash": "657951ff2bf91de7eea99a8300ad046906745e571c00b842c78a5097311ca56a"
     },
     "openspec-archive-change": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-archive-change/SKILL.md",
-      "computedHash": "7539dd3f32f53dcc2f3a13f1e76aee18d77429db7e8acfd16c54a647106afe98"
+      "computedHash": "ae48ad632d04d0880a0ec699559f89f2daae4d717ac2dda3d42ffdeef1203795"
     },
     "openspec-continue-change": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-continue-change/SKILL.md",
-      "computedHash": "476d1ef99391662dc0b6f8d00334003122e4062bc0870e2eb0465267e6ae2262"
+      "computedHash": "756b1204fe592aec5aceab1667b1e93fb6e07ca6df9ccd4bb7815de9e5c9b579"
     },
     "openspec-explore": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-explore/SKILL.md",
-      "computedHash": "0f013981894a7271f94ddfb0e8b10bdfc9503859ec1f04155efc9f52a2c5cbbe"
+      "computedHash": "52cb631a39b20ad4fe718d39508f2f8f1dc58b05dc0d274f5d0670fb18cfe672"
     },
     "openspec-new-change": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-new-change/SKILL.md",
-      "computedHash": "97be4d80ddfe17310482cd592c5033f2110c9a3f172fd7af2beede779d07d6c0"
+      "computedHash": "c2c2e14c8ea57ee6e8c18aeaec0929656602f9da985c973d251c7b7657a0c353"
     },
     "openspec-sync-specs": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-sync-specs/SKILL.md",
-      "computedHash": "deca0e79c7005f205730515eba6d8fed8d05cc068eb8e5cdcb446b68250742ca"
+      "computedHash": "b9404fe7d77772336d764340185c0205bc5217373ff90a3c9cd137070f1c4673"
     },
     "openspec-update-change": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-update-change/SKILL.md",
-      "computedHash": "bf718c43a53131ecb34fd9928a9144c062a73e602e4122bcbfc0360774e343f2"
+      "computedHash": "7cbc00de95a2960198d2b583337c2d3fc239b8ae76c08b649a6c4ddb3b5e51cc"
     },
     "openspec-verify-change": {
       "source": "fission-ai/openspec",
       "sourceType": "github",
       "skillPath": "skills/openspec-verify-change/SKILL.md",
-      "computedHash": "b96855ebd586d5be033ed68d17e79863207b912268cffed6fd10cbe09454935b"
+      "computedHash": "e5932ec33354350fc885dc3b8f3aa13e7586488b0f76a2fbe52f5604d2ab5607"
     },
     "performance-optimization": {
       "source": "addyosmani/agent-skills",
@@ -167,7 +167,7 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/security-and-hardening/SKILL.md",
-      "computedHash": "93c5cdb9dc08fd595ff3bc7221ba81b767b2ad92487cf3a1c8eaa6fc105c2810"
+      "computedHash": "47d027526d7e0be784a19a034f18cba328009b3c8fe483f16e4b12530cf82183"
     },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",
@@ -191,7 +191,7 @@
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
-      "computedHash": "886743d08edece523e48b5c6c737afa29029503bdd3b28a722795712cedfcd91"
+      "computedHash": "583344c20e90f3654dbb0632f088d89fd9f1dde8ac85e8a644dd12eee59b1380"
     },
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
