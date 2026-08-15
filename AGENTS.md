@@ -9,7 +9,6 @@
 - server state: TanStack Query
 - client ui state: Zustand
 - form state management and validation: React Hook Form + Zod
-- table and virtualization: TanStack Table (+ TanStack Virtual when needed)
 - design system and styling: Shadcn UI + Tailwind CSS + CSS design tokens
 - backend platform: Supabase (PostgreSQL, Auth, Realtime, RLS)
 - hosting: Vercel
