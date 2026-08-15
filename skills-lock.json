@@ -169,12 +169,6 @@
       "skillPath": "skills/security-and-hardening/SKILL.md",
       "computedHash": "47d027526d7e0be784a19a034f18cba328009b3c8fe483f16e4b12530cf82183"
     },
-    "setup-matt-pocock-skills": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
-      "computedHash": "f9c2b933dda18eea572e96f6ebbcd5b30e0d1bfdc074af53cc99728dc5f0bdac"
-    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
