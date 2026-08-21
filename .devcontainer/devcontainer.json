@@ -19,10 +19,15 @@
 	"forwardPorts": [5173, 54321, 54323],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// Installs Playwright's browser binaries for this container's platform and the
-	// OS-level libraries Chromium needs to launch (apt packages aren't in the base image).
+	// Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
+	// the base image) before downloading Playwright's browser binaries, so Playwright's
+	// post-download host-requirements check doesn't fail with a "missing dependencies"
+	// warning on every fresh build.
+	// Also preserves HOME (in addition to PATH) when sudo'ing: node-asdf's `npx` shim
+	// resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
+	// to /root by default, which breaks shim resolution ("unknown command: npx").
 	"postCreateCommand": {
-		"installPlaywright": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium"
+		"installPlaywright": "sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:install"
 	},
 
 	// Configure tool-specific properties.

@@ -10,11 +10,6 @@
       "resolved": "ghcr.io/devcontainers-extra/features/node-asdf@sha256:413daa93c0bb7ae76a924f51283a65eca3af3a141984f42fe798b3fe445ece71",
       "integrity": "sha256:413daa93c0bb7ae76a924f51283a65eca3af3a141984f42fe798b3fe445ece71"
     },
-    "ghcr.io/devcontainers-extra/features/supabase-cli:1": {
-      "version": "1.0.7",
-      "resolved": "ghcr.io/devcontainers-extra/features/supabase-cli@sha256:53c2def442886b29bb7719ffbe2e67bdbdeb8651b38d0bbfbd8dd6ffc3645cd9",
-      "integrity": "sha256:53c2def442886b29bb7719ffbe2e67bdbdeb8651b38d0bbfbd8dd6ffc3645cd9"
-    },
     "ghcr.io/devcontainers/features/copilot-cli:1": {
       "version": "1.1.3",
       "resolved": "ghcr.io/devcontainers/features/copilot-cli@sha256:e10d091ae7ef9b8d2ed5f601d75f5a090bc04acbac1a26d4cd3c0d5edde4ea10",
