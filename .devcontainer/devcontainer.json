@@ -1,0 +1,52 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+  "name": "Ubuntu",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/base:noble",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/copilot-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/claude-code:2": {},
+    "ghcr.io/devcontainers-extra/features/node-asdf:0": {}
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // 5173 is the default port for Vite
+  "forwardPorts": [5173],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
+  // the base image) before downloading Playwright's browser binaries, so Playwright's
+  // post-download host-requirements check doesn't fail with a "missing dependencies"
+  // warning on every fresh build.
+  // Also preserves HOME (in addition to PATH) when sudo'ing: node-asdf's `npx` shim
+  // resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
+  // to /root by default, which breaks shim resolution ("unknown command: npx").
+  "postCreateCommand": {
+    "installPlaywright": "sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:install"
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vitest.explorer",
+        "RobBos.ai-engineering-fluency",
+        "streetsidesoftware.code-spell-checker",
+        "ms-azuretools.vscode-containers",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.live-server",
+        "ms-playwright.playwright",
+        "esbenp.prettier-vscode",
+        "Supabase.vscode-supabase-extension",
+        "redhat.vscode-yaml"
+      ]
+    }
+  }
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}

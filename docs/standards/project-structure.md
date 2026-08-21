@@ -103,7 +103,7 @@ Layers are ordered leaf-to-root. An arrow means "is allowed to import from":
 
 ```text
 app ────────────► ui, localization, lib
-routes ─────────► app, features, ui, localization, lib
+routes ─────────► app, features, lib
 features ───────► domain, ui, localization, lib, features/*/api (own feature only)
 features/*/api ─► client-api, domain, lib                       (own feature only)
 client-api ─────► lib
@@ -119,19 +119,17 @@ Rules of thumb:
 - **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client. Its mapper functions take a structurally-typed input they declare themselves, rather than importing `client-api`'s generated types — that's what lets `client-api` return raw rows without `domain` ever depending on `client-api`.
 - **`client-api` has no domain knowledge and is the only place `@supabase/supabase-js` may be imported.** It returns raw or generated shapes; translating those into domain types is `domain`'s job (via a mapper), invoked from `features/*/api` (ADR 0003).
 - **`features` cannot import from other `features`, and only `features/*/api` may import `client-api`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
+- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
 - **`ui` never imports `domain`, `client-api`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
 - **`localization → ui` is one-directional.** `localization` composes `ui` primitives (e.g. `language-selection/LanguageSelect.tsx` uses `ui/select`) to build its own reusable widgets; `ui` still never imports back from `localization` — no cycle.
-- **`app` does not depend on `domain` or `client-api` yet.** There's no auth implementation today, so there's nothing for an app-shell session store to bootstrap. When auth work starts, extend the `app` rule in `boundaries/element-types` (below) to allow `domain` and `client-api` — a two-item addition to one array, not a restructure.
+- **`app` does not depend on `domain` or `client-api` yet.** There's no auth implementation today, so there's nothing for an app-shell session store to bootstrap. When auth work starts, extend the `app` rule in the project boundary policy to allow `domain` and `client-api` — a small, intentional change to the policy, not a restructure.
 
 ## ESLint boundaries configuration
 
-The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) and [`eslint-import-resolver-typescript`](https://github.com/import-js/eslint-import-resolver-typescript), wired into `eslint.config.mjs`:
+The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) and [`eslint-import-resolver-typescript`](https://github.com/import-js/eslint-import-resolver-typescript), using the plugin's flat-config style in `eslint.config.mjs`.
 
 ```js
-import boundaries from 'eslint-plugin-boundaries';
-
-// ...inside the tseslint.config(...) array:
 {
   files: ['src/**/*.{ts,tsx}'],
   plugins: { boundaries },
@@ -140,14 +138,18 @@ import boundaries from 'eslint-plugin-boundaries';
       typescript: true,
     },
     'boundaries/include': ['src/**/*'],
-    // 'file' mode + '**' matches both flat files (src/ui/select.tsx) and
-    // nested ones (src/localization/locales/en.ts) — 'folder' mode (the
-    // plugin default) only matches files nested one level under a matched
+    // 'partialMatch: false' matches both flat files (src/ui/select.tsx) and
+    // nested ones (src/localization/locales/en.ts) — the plugin's default
+    // matching only matches files nested one level under a matched
     // subfolder, so it silently fails to classify flat top-level files.
     'boundaries/elements': [
-      { type: 'app', pattern: 'src/app/**', mode: 'file' },
-      { type: 'domain', pattern: 'src/domain/**', mode: 'file' },
-      { type: 'client-api', pattern: 'src/client-api/**', mode: 'file' },
+      { type: 'app', pattern: 'src/app/**', partialMatch: false },
+      { type: 'domain', pattern: 'src/domain/**', partialMatch: false },
+      {
+        type: 'client-api',
+        pattern: 'src/client-api/**',
+        partialMatch: false,
+      },
       // More specific than 'features' below — must be declared first,
       // since the matcher takes the first element pattern that matches
       // a file. This is the only part of a feature allowed to import
@@ -155,81 +157,135 @@ import boundaries from 'eslint-plugin-boundaries';
       {
         type: 'features-api',
         pattern: 'src/features/*/api/**',
-        mode: 'file',
+        partialMatch: false,
         capture: ['feature'],
       },
       {
         type: 'features',
         pattern: 'src/features/*/**',
-        mode: 'file',
+        partialMatch: false,
         capture: ['feature'],
       },
-      { type: 'routes', pattern: 'src/routes/**', mode: 'file' },
-      { type: 'ui', pattern: 'src/ui/**', mode: 'file' },
-      { type: 'localization', pattern: 'src/localization/**', mode: 'file' },
-      { type: 'lib', pattern: 'src/lib/**', mode: 'file' },
+      { type: 'routes', pattern: 'src/routes/**', partialMatch: false },
+      { type: 'ui', pattern: 'src/ui/**', partialMatch: false },
+      {
+        type: 'localization',
+        pattern: 'src/localization/**',
+        partialMatch: false,
+      },
+      { type: 'lib', pattern: 'src/lib/**', partialMatch: false },
     ],
   },
   rules: {
-    'boundaries/element-types': [
+    'boundaries/dependencies': [
       'error',
       {
         default: 'disallow',
-        message: '${file.type} is not allowed to import ${dependency.type}',
-        rules: [
+        checkAllOrigins: true,
+        message: '{{from.type}} is not allowed to import {{to.type}}',
+        policies: [
           {
-            from: 'app',
-            // add 'domain', 'client-api' here once an auth session store lands
-            allow: ['ui', 'localization', 'lib'],
+            from: { element: { type: 'app' } },
+            allow: {
+              to: { element: { types: ['ui', 'localization', 'lib'] } },
+            },
           },
           {
-            from: 'routes',
-            allow: ['app', 'features', 'ui', 'localization', 'lib'],
+            from: { element: { type: 'routes' } },
+            allow: {
+              to: {
+                element: {
+                  types: ['app', 'features', 'lib'],
+                },
+              },
+            },
           },
           {
-            from: 'features',
+            from: { element: { type: 'features' } },
             allow: [
-              'domain',
-              'ui',
-              'localization',
-              'lib',
-              ['features', { feature: '${from.feature}' }],
-              ['features-api', { feature: '${from.feature}' }],
+              {
+                to: {
+                  element: {
+                    types: ['domain', 'ui', 'localization', 'lib'],
+                  },
+                },
+              },
+              {
+                to: {
+                  element: {
+                    type: 'features',
+                    captured: { feature: '{{from.captured.feature}}' },
+                  },
+                },
+              },
+              {
+                to: {
+                  element: {
+                    type: 'features-api',
+                    captured: { feature: '{{from.captured.feature}}' },
+                  },
+                },
+              },
             ],
           },
           {
-            from: 'features-api',
-            // the seam: calls client-api, maps the result through a
-            // domain mapper, and returns a domain type to the rest of
-            // the feature (ADR 0003)
+            from: { element: { type: 'features-api' } },
             allow: [
-              'client-api',
-              'domain',
-              'lib',
-              ['features-api', { feature: '${from.feature}' }],
+              {
+                to: { element: { types: ['client-api', 'domain', 'lib'] } },
+              },
+              {
+                to: {
+                  element: {
+                    type: 'features-api',
+                    captured: { feature: '{{from.captured.feature}}' },
+                  },
+                },
+              },
             ],
           },
-          { from: 'client-api', allow: ['lib'] },
-          { from: 'ui', allow: ['lib'] },
-          { from: 'localization', allow: ['ui', 'lib'] },
-          { from: 'domain', allow: ['domain'] },
-          { from: 'lib', allow: [] },
-        ],
-      },
-    ],
-    'boundaries/external': [
-      'error',
-      {
-        default: 'allow',
-        rules: [
           {
-            from: '*',
-            disallow: ['@supabase/supabase-js'],
+            from: { element: { type: 'client-api' } },
+            allow: { to: { element: { type: 'lib' } } },
+          },
+          {
+            from: { element: { type: 'ui' } },
+            allow: { to: { element: { type: 'lib' } } },
+          },
+          {
+            from: { element: { type: 'localization' } },
+            allow: { to: { element: { types: ['ui', 'lib'] } } },
+          },
+          {
+            from: { element: { type: 'domain' } },
+            allow: { to: { element: { type: 'domain' } } },
+          },
+          {
+            allow: {
+              to: { module: { origin: ['external', 'core'] } },
+            },
+          },
+          {
+            disallow: {
+              to: {
+                module: {
+                  origin: ['external', 'core'],
+                  source: '@supabase/supabase-js',
+                },
+              },
+            },
             message: 'Import Supabase only inside src/client-api (ADR 0003).',
           },
           {
-            from: 'client-api',
-            allow: ['@supabase/supabase-js'],
+            from: { element: { type: 'client-api' } },
+            allow: {
+              to: {
+                module: {
+                  origin: ['external', 'core'],
+                  source: '@supabase/supabase-js',
+                },
+              },
+            },
           },
         ],
       },
@@ -239,10 +295,9 @@ import boundaries from 'eslint-plugin-boundaries';
 ```
 
 Notes on the config:
-- `'import/resolver': { typescript: true }` is required, not optional: without it, extensionless imports (`'./languages'`, not `'./languages.ts'`) fail to resolve and every `boundaries` rule silently stops checking them — no error, no warning, just no enforcement. The default resolver only understands `.mjs`/`.js`/`.json`/`.node`, never `.ts`/`.tsx`. Confirmed by testing directly against `@boundaries/elements`.
-- `mode: 'file'` on every element (instead of the plugin's default `'folder'` mode) is also required: `'folder'` mode only classifies files nested one level under a matched subfolder, so a flat file directly inside an element's own folder (e.g. `src/ui/select.tsx`) comes back "of unknown type" and has nothing enforced on it — it passes with zero enforcement instead of erroring. Verified directly against `@boundaries/elements` before settling on this shape; don't revert to bare `'src/x/*'` patterns without re-testing.
-- `features-api` (`src/features/*/api/**`) must be declared *before* `features` (`src/features/*/**`) in `boundaries/elements` — the matcher takes the first pattern that matches a file, and `features/*/api/**` is a strict subset of `features/*/**`. Declared in the other order, everything under `api/` would match the broader `features` pattern first and the split would silently stop working.
-- The same-feature captures (`['features', { feature: '${from.feature}' }]` and `['features-api', { feature: '${from.feature}' }]`) let `features/players/components/*` import `features/players/api/*`, but block it from reaching `features/tournaments/api/*` or `features/tournaments/components/*`.
-- `domain` has an empty `allow` list beyond itself — anything it needs (Zod, branded-type helpers) should come from `domain/shared` or an external package, never from `lib`.
-- `boundaries/external`'s `@supabase/supabase-js` rule uses `from: '*'` (disallow everywhere) plus a `client-api`-only `allow` override, rather than an explicit list of every type that should be blocked — that list would need a new entry (e.g. `features-api`) every time an element type is added. Verified directly: `from: '*'` matches every declared element type, not just untyped files.
-- Files that sit outside every declared element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained by `boundaries/element-types`, since nothing should ever import them — they are true composition-root leaves.
+- `'import/resolver': { typescript: true }` is required, not optional: without it, extensionless imports (`'./languages'`, not `'./languages.ts'`) fail to resolve and every `boundaries` rule silently stops checking them — no error, no warning, just no enforcement. The default resolver only understands `.mjs`/`.js`/`.json`/`.node`, never `.ts`/`.tsx`.
+- `partialMatch: false` is the key setting for this repo's flat layout: it matches both flat files (for example `src/ui/select.tsx`) and nested files (for example `src/localization/locales/en.ts`). Using the plugin's default matching would classify some flat files as "unknown" and the boundary checks would silently stop applying.
+- `features-api` (`src/features/*/api/**`) must be declared *before* `features` (`src/features/*/**`) in `boundaries/elements` — the matcher takes the first pattern that matches a file, and `features/*/api/**` is a strict subset of `features/*/**`.
+- The same-feature captures (`captured: { feature: '{{from.captured.feature}}' }`) let `features/players/components/*` import `features/players/api/*`, but block it from reaching `features/tournaments/api/*` or `features/tournaments/components/*`.
+- `checkAllOrigins: true` keeps the policy check aware of external module imports, so the Supabase guard can be expressed in one place rather than in a separate deprecated `boundaries/external` rule.
+- Files that sit outside every declared element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained by the boundary policy, since nothing should ever import them — they are true composition-root leaves.

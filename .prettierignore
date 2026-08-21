@@ -4,6 +4,8 @@ node_modules/
 **/.vite/
 package-lock.json
 .agents/
+.claude/
 .github/prompts/
 docs/
 skills-lock.json
+openspec/
