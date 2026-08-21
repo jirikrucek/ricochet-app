@@ -2,7 +2,6 @@
   "package.json": ["prettier --write"],
   "eslint.config.mjs": ["prettier --write"],
   ".prettierrc.json": ["prettier --write"],
-  ".prettierignore": ["prettier --write"],
   ".lintstagedrc.json": ["prettier --write"],
   "tsconfig.json": ["prettier --write"],
   "src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,css,html}": [
