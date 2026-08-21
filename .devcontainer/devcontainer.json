@@ -11,16 +11,21 @@
 		"ghcr.io/devcontainers-extra/features/claude-code:2": {},
 		"ghcr.io/devcontainers-extra/features/node-asdf:0": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/jrussellsmyth/devcontainer-features/openspec:1": {}
+		"ghcr.io/jrussellsmyth/devcontainer-features/openspec:1": {},
+		"ghcr.io/postfinance/devcontainer-features/docker-out:1": {}
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5173],
+	// 5173 is the default port for Vite, 54323 is the default port for Supabase Studio, and 54321 is the default port for Supabase API.
+	"forwardPorts": [5173, 54321, 54323],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// Installs Playwright's browser binaries for this container's platform and the
 	// OS-level libraries Chromium needs to launch (apt packages aren't in the base image).
-	"postCreateCommand": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium",
+	"postCreateCommand": {
+		"installPlaywright": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium",
+		"installSupabase": "npm install -g supabase"
+	},
 
 	// Configure tool-specific properties.
 	"customizations": {
