@@ -7,7 +7,6 @@
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
     "ghcr.io/devcontainers/features/copilot-cli:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers-extra/features/claude-code:2": {},
@@ -15,8 +14,8 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // 5173 is the default port for Vite, 54323 is the default port for Supabase Studio, and 54321 is the default port for Supabase API.
-  "forwardPorts": [5173, 54321, 54323],
+  // 5173 is the default port for Vite
+  "forwardPorts": [5173],
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
