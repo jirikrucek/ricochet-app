@@ -66,14 +66,18 @@ export default tseslint.config(
         typescript: true,
       },
       'boundaries/include': ['src/**/*'],
-      // 'file' mode + '**' matches both flat files (src/ui/select.tsx) and
-      // nested ones (src/localization/locales/en.ts) — 'folder' mode (the
-      // plugin default) only matches files nested one level under a matched
+      // 'partialMatch: false' matches both flat files (src/ui/select.tsx) and
+      // nested ones (src/localization/locales/en.ts) — the plugin's default
+      // matching only matches files nested one level under a matched
       // subfolder, so it silently fails to classify flat top-level files.
       'boundaries/elements': [
-        { type: 'app', pattern: 'src/app/**', mode: 'file' },
-        { type: 'domain', pattern: 'src/domain/**', mode: 'file' },
-        { type: 'client-api', pattern: 'src/client-api/**', mode: 'file' },
+        { type: 'app', pattern: 'src/app/**', partialMatch: false },
+        { type: 'domain', pattern: 'src/domain/**', partialMatch: false },
+        {
+          type: 'client-api',
+          pattern: 'src/client-api/**',
+          partialMatch: false,
+        },
         // More specific than 'features' below — must be declared first,
         // since the matcher takes the first element pattern that matches
         // a file. This is the only part of a feature allowed to import
@@ -81,81 +85,142 @@ export default tseslint.config(
         {
           type: 'features-api',
           pattern: 'src/features/*/api/**',
-          mode: 'file',
+          partialMatch: false,
           capture: ['feature'],
         },
         {
           type: 'features',
           pattern: 'src/features/*/**',
-          mode: 'file',
+          partialMatch: false,
           capture: ['feature'],
         },
-        { type: 'routes', pattern: 'src/routes/**', mode: 'file' },
-        { type: 'ui', pattern: 'src/ui/**', mode: 'file' },
-        { type: 'localization', pattern: 'src/localization/**', mode: 'file' },
-        { type: 'lib', pattern: 'src/lib/**', mode: 'file' },
+        { type: 'routes', pattern: 'src/routes/**', partialMatch: false },
+        { type: 'ui', pattern: 'src/ui/**', partialMatch: false },
+        {
+          type: 'localization',
+          pattern: 'src/localization/**',
+          partialMatch: false,
+        },
+        { type: 'lib', pattern: 'src/lib/**', partialMatch: false },
       ],
     },
     rules: {
-      'boundaries/element-types': [
+      'boundaries/dependencies': [
         'error',
         {
           default: 'disallow',
-          message: '${file.type} is not allowed to import ${dependency.type}',
-          rules: [
+          // also check module dependencies (external packages), not just
+          // local elements, so the Supabase policy below can be expressed
+          // here instead of in the separate (now deprecated) 'external' rule
+          checkAllOrigins: true,
+          message: '{{from.type}} is not allowed to import {{to.type}}',
+          policies: [
             {
-              from: 'app',
+              from: { element: { type: 'app' } },
               // add 'domain', 'client-api' here once an auth session store lands
-              allow: ['ui', 'localization', 'lib'],
+              allow: {
+                to: { element: { types: ['ui', 'localization', 'lib'] } },
+              },
             },
             {
-              from: 'routes',
-              allow: ['app', 'features', 'ui', 'localization', 'lib'],
+              from: { element: { type: 'routes' } },
+              allow: {
+                to: {
+                  element: {
+                    types: ['app', 'features', 'lib'],
+                  },
+                },
+              },
             },
             {
-              from: 'features',
+              from: { element: { type: 'features' } },
               allow: [
-                'domain',
-                'ui',
-                'localization',
-                'lib',
-                ['features', { feature: '${from.feature}' }],
-                ['features-api', { feature: '${from.feature}' }],
+                {
+                  to: {
+                    element: {
+                      types: ['domain', 'ui', 'localization', 'lib'],
+                    },
+                  },
+                },
+                {
+                  to: {
+                    element: {
+                      type: 'features',
+                      captured: { feature: '{{from.captured.feature}}' },
+                    },
+                  },
+                },
+                {
+                  to: {
+                    element: {
+                      type: 'features-api',
+                      captured: { feature: '{{from.captured.feature}}' },
+                    },
+                  },
+                },
               ],
             },
             {
-              from: 'features-api',
+              from: { element: { type: 'features-api' } },
               // the seam: calls client-api, maps the result through a
               // domain mapper, and returns a domain type to the rest of
               // the feature (ADR 0003)
               allow: [
-                'client-api',
-                'domain',
-                'lib',
-                ['features-api', { feature: '${from.feature}' }],
+                {
+                  to: { element: { types: ['client-api', 'domain', 'lib'] } },
+                },
+                {
+                  to: {
+                    element: {
+                      type: 'features-api',
+                      captured: { feature: '{{from.captured.feature}}' },
+                    },
+                  },
+                },
               ],
             },
-            { from: 'client-api', allow: ['lib'] },
-            { from: 'ui', allow: ['lib'] },
-            { from: 'localization', allow: ['ui', 'lib'] },
-            { from: 'domain', allow: ['domain'] },
-            { from: 'lib', allow: [] },
-          ],
-        },
-      ],
-      'boundaries/external': [
-        'error',
-        {
-          default: 'allow',
-          rules: [
             {
-              from: '*',
-              disallow: ['@supabase/supabase-js'],
+              from: { element: { type: 'client-api' } },
+              allow: { to: { element: { type: 'lib' } } },
+            },
+            {
+              from: { element: { type: 'ui' } },
+              allow: { to: { element: { type: 'lib' } } },
+            },
+            {
+              from: { element: { type: 'localization' } },
+              allow: { to: { element: { types: ['ui', 'lib'] } } },
+            },
+            {
+              from: { element: { type: 'domain' } },
+              allow: { to: { element: { type: 'domain' } } },
+            },
+            {
+              allow: {
+                to: { module: { origin: ['external', 'core'] } },
+              },
+            },
+            {
+              disallow: {
+                to: {
+                  module: {
+                    origin: ['external', 'core'],
+                    source: '@supabase/supabase-js',
+                  },
+                },
+              },
               message: 'Import Supabase only inside src/client-api (ADR 0003).',
             },
             {
-              from: 'client-api',
-              allow: ['@supabase/supabase-js'],
+              from: { element: { type: 'client-api' } },
+              allow: {
+                to: {
+                  module: {
+                    origin: ['external', 'core'],
+                    source: '@supabase/supabase-js',
+                  },
+                },
+              },
             },
           ],
         },
