@@ -17,7 +17,9 @@
 	"forwardPorts": [5173],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	// Installs Playwright's browser binaries for this container's platform and the
+	// OS-level libraries Chromium needs to launch (apt packages aren't in the base image).
+	"postCreateCommand": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium",
 
 	// Configure tool-specific properties.
 	"customizations": {
