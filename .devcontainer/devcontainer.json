@@ -7,12 +7,11 @@
 	
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/copilot-cli:1": {},
-		"ghcr.io/devcontainers-extra/features/claude-code:2": {},
-		"ghcr.io/devcontainers-extra/features/node-asdf:0": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-		"ghcr.io/devcontainers-extra/features/supabase-cli:1": {}
+		"ghcr.io/devcontainers/features/copilot-cli:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers-extra/features/claude-code:2": {},
+		"ghcr.io/devcontainers-extra/features/node-asdf:0": {}		
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -23,8 +22,7 @@
 	// Installs Playwright's browser binaries for this container's platform and the
 	// OS-level libraries Chromium needs to launch (apt packages aren't in the base image).
 	"postCreateCommand": {
-		"installPlaywright": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium",
-		"installOpenSpec": "npm install -g @fission-ai/openspec@latest"
+		"installPlaywright": "npm run test:e2e:install && sudo env \"PATH=$PATH\" npx playwright install-deps chromium"
 	},
 
 	// Configure tool-specific properties.
