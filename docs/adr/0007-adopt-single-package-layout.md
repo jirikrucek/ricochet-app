@@ -21,9 +21,9 @@ Collapse the repository to a single npm package at the root:
 - Remove the `apps/*` / `packages/*` npm workspaces. One `package.json`, one `tsconfig.json`, one `src/` at the repo root.
 - Fold `packages/shared`'s intended purpose (shared contracts) into `src/domain/shared/`.
 - Adopt the folder layout and dependency graph defined in [`docs/standards/project-structure.md`](../standards/project-structure.md), which supersedes the folder mapping previously in ADR 0004.
-- Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see the standards doc for the rule set.
+- Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see the standards doc for the flat-config rule set used in `eslint.config.mjs`.
 
-This does not change the domain boundaries decided in ADR 0003 (players / tournaments / auth, repository seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
+This does not change the domain boundaries decided in ADR 0003 (players / tournaments / auth, repository seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary. The current policy uses `boundaries/dependencies` with `checkAllOrigins: true` and explicit `features-api`/`features` element captures, rather than the legacy `boundaries/element-types` and `boundaries/external` syntax that older documentation described.
 
 ## Consequences
 
