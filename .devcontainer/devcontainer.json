@@ -11,7 +11,8 @@
 		"ghcr.io/devcontainers-extra/features/claude-code:2": {},
 		"ghcr.io/devcontainers-extra/features/node-asdf:0": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers-extra/features/supabase-cli:1": {}
+		"ghcr.io/devcontainers-extra/features/supabase-cli:1": {},
+		"ghcr.io/jrussellsmyth/devcontainer-features/openspec:1": {}
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
