@@ -16,7 +16,6 @@ export function initSentry() {
     environment: import.meta.env.MODE,
     integrations: [Sentry.browserTracingIntegration()],
     tracesSampleRate: 1.0,
-    enableLogs: true,
   });
 }
 
