@@ -16,6 +16,13 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      // 'use client' directives in deps (e.g. @base-ui) only matter for RSC; this is a CSR SPA.
+      onwarn(warning, defaultHandler) {
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return;
+        }
+        defaultHandler(warning);
+      },
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) {

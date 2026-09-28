@@ -8,7 +8,7 @@ For any change that adds a Supabase call, a new route, or a background/retry pat
 ## Error reporting baseline
 
 Already wired in `src/app/observability/`:
-- `sentry.ts` — `initSentry()`, called once in `main.tsx` before render. No-ops when `VITE_SENTRY_DSN` is unset (local dev and any environment without a DSN configured). Enables `browserTracingIntegration` (`tracesSampleRate: 1.0`) and `enableLogs`. Session Replay is deliberately **not** enabled yet — revisit once there are real screens worth replaying; if it's added later, keep the SDK's default text/input masking on.
+- `sentry.ts` — `initSentry()`, called once in `main.tsx` before render. No-ops when `VITE_SENTRY_DSN` is unset (local dev and any environment without a DSN configured). Enables `browserTracingIntegration` (`tracesSampleRate: 1.0`). Logs need no flag — since SDK v11 they're always captured once the client is initialised. Session Replay is deliberately **not** enabled yet — revisit once there are real screens worth replaying; if it's added later, keep the SDK's default text/input masking on.
 - `AppErrorBoundary.tsx` — wraps the app in `AppProviders.tsx`. Catches render errors, reports them to Sentry, and shows a translated fallback screen instead of a white screen.
 - `AppProviders.tsx` — the shared `QueryClient` has `QueryCache`/`MutationCache` `onError` hooks that report every failed query and mutation to Sentry with the query/mutation key attached. Components are never required to handle an error just so it gets reported — component-level `onError`/error UI is still fine for user-facing messaging, but don't rely on it for visibility.
 
@@ -16,7 +16,7 @@ The DSN is deliberately **not** committed to `.env.example` (it stays blank) —
 
 ## Structured logging
 
-Use `Sentry.logger.*` (from `src/app/observability/sentry.ts`) instead of `console.*` — it requires `enableLogs`, already on, and ships structured attributes to the same place errors go, with no separate vendor to run.
+Use `Sentry.logger.*` (from `src/app/observability/sentry.ts`) instead of `console.*` — it ships structured attributes to the same place errors go, with no separate vendor to run.
 
 - Pick the level deliberately (`trace`/`debug`/`info`/`warn`/`error`/`fatal`) — see the level table in this skill's process for what each implies for on-call.
 - Pass structured `attributes`, not an interpolated string:
