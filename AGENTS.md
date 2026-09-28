@@ -34,11 +34,11 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 #### Phase 1: Standards
 
-- Check code against relevant `docs/standards/` files. Align code to comply with the standards.
+- Check code against `docs/standards/` files. Align code to comply with the standards.
 
 #### Phase 2: ADRs
 
-- Check code against relevant `docs/adr/` files. Align code to comply with the architecture decision records.
+- Check code against `docs/adr/` files. Align code to comply with the architecture decisions.
 
 #### Phase 3: Automated Verification
 
