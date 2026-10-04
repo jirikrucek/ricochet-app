@@ -59,6 +59,11 @@ export default tseslint.config(
     },
   },
   {
+    // route files export `Route` next to a local page component by design
+    files: ['src/routes/**/*.{ts,tsx}'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { boundaries },
     settings: {
