@@ -66,4 +66,4 @@ jobs:
       # Pushes made with GITHUB_TOKEN don't trigger pull_request workflows, so start the verification checks explicitly.
       - name: Run verification checks
         if: steps.detect.outputs.changed == 'true'
-        run: gh workflow run pr-checks.yml --ref "${{ steps.pr.outputs.branch }}"
+        run: gh workflow run verification-checks.yml --ref "${{ steps.pr.outputs.branch }}"
