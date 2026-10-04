@@ -1,10 +1,11 @@
 import { createRoot } from 'react-dom/client';
 import { AppProviders } from './app/providers/AppProviders';
 import { initSentry } from './app/observability/sentry';
+import { router } from './router';
 import i18n from './localization/i18n';
 import './styles/globals.css';
 
-initSentry();
+initSentry(router);
 
 const container = document.getElementById('root');
 

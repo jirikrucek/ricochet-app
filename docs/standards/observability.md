@@ -8,7 +8,7 @@ For any change that adds a Supabase call, a new route, or a background/retry pat
 ## Error reporting baseline
 
 Already wired in `src/app/observability/`:
-- `sentry.ts` — `initSentry()`, called once in `main.tsx` before render. No-ops when `VITE_SENTRY_DSN` is unset (local dev and any environment without a DSN configured). Enables `browserTracingIntegration` (`tracesSampleRate: 1.0`). Logs need no flag — since SDK v11 they're always captured once the client is initialised. Session Replay is deliberately **not** enabled yet — revisit once there are real screens worth replaying; if it's added later, keep the SDK's default text/input masking on.
+- `sentry.ts` — `initSentry(router)`, called once in `main.tsx` before render. No-ops when `VITE_SENTRY_DSN` is unset (local dev and any environment without a DSN configured). Enables `tanstackRouterBrowserTracingIntegration(router)` (`tracesSampleRate: 1.0`). Logs need no flag — since SDK v11 they're always captured once the client is initialised. Session Replay is deliberately **not** enabled yet — revisit once there are real screens worth replaying; if it's added later, keep the SDK's default text/input masking on.
 - `AppErrorBoundary.tsx` — wraps the app in `AppProviders.tsx`. Catches render errors, reports them to Sentry, and shows a translated fallback screen instead of a white screen.
 - `AppProviders.tsx` — the shared `QueryClient` has `QueryCache`/`MutationCache` `onError` hooks that report every failed query and mutation to Sentry with the query/mutation key attached. Components are never required to handle an error just so it gets reported — component-level `onError`/error UI is still fine for user-facing messaging, but don't rely on it for visibility.
 
@@ -37,7 +37,7 @@ Every Supabase error/log reported to Sentry should carry enough context to find 
 
 ## RUM / performance
 
-`browserTracingIntegration` is enabled, giving route-change and page-load performance in Sentry's Performance view — no separate RUM vendor needed. `tracesSampleRate: 1.0` is fine at current traffic; revisit (lower it) if ingestion volume/cost becomes a concern before a second vendor is ever considered.
+`tanstackRouterBrowserTracingIntegration` is enabled, giving route-change and page-load performance in Sentry's Performance view, with transactions named by route pattern (e.g. `/tournaments/$id`) instead of raw URL — no separate RUM vendor needed. `tracesSampleRate: 1.0` is fine at current traffic; revisit (lower it) if ingestion volume/cost becomes a concern before a second vendor is ever considered.
 
 If a custom metric/span attribute is ever added, it must use a bounded label set (route template, status class) — never a user id, raw URL, or error message text as a label/tag.
 
