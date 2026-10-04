@@ -1,0 +1,130 @@
+name: Update dependencies
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-dependencies
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update dependencies (skip major bumps)
+        run: |
+          npx --yes npm-check-updates --target minor -u
+          npm install
+          git diff --stat
+
+      - name: Detect changes
+        id: detect
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "All dependencies are up to date (excluding major bumps)." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Definition of Done: automated verification.
+      - name: Typecheck
+        id: typecheck
+        if: steps.detect.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm run typecheck
+
+      - name: Lint
+        id: lint
+        if: steps.detect.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Build
+        id: build
+        if: steps.detect.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm run build
+
+      - name: Install Playwright browser
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          npm run test:e2e:install
+          npx playwright install-deps chromium
+
+      - name: Tests
+        id: tests
+        if: steps.detect.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm run test:all
+
+      # Definition of Done: final report.
+      - name: Definition of Done report
+        id: report
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          status() { [ "$1" = "success" ] && echo OK || echo NOK; }
+          {
+            echo "- Typecheck: $(status '${{ steps.typecheck.outcome }}')"
+            echo "- Lint: $(status '${{ steps.lint.outcome }}')"
+            echo "- Build: $(status '${{ steps.build.outcome }}')"
+            echo "- Tests: $(status '${{ steps.tests.outcome }}')"
+          } > dod-report.md
+          cat dod-report.md >> "$GITHUB_STEP_SUMMARY"
+          if grep -q NOK dod-report.md; then
+            echo "draft=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open pull request
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          DRAFT: ${{ steps.report.outputs.draft }}
+        run: |
+          branch="chore/update-dependencies-$(date -u +%Y%m%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add package.json package-lock.json
+          git commit -m "chore(deps): update dependencies"
+          git push --force origin "$branch"
+
+          {
+            echo "Automated dependency update (major version bumps are skipped)."
+            echo
+            echo "## Definition of Done"
+            cat dod-report.md
+            if [ "$DRAFT" = "true" ]; then
+              echo
+              echo "> One or more checks failed, so this PR is a draft. Fix the failures on this branch before merging. See the [workflow run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
+            fi
+          } > pr-body.md
+
+          args=(--base "${{ github.event.repository.default_branch }}" --head "$branch" \
+            --title "chore(deps): update dependencies" --body-file pr-body.md)
+          [ "$DRAFT" = "true" ] && args+=(--draft)
+          gh pr create "${args[@]}" || echo "PR already exists for $branch"
+
+      - name: Fail run if checks failed
+        if: steps.report.outputs.draft == 'true'
+        run: |
+          echo "::error::Definition of Done checks failed; a draft PR was opened."
+          exit 1
