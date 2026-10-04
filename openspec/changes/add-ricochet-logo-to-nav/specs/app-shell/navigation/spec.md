@@ -73,10 +73,18 @@ The system SHALL close the menu, leaving the current page unchanged, when the vi
 - **AND** the Players page is still shown
 - **AND** keyboard focus is on the menu button
 
+#### Scenario: Closing the menu with its close control
+- **GIVEN** a visitor on a phone has opened the menu on the Players page
+- **WHEN** the visitor activates the menu's close control
+- **THEN** the menu is closed
+- **AND** the Players page is still shown
+- **AND** keyboard focus is on the menu button
+
 #### Scenario: Closing the menu by tapping outside it
 - **GIVEN** a visitor on a phone has opened the menu
 - **WHEN** the visitor taps the page area outside the menu
 - **THEN** the menu is closed
+- **AND** keyboard focus is on the menu button
 
 ### Requirement: Menu button is accessible and localized
 The system SHALL give the menu button an accessible name in the active UI language and expose whether the menu is open or closed. While the menu is open, keyboard focus SHALL stay within it. The menu button SHALL have a touch target of at least 48×48px.

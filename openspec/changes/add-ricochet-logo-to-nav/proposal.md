@@ -14,6 +14,7 @@ The top nav bar also has no phone layout. It renders the brand, both section lin
 - Below the 744px mobile breakpoint, collapse the top nav bar to the logo plus a hamburger button. The button opens a sheet holding the Players and Tournaments links and the language selector. From 744px up, the current single-row layout stays unchanged.
 - Add minimal placeholder `/players` and `/tournaments` routes that show only a translated page heading. The nav already links to them, but they don't exist yet, and the nav's navigation and active-section behaviour needs real pages to land on. Real page content is out of scope.
 - At phone width the logo fits beside the hamburger without clipping and without making the page scroll horizontally.
+- Fix the section links' active-state styling. The active classes lost the CSS cascade to the base muted/transparent classes, so no section ever looked active (unnoticed until the placeholder routes existed). The menu must show the active section, and because both navs share one link component, the desktop nav gains a visible active state too.
 
 ## Capabilities
 
@@ -46,7 +47,7 @@ _None._
 - Dark-mode or monochrome logo variants. Dark mode isn't supported (see the design-system standard).
 - Adding brand colours to `DESIGN.md` or the token set in `globals.css`.
 - PWA manifest icons, Apple touch icons, and social preview images.
-- Changing the desktop (≥744px) nav layout, the section links' destinations, or the language selector's own behaviour and contents.
+- Changing the desktop (≥744px) nav layout (other than the active-link styling fix above), the section links' destinations, or the language selector's own behaviour and contents.
 - Any Players or Tournaments page content beyond a placeholder heading.
 - A separate tablet-specific nav layout (744–1128px keeps the current single row).
 - Responsive changes to page content or the footer outside the top nav bar.

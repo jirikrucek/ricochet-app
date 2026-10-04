@@ -10,7 +10,7 @@ Current state:
 - Precedent for vendored artwork: the flag SVGs in `src/assets/flags/` are imported as URLs and rendered as decorative `<img alt="" aria-hidden>` elements (ADR 0006).
 - DESIGN.md defines the mobile breakpoint as `< 744px` and 48×48px minimum touch targets. Tailwind's default `md` breakpoint is 768px, and `globals.css` defines no breakpoint tokens. Spacing tokens include `xl` (32px) and `xxl` (48px). The nav height is 80px.
 - Vitest configs only collect `*.test.ts` files in a Node environment: there is no jsdom or `.tsx` component-test setup. Playwright runs one Desktop Chrome project (1280px), and every existing e2e test drives `#language-trigger` at that width.
-- The source logo is a 1186×388 PNG (≈3.06:1) with flat colours: brand grey ≈ `#808285`, red ≈ `#C1121F`, and a white background. It includes a ® mark at the top right, which this change drops. The repo has no raster-tracing tooling.
+- The source logo is a 1186×388 PNG (≈3.06:1) with flat colours: brand grey ≈ `#808285`, red ≈ `#C1121F` (sampled exactly from flat interior pixels during implementation: `#818286` and `#c3121a`), and a white background. It includes a ® mark at the top right, which this change drops. The repo has no raster-tracing tooling.
 
 ## Goals / Non-Goals
 
@@ -53,9 +53,9 @@ The SVG carries literal brand hex fills. To reconcile this with the design-syste
 
 ### D4. Fixed logo height of 32px (`h-xl`) at every width
 
-Render the image at `h-xl w-auto` (32px tall, under 98px wide once the ® is cropped away). This keeps the logo visually balanced against the 16px nav links in the 80px bar. At 320px the collapsed row needs at most 16px gutter + 98px logo + 48px button + 16px gutter = 178px, which fits comfortably, so no shrinking logic is needed. Add `shrink-0` to the image and `min-w-0` to the link as a guard against squashing.
+Render the image at `h-xl w-auto` (32px tall, ≈110.5px wide once the ® is cropped away; the traced `viewBox` is 1081×313). This keeps the logo visually balanced against the 16px nav links in the 80px bar. At 320px the collapsed row needs at most 16px gutter + 111px logo + 48px button + 16px gutter ≈ 191px, which fits comfortably, so no shrinking logic is needed. Add `shrink-0` to the image and `min-w-0` to the link as a guard against squashing.
 
-- *Alternative: 48px (`h-xxl`, up to ≈147px wide).* Rejected: it dominates the bar and crowds the centred links at 744px.
+- *Alternative: 48px (`h-xxl`, ≈166px wide).* Rejected: it dominates the bar and crowds the centred links at 744px.
 - *Alternative: a responsive height.* Unnecessary given the width budget above.
 
 ### D5. Favicon: a hand-authored ring-mark SVG in `public/`
@@ -86,6 +86,8 @@ Add the `sheet` primitive with `npx shadcn@latest add sheet`, which puts it in `
 - If the viewport crosses into `tablet` while the menu is open, a `matchMedia('(min-width: 744px)')` change listener closes it, so no orphaned overlay or scroll lock remains over the desktop layout.
 - The trigger is a 48×48px (`size-xxl`) button with a lucide `MenuIcon` and a localized `aria-label`. New `nav.openMenu`, `nav.closeMenu` and `nav.menuTitle` keys are added to all six locale files; typecheck enforces parity with `en`.
 - Base UI Dialog supplies the focus trap, Escape and outside-click dismissal, focus return to the trigger, and `aria-expanded` on the trigger.
+- The primitive's built-in close button is disabled (`showCloseButton={false}`) because its label is hard-coded in English. `TopNav` renders its own `SheetClose` with `aria-label={t('nav.closeMenu')}`, at the same 48×48px size as the trigger.
+- `NavLink` puts the active styles in `activeProps` and the inactive styles (`border-transparent text-muted`) in `inactiveProps`, never both in the base `className`. When both sets sit on the element at once, the base muted/transparent utilities win the cascade, so no active state is visible. This also gives the desktop nav a visible active state (see proposal).
 - *Alternative: a hand-rolled disclosure panel.* Rejected: it re-implements focus trapping and dismissal, which are the spec's accessibility requirements.
 - *Alternative: a dropdown menu primitive.* Rejected: a `menu` role doesn't fit a language `<select>` nested inside it.
 
