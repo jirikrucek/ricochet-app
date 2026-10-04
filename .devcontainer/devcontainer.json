@@ -18,6 +18,13 @@
   // 5173 is the default port for Vite
   "forwardPorts": [5173],
 
+  // Keep node_modules in a container-only named volume. The repo is bind-mounted from the
+  // host, and npm only installs native optional deps (e.g. @rolldown/binding-*) for the OS it
+  // runs on, so sharing node_modules between macOS and Linux breaks Vite/Vitest on one side.
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+
   // Use 'postCreateCommand' to run commands after the container is created.
   // Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
   // the base image) before downloading Playwright's browser binaries, so Playwright's
@@ -27,7 +34,7 @@
   // resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
   // to /root by default, which breaks shim resolution ("unknown command: npx").
   "postCreateCommand": {
-    "installPlaywright": "sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:install"
+    "installPlaywright": "sudo chown vscode:vscode node_modules && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:install"
   },
 
   // Configure tool-specific properties.
