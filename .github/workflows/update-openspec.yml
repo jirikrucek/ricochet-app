@@ -48,15 +48,7 @@ jobs:
 
       - name: Update OpenSpec skills
         if: steps.detect.outputs.changed == 'true'
-        run: |
-          skills=$(node -e "
-            const { skills } = require('./skills-lock.json');
-            console.log(Object.entries(skills)
-              .filter(([, s]) => s.source.toLowerCase() === 'fission-ai/openspec')
-              .map(([name]) => name).join(' '));
-          ")
-          # shellcheck disable=SC2086
-          npx --yes skills update $skills --project --yes
+        run: npx openspec update
 
       - name: Open pull request
         if: steps.detect.outputs.changed == 'true'
@@ -77,7 +69,7 @@ jobs:
             --body "Automated update for the [OpenSpec ${VERSION} release](https://github.com/Fission-AI/OpenSpec/releases/tag/v${VERSION}).
 
           - Bumps \`@fission-ai/openspec\` in \`package.json\`
-          - Refreshes OpenSpec skills via \`npx skills update\` (\`skills-lock.json\`)
+          - Refreshes OpenSpec skills via \`npx openspec update\`
 
           Review the skill diffs and run the Definition of Done checks before merging." \
             || echo "PR already exists for $branch"
