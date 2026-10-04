@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -16,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      CI: true
     steps:
       - uses: actions/checkout@v4
 
@@ -44,60 +44,9 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # Definition of Done: automated verification.
-      - name: Typecheck
-        id: typecheck
-        if: steps.detect.outputs.changed == 'true'
-        continue-on-error: true
-        run: npm run typecheck
-
-      - name: Lint
-        id: lint
-        if: steps.detect.outputs.changed == 'true'
-        continue-on-error: true
-        run: npm run lint
-
-      - name: Build
-        id: build
-        if: steps.detect.outputs.changed == 'true'
-        continue-on-error: true
-        run: npm run build
-
-      - name: Install Playwright browser
-        if: steps.detect.outputs.changed == 'true'
-        run: |
-          npm run test:e2e:install
-          npx playwright install-deps chromium
-
-      - name: Tests
-        id: tests
-        if: steps.detect.outputs.changed == 'true'
-        continue-on-error: true
-        run: npm run test:all
-
-      # Definition of Done: final report.
-      - name: Definition of Done report
-        id: report
-        if: steps.detect.outputs.changed == 'true'
-        run: |
-          status() { [ "$1" = "success" ] && echo OK || echo NOK; }
-          {
-            echo "- Typecheck: $(status '${{ steps.typecheck.outcome }}')"
-            echo "- Lint: $(status '${{ steps.lint.outcome }}')"
-            echo "- Build: $(status '${{ steps.build.outcome }}')"
-            echo "- Tests: $(status '${{ steps.tests.outcome }}')"
-          } > dod-report.md
-          cat dod-report.md >> "$GITHUB_STEP_SUMMARY"
-          if grep -q NOK dod-report.md; then
-            echo "draft=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "draft=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Open pull request
+        id: pr
         if: steps.detect.outputs.changed == 'true'
-        env:
-          DRAFT: ${{ steps.report.outputs.draft }}
         run: |
           branch="chore/update-dependencies-$(date -u +%Y%m%d)"
           git config user.name "github-actions[bot]"
@@ -106,25 +55,15 @@ jobs:
           git add package.json package-lock.json
           git commit -m "chore(deps): update dependencies"
           git push --force origin "$branch"
+          gh pr create \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch" \
+            --title "chore(deps): update dependencies" \
+            --body "Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the PR checks." \
+            || echo "PR already exists for $branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
-          {
-            echo "Automated dependency update (major version bumps are skipped)."
-            echo
-            echo "## Definition of Done"
-            cat dod-report.md
-            if [ "$DRAFT" = "true" ]; then
-              echo
-              echo "> One or more checks failed, so this PR is a draft. Fix the failures on this branch before merging. See the [workflow run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
-            fi
-          } > pr-body.md
-
-          args=(--base "${{ github.event.repository.default_branch }}" --head "$branch" \
-            --title "chore(deps): update dependencies" --body-file pr-body.md)
-          [ "$DRAFT" = "true" ] && args+=(--draft)
-          gh pr create "${args[@]}" || echo "PR already exists for $branch"
-
-      - name: Fail run if checks failed
-        if: steps.report.outputs.draft == 'true'
-        run: |
-          echo "::error::Definition of Done checks failed; a draft PR was opened."
-          exit 1
+      # Pushes made with GITHUB_TOKEN don't trigger pull_request workflows, so start the PR checks explicitly.
+      - name: Run PR checks
+        if: steps.detect.outputs.changed == 'true'
+        run: gh workflow run pr-checks.yml --ref "${{ steps.pr.outputs.branch }}"
