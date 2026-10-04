@@ -7,6 +7,9 @@ const hu = {
   nav: {
     players: 'Játékosok',
     tournaments: 'Tornák',
+    openMenu: 'Menü megnyitása',
+    closeMenu: 'Menü bezárása',
+    menuTitle: 'Menü',
   },
   footer: {
     legal: '© {{year}} Ricochet App',

@@ -9,6 +9,10 @@ For all UI work:
 - Use the spacing scale for margins, padding, and gaps
 - Do not introduce new design decisions without a reason
 
+## Vendored artwork
+
+The "no custom hex values" rule governs UI styling. Vendored artwork rendered as an image keeps its intrinsic colours inside the asset file: the brand logo (`src/assets/brand/`), the favicon (`public/favicon.svg`) and the flag SVGs (`src/assets/flags/`). Don't map those fills to tokens, and don't reuse their hex values in component styles. See [ADR 0008](../adr/0008-vendored-brand-artwork-keeps-its-own-colours.md).
+
 ## Setup status
 
 Tailwind CSS v4 and Shadcn UI are **installed and configured**:

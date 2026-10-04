@@ -7,6 +7,9 @@ const nl = {
   nav: {
     players: 'Spelers',
     tournaments: 'Toernooien',
+    openMenu: 'Menu openen',
+    closeMenu: 'Menu sluiten',
+    menuTitle: 'Menu',
   },
   footer: {
     legal: '© {{year}} Ricochet App',
