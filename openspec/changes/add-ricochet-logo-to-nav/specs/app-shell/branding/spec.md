@@ -89,9 +89,9 @@ The system SHALL size the logo to fit fully inside the top nav bar at every view
 - **AND** the page does not scroll horizontally
 
 ### Requirement: Browser tab shows the Ricochet favicon
-The system SHALL provide a favicon derived from the Ricochet logo's red ring mark, so the app's browser tab and bookmarks are identifiable as Ricochet.
+The system SHALL provide a favicon derived from the Ricochet logo's mark (the red ring inside the grey "C" with its motion strokes), so the app's browser tab and bookmarks are identifiable as Ricochet.
 
 #### Scenario: Favicon shown in the browser tab
 - **GIVEN** a visitor opens the app in a browser
 - **WHEN** the page has loaded
-- **THEN** the browser tab shows the Ricochet ring-mark favicon instead of the browser's default icon
+- **THEN** the browser tab shows the Ricochet logo-mark favicon instead of the browser's default icon

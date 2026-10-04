@@ -9,7 +9,7 @@ The top nav bar also has no phone layout. It renders the brand, both section lin
 - Convert the official Ricochet logo, supplied as a 1186×388 PNG in the issue, into a vector SVG. The SVG keeps the original shapes and the brand grey and red, but leaves out the ® mark.
 - Vendor the SVG as a bundler-processed asset under `src/assets/`.
 - In `TopNav`, replace the placeholder ring glyph **and** the "Ricochet" text with the logo. The logo stays a link to `/`, keeps an accessible name ("Ricochet"), and is sized to fit the nav bar height.
-- Add a favicon based on the logo's ring mark and reference it from `index.html`.
+- Add a favicon based on the logo's mark (the red ring inside the grey "C" with its motion strokes) and reference it from `index.html`.
 - Keep the logo's brand colours inside the SVG rather than mapping them to design tokens, and record this as an explicit exception to the design-system rule against custom hex values. Vendored brand artwork, like the flag SVGs, keeps its own colours. The token rule still governs UI styling.
 - Below the 744px mobile breakpoint, collapse the top nav bar to the logo plus a hamburger button. The button opens a sheet holding the Players and Tournaments links and the language selector. From 744px up, the current single-row layout stays unchanged.
 - Add minimal placeholder `/players` and `/tournaments` routes that show only a translated page heading. The nav already links to them, but they don't exist yet, and the nav's navigation and active-section behaviour needs real pages to land on. Real page content is out of scope.
@@ -34,7 +34,7 @@ _None._
 - `src/ui/`: new Shadcn `sheet` primitive (and `button` if the registry pulls it in).
 - `src/localization/locales/{en,cs,de,pl,nl,hu}.ts`: new keys for the hamburger button's accessible label (e.g. open/close menu).
 - `src/assets/brand/ricochet-logo.svg`: new vendored logo SVG. No new runtime dependency.
-- `public/favicon.svg` (new `public/` directory) and `index.html`: the ring-mark favicon and its `<link>`.
+- `public/favicon.svg` (new `public/` directory) and `index.html`: the logo-mark favicon and its `<link>`.
 - `src/styles/globals.css`: a named `tablet` (744px) breakpoint token matching DESIGN.md.
 - `docs/standards/design-system.md`: note that vendored brand and flag artwork may keep its own colours.
 - `docs/adr/0008-vendored-brand-artwork-keeps-its-own-colours.md`: new ADR recording that exception.

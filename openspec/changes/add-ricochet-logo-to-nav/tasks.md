@@ -35,7 +35,7 @@ Each slice is a complete, demoable path. Work it test-first: write the listed E2
 ## 3. Slice: Ricochet favicon (branding)
 
 - [x] 3.1 Write the failing E2E test in `branding.spec.ts`, "Favicon shown in the browser tab": the page has `link[rel="icon"]` with `type="image/svg+xml"`, and requesting its `href` returns `200` with content type `image/svg+xml`.
-- [x] 3.2 Create `public/favicon.svg` (design D5) from the same ring geometry as the logo: only the red ring, in brand red, centred in a square `viewBox` with padding, on a transparent background. Check it visually at 16px and 32px.
+- [x] 3.2 Create `public/favicon.svg` (design D5) from the logo's mark: the grey "C" and motion-stroke subpaths from the 2.2 trace plus the red ring geometry, in brand colours, centred in a square `viewBox` with padding, on a transparent background. Check it visually at 16px and 32px.
 - [x] 3.3 Add `<link rel="icon" type="image/svg+xml" href="/favicon.svg" />` to `index.html`.
 - [x] 3.4 Verify: 3.1 passes, and `npm run build` copies `favicon.svg` into `dist/`.
 

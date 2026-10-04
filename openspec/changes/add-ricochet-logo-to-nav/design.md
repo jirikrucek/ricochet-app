@@ -58,9 +58,12 @@ Render the image at `h-xl w-auto` (32px tall, ≈110.5px wide once the ® is cro
 - *Alternative: 48px (`h-xxl`, ≈166px wide).* Rejected: it dominates the bar and crowds the centred links at 744px.
 - *Alternative: a responsive height.* Unnecessary given the width budget above.
 
-### D5. Favicon: a hand-authored ring-mark SVG in `public/`
+### D5. Favicon: the logo's mark, cut from the D1 trace, in `public/`
 
-Create `public/favicon.svg` (the project-structure standard places the favicon in `public/`, served verbatim) containing only the red ring, built from the same circle geometry as D1 and padded inside a square `viewBox`. Reference it from `index.html` with `<link rel="icon" type="image/svg+xml" href="/favicon.svg">`. The grey "C" and the motion strokes are omitted because they turn to mush at 16px.
+Create `public/favicon.svg` (the project-structure standard places the favicon in `public/`, served verbatim) containing the logo's mark: the grey "C" and its five motion strokes (taken as whole subpaths from the D1 grey trace), plus the red ring with the same circle geometry as D1. Centre it in a square `viewBox` with about 3% padding. Exclude potrace's sub-pixel slivers, and leave out the neighbouring letters. Reference it from `index.html` with `<link rel="icon" type="image/svg+xml" href="/favicon.svg">`.
+
+- *Alternative: the red ring only.* This was the original choice, because the grey turns soft at 16px. The user chose the full mark after comparing renders at 16px and 32px. Accepted trade-off: the ring shrinks to about 60% of the icon's width, and on 1× displays the motion strokes blur at 16px. They resolve at 2× and at 32px.
+- *Alternative: ring plus grey "C", no strokes.* This is legible at 16px, but less faithful to the mark. Not chosen.
 
 - *Alternative: a Vite-processed asset referenced from `index.html`.* It works, but contradicts the standard's explicit placement.
 - *Alternative: also ship `.ico`/PNG fallbacks.* Out of scope (proposal), see the risks below.

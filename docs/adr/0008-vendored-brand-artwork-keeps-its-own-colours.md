@@ -5,7 +5,7 @@
 
 ## Context
 
-The design-system standard requires UI styling to use the DESIGN.md colour tokens, with no custom hex values. The official Ricochet logo (issue #36) is vendored as `src/assets/brand/ricochet-logo.svg`, and the favicon (`public/favicon.svg`) is derived from its red ring. Both use the brand's own grey (`#818286`) and red (`#c3121a`), sampled from the official artwork. Neither colour exists in the token set, and the closest tokens (`muted`, `primary`) are visibly different hues.
+The design-system standard requires UI styling to use the DESIGN.md colour tokens, with no custom hex values. The official Ricochet logo (issue #36) is vendored as `src/assets/brand/ricochet-logo.svg`, and the favicon (`public/favicon.svg`) is derived from its mark: the grey "C", its motion strokes and the red ring. Both use the brand's own grey (`#818286`) and red (`#c3121a`), sampled from the official artwork. Neither colour exists in the token set, and the closest tokens (`muted`, `primary`) are visibly different hues.
 
 ## Decision
 
