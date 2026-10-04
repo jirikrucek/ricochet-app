@@ -15,8 +15,14 @@ import {
 // A brand name, identical in every UI language, so not a translation key.
 const BRAND_NAME = 'Ricochet';
 
-// Matches the `tablet` breakpoint in globals.css, where the menu button hides.
-const TABLET_MEDIA_QUERY = '(min-width: 744px)';
+// Read from the `tablet` breakpoint token in globals.css, so the menu closes at
+// exactly the width where the menu button hides.
+function tabletMediaQuery() {
+  const width = getComputedStyle(document.documentElement)
+    .getPropertyValue('--breakpoint-tablet')
+    .trim();
+  return `(min-width: ${width})`;
+}
 
 const iconButtonClassName =
   'inline-flex size-xxl shrink-0 items-center justify-center rounded-full text-ink outline-none transition-colors hover:bg-surface-strong focus-visible:ring-3 focus-visible:ring-ring/50';
@@ -29,7 +35,7 @@ export function TopNav() {
   // Without this, a menu left open while the viewport widens would keep its
   // overlay and scroll lock over the full nav, with no visible way to close it.
   useEffect(() => {
-    const tablet = window.matchMedia(TABLET_MEDIA_QUERY);
+    const tablet = window.matchMedia(tabletMediaQuery());
     const closeOnTablet = (event: MediaQueryListEvent) => {
       if (event.matches) setMenuOpen(false);
     };
