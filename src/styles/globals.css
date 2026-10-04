@@ -55,6 +55,9 @@
   --container-app-shell: 1280px;
   --container-form-field: 240px;
 
+  /* Breakpoints (DESIGN.md: mobile < 744px) */
+  --breakpoint-tablet: 744px;
+
   /* Typography */
   --font-sans:
     'Inter', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;

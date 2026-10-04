@@ -7,6 +7,9 @@ const en = {
   nav: {
     players: 'Players',
     tournaments: 'Tournaments',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    menuTitle: 'Menu',
   },
   footer: {
     legal: '© {{year}} Ricochet App',

@@ -7,6 +7,9 @@ const cs = {
   nav: {
     players: 'Hráči',
     tournaments: 'Turnaje',
+    openMenu: 'Otevřít menu',
+    closeMenu: 'Zavřít menu',
+    menuTitle: 'Menu',
   },
   footer: {
     legal: '© {{year}} Ricochet App',
