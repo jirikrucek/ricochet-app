@@ -135,6 +135,29 @@ test('Switching to German on a phone', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('Mobile language selection stays in sync after resizing to desktop', async ({
+  page,
+}) => {
+  await openAt(page, PHONE);
+  await openMenu(page);
+
+  await menu(page).getByRole('combobox', { name: 'Language' }).click();
+  await page.getByRole('option', { name: 'Deutsch' }).click();
+  await expect(
+    page.getByText('Die Initialisierung des Workspaces ist bereit.'),
+  ).toBeVisible();
+
+  await page.setViewportSize(DESKTOP);
+
+  const desktopLanguage = banner(page).getByRole('combobox');
+  await expect(desktopLanguage).toContainText('Deutsch');
+  await desktopLanguage.click();
+  await page.getByRole('option', { name: 'English' }).click();
+
+  await expect(bannerLink(page, 'Players')).toBeVisible();
+  await expect(desktopLanguage).toContainText('English');
+});
+
 test('Closing the menu with Escape', async ({ page }) => {
   await openAt(page, PHONE, '/players');
   await openMenu(page);

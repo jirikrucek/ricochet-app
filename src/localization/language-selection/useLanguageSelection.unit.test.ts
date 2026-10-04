@@ -51,15 +51,51 @@ describe('useLanguageSelection', () => {
   it('updates the selection and changes the app language when a new option is chosen', () => {
     mockI18n.resolvedLanguage = 'en';
     mockI18n.changeLanguage.mockClear();
+    mockI18n.changeLanguage.mockImplementation((language: string) => {
+      mockI18n.language = language;
+      mockI18n.resolvedLanguage = language;
+      return Promise.resolve();
+    });
 
-    const { result } = renderHook(() => useLanguageSelection());
+    const { result, rerender } = renderHook(() => useLanguageSelection());
 
     act(() => {
       result.current.onSelect('de');
     });
+    rerender();
 
     expect(result.current.selectedLanguage).toBe('de');
     expect(mockI18n.changeLanguage).toHaveBeenCalledWith('de');
+  });
+
+  it('keeps mounted selectors in sync after changing language on mobile', () => {
+    mockI18n.language = 'en';
+    mockI18n.resolvedLanguage = 'en';
+    mockI18n.changeLanguage.mockReset();
+    mockI18n.changeLanguage.mockImplementation((language: string) => {
+      mockI18n.language = language;
+      mockI18n.resolvedLanguage = language;
+      return Promise.resolve();
+    });
+
+    const { result, rerender } = renderHook(() => ({
+      desktop: useLanguageSelection(),
+      mobile: useLanguageSelection(),
+    }));
+
+    act(() => {
+      result.current.mobile.onSelect('de');
+    });
+    rerender();
+
+    expect(result.current.desktop.selectedLanguage).toBe('de');
+    expect(result.current.mobile.selectedLanguage).toBe('de');
+
+    act(() => {
+      result.current.desktop.onSelect('en');
+    });
+
+    expect(mockI18n.changeLanguage).toHaveBeenNthCalledWith(2, 'en');
   });
 
   it('does not call changeLanguage when selecting the already-active language', () => {

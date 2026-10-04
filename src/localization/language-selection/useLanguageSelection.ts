@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -16,8 +16,8 @@ export type LanguageOption = {
 
 export function useLanguageSelection() {
   const { i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(() =>
-    resolveSupportedLanguage(i18n.resolvedLanguage ?? i18n.language),
+  const selectedLanguage = resolveSupportedLanguage(
+    i18n.resolvedLanguage ?? i18n.language,
   );
 
   const options = useMemo<LanguageOption[]>(
@@ -31,16 +31,11 @@ export function useLanguageSelection() {
 
   const onSelect = useCallback(
     (language: SupportedLanguage) => {
-      setSelectedLanguage((current) => {
-        if (language === current) {
-          return current;
-        }
-
+      if (language !== selectedLanguage) {
         void i18n.changeLanguage(language);
-        return language;
-      });
+      }
     },
-    [i18n],
+    [i18n, selectedLanguage],
   );
 
   return { selectedLanguage, options, onSelect };
