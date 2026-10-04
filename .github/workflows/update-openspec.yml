@@ -1,0 +1,83 @@
+name: Update OpenSpec
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-openspec
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Detect new OpenSpec release
+        id: detect
+        run: |
+          latest=$(gh release view --repo Fission-AI/OpenSpec --json tagName --jq .tagName)
+          latest="${latest#v}"
+          current=$(node -p "require('./package.json').devDependencies?.['@fission-ai/openspec'] ?? require('./package.json').dependencies['@fission-ai/openspec']")
+          current="${current#^}"
+          echo "latest=$latest current=$current"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          highest=$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -n1)
+          if [ "$latest" != "$current" ] && [ "$highest" = "$latest" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update @fission-ai/openspec
+        if: steps.detect.outputs.changed == 'true'
+        run: npm install "@fission-ai/openspec@^${{ steps.detect.outputs.latest }}"
+
+      - name: Update OpenSpec skills
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          skills=$(node -e "
+            const { skills } = require('./skills-lock.json');
+            console.log(Object.entries(skills)
+              .filter(([, s]) => s.source.toLowerCase() === 'fission-ai/openspec')
+              .map(([name]) => name).join(' '));
+          ")
+          # shellcheck disable=SC2086
+          npx --yes skills update $skills --project --yes
+
+      - name: Open pull request
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          VERSION: ${{ steps.detect.outputs.latest }}
+        run: |
+          branch="chore/update-openspec-${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "chore(deps): update OpenSpec to ${VERSION}"
+          git push --force origin "$branch"
+          gh pr create \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch" \
+            --title "chore(deps): update OpenSpec to ${VERSION}" \
+            --body "Automated update for the [OpenSpec ${VERSION} release](https://github.com/Fission-AI/OpenSpec/releases/tag/v${VERSION}).
+
+          - Bumps \`@fission-ai/openspec\` in \`package.json\`
+          - Refreshes OpenSpec skills via \`npx skills update\` (\`skills-lock.json\`)
+
+          Review the skill diffs and run the Definition of Done checks before merging." \
+            || echo "PR already exists for $branch"
