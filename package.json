@@ -11,7 +11,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright test",
-    "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright install chromium",
+    "test:e2e:setup": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright install chromium",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "prepare": "is-ci || husky",
     "supabase:start": "supabase start",

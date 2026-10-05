@@ -59,7 +59,7 @@ jobs:
         id: playwright
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
-          npm run test:e2e:install
+          npm run test:e2e:setup
           npx playwright install-deps chromium
 
       - name: E2E tests
