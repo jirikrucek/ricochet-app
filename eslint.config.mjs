@@ -232,5 +232,21 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Pixel baselines are OS- and renderer-specific, so e2e tests must not
+    // use them (ADR 0009).
+    files: ['tests/e2e/**/*.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'CallExpression[callee.property.name=/^(toHaveScreenshot|toMatchSnapshot)$/]',
+          message:
+            'Pixel snapshots are not allowed in e2e tests: they differ per OS. Assert structure instead (ADR 0009).',
+        },
+      ],
+    },
+  },
   prettierConfig,
 );

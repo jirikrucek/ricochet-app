@@ -98,6 +98,10 @@ When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-f
 
 Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `CONTEXT.md` and `docs/adr/`.
 
+### E2E tests
+
+When running, writing, or debugging E2E tests (Playwright), read `docs/agents/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
+
 ### Deployment
 
 When touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/agents/deployment.md`.

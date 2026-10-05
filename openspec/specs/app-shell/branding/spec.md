@@ -50,12 +50,14 @@ The system SHALL deliver the logo as resolution-independent vector artwork, so i
 #### Scenario: Logo on a high-density display
 - **GIVEN** a visitor uses a display with a device pixel ratio of 2 or more
 - **WHEN** the top nav bar is shown
-- **THEN** the logo edges are crisp, with no visible pixelation or blur
+- **THEN** the logo is delivered as vector artwork
+- **AND** the logo keeps the same size and proportions as on a standard display
 
 #### Scenario: Logo when the page is zoomed in
 - **GIVEN** a visitor has zoomed the page to 200%
 - **WHEN** the top nav bar is shown
-- **THEN** the logo scales up with crisp edges and no visible pixelation
+- **THEN** the logo is delivered as vector artwork
+- **AND** the logo is twice its normal size and keeps its proportions
 
 ### Requirement: Logo fits within the top nav bar at every viewport width
 The system SHALL size the logo to fit fully inside the top nav bar at every viewport width from 320px upward. It SHALL never be clipped, overlap other nav items, or make the page scroll horizontally. At widths of 744px and above, the nav bar's height and the position of its other items (section links and language selector) SHALL stay as they are today.

@@ -84,30 +84,45 @@ test('Brand name is not translated', async ({ page }) => {
   await expect(logoLink(page)).toHaveAccessibleName('Ricochet');
 });
 
-test.describe('on a high-density display', () => {
-  test.use({ deviceScaleFactor: 2 });
+test('Logo on a high-density display', async ({ browser }) => {
+  const standard = await browser.newContext({ deviceScaleFactor: 1 });
+  const dense = await browser.newContext({ deviceScaleFactor: 2 });
+  try {
+    const standardPage = await standard.newPage();
+    const densePage = await dense.newPage();
+    await openAt(standardPage, DESKTOP);
+    await openAt(densePage, DESKTOP);
 
-  test('Logo on a high-density display', async ({ page }) => {
-    await openAt(page, DESKTOP);
+    expect(await densePage.evaluate(() => window.devicePixelRatio)).toBe(2);
+    await expectImageToHaveLoaded(logoImage(densePage));
+    await expectSvgSource(logoImage(densePage));
 
-    const image = logoImage(page);
-    await expectImageToHaveLoaded(image);
-    await expectSvgSource(image);
-    // 'device' keeps the 2x pixels; the default 'css' scale would downsample them.
-    await expect(image).toHaveScreenshot('logo-2x.png', { scale: 'device' });
-  });
+    const standardBox = await boxOf(logoImage(standardPage));
+    const denseBox = await boxOf(logoImage(densePage));
+    expect(denseBox.width).toBeCloseTo(standardBox.width, 1);
+    expect(denseBox.height).toBeCloseTo(standardBox.height, 1);
+    await expectRenderedRatioToMatchViewBox(logoImage(densePage));
+  } finally {
+    await standard.close();
+    await dense.close();
+  }
 });
 
 test('Logo when the page is zoomed in', async ({ page }) => {
   await openAt(page, DESKTOP);
+  const image = logoImage(page);
+  await expectImageToHaveLoaded(image);
+  const normalBox = await boxOf(image);
+
   await page.evaluate(() => {
     document.documentElement.style.zoom = '2';
   });
 
-  const image = logoImage(page);
-  await expectImageToHaveLoaded(image);
   await expectSvgSource(image);
-  await expect(image).toHaveScreenshot('logo-zoom-200.png');
+  const zoomedBox = await boxOf(image);
+  expect(zoomedBox.width).toBeCloseTo(normalBox.width * 2, 0);
+  expect(zoomedBox.height).toBeCloseTo(normalBox.height * 2, 0);
+  await expectRenderedRatioToMatchViewBox(image);
 });
 
 test('Favicon shown in the browser tab', async ({ page, request }) => {

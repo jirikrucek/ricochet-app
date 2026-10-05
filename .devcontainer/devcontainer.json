@@ -18,11 +18,15 @@
   // 5173 is the default port for Vite
   "forwardPorts": [5173],
 
-  // Keep node_modules in a container-only named volume. The repo is bind-mounted from the
+  // Keep node_modules and .playwright-browsers in container-only named volumes. The repo is bind-mounted from the
   // host, and npm only installs native optional deps (e.g. @rolldown/binding-*) for the OS it
   // runs on, so sharing node_modules between macOS and Linux breaks Vite/Vitest on one side.
+  // Playwright has the same problem: it marks a browser folder as installed per version, so a
+  // macOS host would skip downloading its own build once the container installed the Linux one
+  // into the shared folder.
   "mounts": [
-    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume"
   ],
 
   // Use 'postCreateCommand' to run commands after the container is created.
@@ -34,7 +38,7 @@
   // resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
   // to /root by default, which breaks shim resolution ("unknown command: npx").
   "postCreateCommand": {
-    "installPlaywright": "sudo chown vscode:vscode node_modules && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:install"
+    "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:setup"
   },
 
   // Configure tool-specific properties.
