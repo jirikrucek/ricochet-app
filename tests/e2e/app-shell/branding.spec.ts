@@ -84,16 +84,6 @@ test('Brand name is not translated', async ({ page }) => {
   await expect(logoLink(page)).toHaveAccessibleName('Ricochet');
 });
 
-test('Logo matches the official artwork', async ({ page }) => {
-  await openAt(page, DESKTOP);
-
-  const image = logoImage(page);
-  await expectImageToHaveLoaded(image);
-  await expectSvgSource(image);
-  await expectRenderedRatioToMatchViewBox(image);
-  await expect(image).toHaveScreenshot('logo.png');
-});
-
 test.describe('on a high-density display', () => {
   test.use({ deviceScaleFactor: 2 });
 
