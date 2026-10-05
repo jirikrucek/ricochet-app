@@ -44,16 +44,6 @@ The system SHALL expose the logo link to assistive technology with the accessibl
 - **WHEN** a screen reader reaches the logo in the top nav bar
 - **THEN** it still announces a link named "Ricochet"
 
-### Requirement: Logo faithfully reproduces the official artwork
-The system SHALL render the logo with the shapes and brand colours of the official Ricochet artwork attached to issue #36: grey "RICHET" lettering and the red ring inside the grey "C" with its motion strokes. The registered-trademark mark (®) from the original artwork SHALL NOT be shown. The wordmark SHALL keep its original proportions, without stretching or cropping.
-
-#### Scenario: Logo matches the official artwork
-- **GIVEN** a visitor is on any page
-- **WHEN** the visitor looks at the top nav bar
-- **THEN** the logo shows grey lettering and the red ring inside the "C"
-- **AND** no ® mark is shown
-- **AND** the logo is neither stretched, squashed, nor cropped
-
 ### Requirement: Logo stays sharp at any display density or zoom level
 The system SHALL deliver the logo as resolution-independent vector artwork, so it renders without pixelation or blur on high-density displays and when the page is zoomed.
 
