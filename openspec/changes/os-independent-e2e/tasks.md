@@ -12,9 +12,9 @@
 
 ## 3. Predictable server
 
-- [ ] 3.1 In `playwright.config.ts`, read `E2E_PORT` (default `4173`) and derive `baseURL`, `webServer.url` and the `--port` flag from it
-- [ ] 3.2 Set `reuseExistingServer: false` and add `--strictPort` to the server command
-- [ ] 3.3 Verify: with the port occupied, the run fails fast with a clear error; with `E2E_PORT` set to a free port, the suite passes
+- [x] 3.1 In `playwright.config.ts`, read `E2E_PORT` (default `4173`) and derive `baseURL`, `webServer.url` and the `--port` flag from it
+- [x] 3.2 Set `reuseExistingServer: false` and add `--strictPort` to the server command
+- [x] 3.3 Verify: with the port occupied, the run fails fast with a clear error; with `E2E_PORT` set to a free port, the suite passes
 
 ## 4. Browsers and setup
 
