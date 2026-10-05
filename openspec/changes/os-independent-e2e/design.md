@@ -27,7 +27,7 @@ Alternatives: a per-OS baseline set (more files to maintain, and Linux runners s
 
 **Named volume for `.playwright-browsers`.** Same mechanism as `node_modules` in `devcontainer.json`, plus a `chown` in `postCreateCommand`. The container keeps its Linux browsers and the host keeps its own. The repo-local `PLAYWRIGHT_BROWSERS_PATH` override stays unchanged. Alternative: dropping the override and using Playwright's default per-user cache; not chosen because the repo-local folder is deliberate and the volume solves the sharing problem.
 
-**`test:e2e:setup` for the portable part.** It runs the browser install. `playwright install-deps` is Linux-only and needs `sudo`, so it stays in the dev container and the CI workflow. The README documents the three recipes.
+**`test:e2e:setup` for the portable part.** It runs the browser install. `playwright install-deps` is Linux-only and needs `sudo`, so it stays in the dev container and the CI workflow. `docs/agents/e2e-tests.md` documents the three recipes and is linked from the AGENTS.md playbooks.
 
 ## Risks / Trade-offs
 

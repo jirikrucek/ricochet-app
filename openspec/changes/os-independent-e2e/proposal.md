@@ -9,7 +9,7 @@ The E2E suite is meant to run on a macOS host, in the Ubuntu dev container, and 
 - Add an ESLint rule that bans `toHaveScreenshot` and `toMatchSnapshot` in `tests/e2e`, and an ADR recording why.
 - `playwright.config.ts`: always start a fresh `vite dev` server (`reuseExistingServer: false`, `--strictPort`), with the port read from `E2E_PORT` (default `4173`).
 - Dev container: keep `.playwright-browsers` in a named volume, like `node_modules`.
-- Add a `test:e2e:setup` npm script and README recipes for macOS, the dev container and CI.
+- Add a `test:e2e:setup` npm script and recipes (`docs/agents/e2e-tests.md`) for macOS, the dev container and CI.
 
 ## Capabilities
 
@@ -25,7 +25,7 @@ None.
 
 - `openspec/specs/app-shell/branding/spec.md` (via the delta spec, applied on archive)
 - `tests/e2e/app-shell/branding.spec.ts`, `tests/e2e/app-shell/shell.ts`, and the removed `branding.spec.ts-snapshots/`
-- `playwright.config.ts`, `eslint.config.mjs`, `package.json`, `.devcontainer/devcontainer.json`, `README.md`
+- `playwright.config.ts`, `eslint.config.mjs`, `package.json`, `.devcontainer/devcontainer.json`, `docs/agents/e2e-tests.md`, `AGENTS.md`
 - New ADR in `docs/adr/`
 - No production code, dependencies, or APIs change.
 
