@@ -6,9 +6,9 @@
 
 ## 2. Guard against snapshots
 
-- [ ] 2.1 Add a failing lint check: a temporary `toHaveScreenshot` call in `tests/e2e` that the new rule must flag
-- [ ] 2.2 Add the `no-restricted-syntax` rule for `toHaveScreenshot` and `toMatchSnapshot` scoped to `tests/e2e/**` in `eslint.config.mjs`, then remove the temporary call
-- [ ] 2.3 Write the ADR in `docs/adr/` (next number after 0008) and reference it in the rule message
+- [x] 2.1 Add a failing lint check: a temporary `toHaveScreenshot` call in `tests/e2e` that the new rule must flag
+- [x] 2.2 Add the `no-restricted-syntax` rule for `toHaveScreenshot` and `toMatchSnapshot` scoped to `tests/e2e/**` in `eslint.config.mjs`, then remove the temporary call
+- [x] 2.3 Write the ADR in `docs/adr/` (next number after 0008) and reference it in the rule message
 
 ## 3. Predictable server
 
