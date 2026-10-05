@@ -24,7 +24,7 @@
 
 ## 5. Verification
 
-- [ ] 5.1 Run the full suite on the macOS host
-- [ ] 5.2 Rebuild the dev container and run the full suite there
+- [x] 5.1 Run the full suite on the macOS host
+- [x] 5.2 Rebuild the dev container and run the full suite there
 - [ ] 5.3 Push and confirm the Verification checks workflow passes on Ubuntu
-- [ ] 5.4 Run the Definition of Done from `AGENTS.md`
+- [x] 5.4 Run the Definition of Done from `AGENTS.md`
