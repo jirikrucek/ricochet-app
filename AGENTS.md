@@ -84,24 +84,24 @@ When adding or editing a Supabase migration (tables, RLS policies), read `docs/s
 
 When adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability.md` first.
 
-## Playbooks
+## Guides
 
 ### Issue tracker
 
-When creating, reading, updating, or triaging an issue or PR, use the `gh` CLI per `docs/agents/issue-tracker.md`.
+When creating, reading, updating, or triaging an issue or PR, use the `gh` CLI per `docs/guides/issue-tracker.md`.
 
 ### Triage labels
 
-When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Full mapping in `docs/agents/triage-labels.md`.
+When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Full mapping in `docs/guides/triage-labels.md`.
 
 ### Domain docs
 
-Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `GLOSSARY.md` and `docs/adr/`.
+Before exploring the codebase for a task, read `docs/guides/domain.md` for how to consult `GLOSSARY.md` and `docs/adr/`.
 
 ### E2E tests
 
-When running, writing, or debugging E2E tests (Playwright), read `docs/agents/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
+When running, writing, or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
 
 ### Deployment
 
-When touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/agents/deployment.md`.
+When touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment.md`.

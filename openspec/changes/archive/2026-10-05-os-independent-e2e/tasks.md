@@ -20,7 +20,7 @@
 
 - [x] 4.1 Add the `test:e2e:setup` script in `package.json` and have `test:e2e:install` callers (dev container, CI workflow) use it
 - [x] 4.2 Add the named volume for `.playwright-browsers` to `.devcontainer/devcontainer.json` and the matching `chown` to `postCreateCommand`
-- [x] 4.3 Document recipes for macOS, the dev container and CI (including `E2E_PORT`) in `docs/agents/e2e-tests.md`, linked from the AGENTS.md playbooks
+- [x] 4.3 Document recipes for macOS, the dev container and CI (including `E2E_PORT`) in `docs/guides/e2e-tests.md`, linked from the AGENTS.md playbooks
 
 ## 5. Verification
 
