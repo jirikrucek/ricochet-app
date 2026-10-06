@@ -96,7 +96,7 @@ When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-f
 
 ### Domain docs
 
-Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `CONTEXT.md` and `docs/adr/`.
+Before exploring the codebase for a task, read `docs/agents/domain.md` for how to consult `GLOSSARY.md` and `docs/adr/`.
 
 ### E2E tests
 
