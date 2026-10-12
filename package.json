@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@fission-ai/openspec": "^1.14.0",
+    "@fission-ai/openspec": "^1.14.1",
     "@playwright/test": "^1.63.0",
     "@tanstack/react-query-devtools": "^5.104.1",
     "@testing-library/react": "^16.3.3",
