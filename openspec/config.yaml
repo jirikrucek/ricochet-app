@@ -1,4 +1,4 @@
-schema: feature-workflow
+schema: spec-driven
 
 rules:
   proposal:
