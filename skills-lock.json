@@ -7,11 +7,23 @@
       "skillPath": "skills/api-and-interface-design/SKILL.md",
       "computedHash": "26f5a9e7abfd332d7a2e5887cf19bddd3393f47514c379b36bf227c1f15cdec4"
     },
+    "architectural-decision-records": {
+      "source": "intent-driven-dev/intent-driven-template",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/architectural-decision-records/SKILL.md",
+      "computedHash": "a1bbf5fa344369d07234164df3bf15582aaffd1f58b9321e5b5ecc1fea8e2252"
+    },
     "ask-matt": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/ask-matt/SKILL.md",
       "computedHash": "16554b785353aabf3880228755d317a3193a8359772f25ecb5f2a1f762d6e12d"
+    },
+    "c4-diagrams": {
+      "source": "intent-driven-dev/intent-driven-template",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/c4-diagrams/SKILL.md",
+      "computedHash": "6c432ca7c9f5dec38ec9309b0f874025b668c53fad8f13125ef049db7a571b12"
     },
     "code-review": {
       "source": "mattpocock/skills",
@@ -60,6 +72,12 @@
       "sourceType": "github",
       "skillPath": ".agents/skills/gherkin-authoring/SKILL.md",
       "computedHash": "c9e0f9b6eddc4dffb9da6e359353e4cf01a6bad73bcc4613f0528695ceff5d1d"
+    },
+    "glossary": {
+      "source": "intent-driven-dev/intent-driven-template",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/glossary/SKILL.md",
+      "computedHash": "8b4ea6a5f8d03d009905d66841bf1ca52740a7574b06b42e0241293dd688771d"
     },
     "grill-me": {
       "source": "mattpocock/skills",
