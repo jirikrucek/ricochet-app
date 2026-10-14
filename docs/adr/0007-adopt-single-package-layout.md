@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-08-10
+- Supersedes: ADR 0004
 - Updated: 2026-08-21
 
 ## Context
