@@ -1,19 +1,30 @@
-schema: spec-driven
+schema: intent-driven
 
 rules:
+  adr:
+    - Must use /glossary skill
+    - Must use /architectural-decision-records skill  
+  design:
+    - Must use /glossary skill
+    - Must use /c4-diagrams skill 
   proposal:
-    - Must use /grill-with-docs skill
+    - Must use /grilling skill
+    - Must use /glossary skill
     - Must organize specs by feature area
     - Must include an **Out of Scope** section
     - Must include a **Traceability** section with a link to a relevant issue in the issue tracker
   specs:
+    - Must use /glossary skill
     - Must use /gherkin-authoring skill
   tasks:
-    - Must break the work into tracer bullets, small slices of functionality that get built end-to-end; each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests), vertical NOT horizontal; each slice is demoable/verifiable on its own and sized to fit in a single fresh context window; any prefactoring should be done first
-    - Must ensure tests (unit, integration, and E2E) are always written before implementation following TDD
+    - Must break the work into tracer bullets, small slices of functionality that get built end-to-end; each slice cuts a narrow but complete path through every layer (schema, API, UI, tests), vertical NOT horizontal; each slice is demoable/verifiable on its own and sized to fit in a single fresh context window; any prefactoring should be done first
+    - Must ensure tests (unit, integration, and E2E) are always written before implementation; follow TDD
     - Must cover each spec, its all requirement scenarios, by an E2E test
 
 operations:
   apply:
     guidance:
       - Must use /implement skill
+  archive:
+    guidance:
+      - Must run OpenSpec Sync before archiving      
