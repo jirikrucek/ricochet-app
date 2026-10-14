@@ -14,6 +14,7 @@ Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guide
 
 - Status: Proposed | Accepted | Deprecated | Superseded by ADR NNNN
 - Created: YYYY-MM-DD
+- Updated: YYYY-MM-DD
 
 ## Context
 
@@ -30,12 +31,17 @@ Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guide
 ## Consequences
 
 - {Positive, negative, and follow-up work. Only non-obvious downstream effects.}
+
+## Notes
+
+- {Other things worth mentioning.}
+
 ```
 
 ## Rules
 
 - One decision per ADR.
-- `Alternatives Considered` and `Consequences` are optional; include them only when they add value. Context and Decision are required.
+- `Alternatives Considered`, `Consequences` and `Notes` are optional; include them only when they add value. Context and Decision are required.
 - Never rewrite an accepted ADR to change the decision. Add a new ADR and mark the old one `Superseded by ADR NNNN`.
 - Use terms from the glossary.
 - If the decision contradicts an existing ADR, say so explicitly.
