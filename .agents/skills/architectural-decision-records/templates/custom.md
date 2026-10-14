@@ -4,7 +4,7 @@ Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guide
 
 ## File
 
-- Location: `docs/adr/NNNN-kebab-case-slug.md`. Scan `docs/adr/` for the highest number and increment by one (4 digits).
+- Location: `docs/adr/ADRNNNN-kebab-case-slug.md`. Scan `docs/adr/` for the highest number and increment by one (4 digits).
 - Create an ADR only when the decision is hard to reverse, surprising without context, and a real trade-off (see `docs/guides/adrs.md`).
 
 ## Template

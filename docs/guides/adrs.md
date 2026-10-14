@@ -1,6 +1,6 @@
 # ADRs
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+ADRs live in `docs/adr/` and use sequential numbering: `ADR0001-slug.md`, `ADR0002-slug.md`, etc.
 
 When creating or updating an ADR, use `/architectural-decision-records` skill.
 

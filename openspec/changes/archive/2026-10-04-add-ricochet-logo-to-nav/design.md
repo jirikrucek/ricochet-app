@@ -47,7 +47,7 @@ Import `src/assets/brand/ricochet-logo.svg` as a URL (as the flags do) and rende
 
 ### D3. Brand colours stay inside the SVG; record the exception in an ADR
 
-The SVG carries literal brand hex fills. To reconcile this with the design-system rule "No custom hex values", add a short "Vendored artwork" note to `docs/standards/design-system.md`: the token rule governs UI styling, while vendored brand and flag artwork keeps its intrinsic colours. Record the decision in `docs/adr/0008-vendored-brand-artwork-keeps-its-own-colours.md`, citing ADR 0006's flags as precedent.
+The SVG carries literal brand hex fills. To reconcile this with the design-system rule "No custom hex values", add a short "Vendored artwork" note to `docs/standards/design-system.md`: the token rule governs UI styling, while vendored brand and flag artwork keeps its intrinsic colours. Record the decision in `docs/adr/ADR0008-vendored-brand-artwork-keeps-its-own-colours.md`, citing ADR 0006's flags as precedent.
 
 - *Alternatives considered (mapping to the nearest tokens, or adding brand tokens):* both were rejected with the user during proposal review.
 
