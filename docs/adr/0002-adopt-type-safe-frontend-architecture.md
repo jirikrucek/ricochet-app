@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-21
+- Updated: 2026-07-21
 
 ## Context
 
@@ -30,19 +31,17 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
   - React components do not call backend clients directly.
   - Access data via repository/service interfaces and shared contracts.
 
-## Consequences
-
-- Positive:
-  - Strong type safety across navigation, API interactions, and input validation.
-  - Better separation of concerns between server state, client state, and URL state.
-  - Maintainable UI styling through token-based design.
-  - Easier AI-assisted changes due to predictable patterns and localized responsibilities.
-- Tradeoffs:
-  - Requires team discipline to avoid bypassing repositories or mixing state layers.
-  - Adds initial architectural setup overhead versus ad hoc feature coding.
-
 ## Alternatives Considered
 
-- React Router as routing baseline: viable, but weaker built-in typed URL/search ergonomics.
-- RTK Query as server-state layer: viable when Redux is already central, but adds store/middleware overhead for this app's preferred architecture.
-- Formik/Yup for forms: viable, but lower performance/ergonomics for this stack compared with RHF + Zod.
+- React Router as routing baseline. Rejected: viable, but weaker built-in typed URL/search ergonomics.
+- RTK Query as server-state layer. Rejected: viable when Redux is already central, but adds store/middleware overhead for this app's preferred architecture.
+- Formik/Yup for forms. Rejected: viable, but lower performance/ergonomics for this stack compared with RHF + Zod.
+
+## Consequences
+
+- Positive: strong type safety across navigation, API interactions, and input validation.
+- Positive: better separation of concerns between server state, client state, and URL state.
+- Positive: maintainable UI styling through token-based design.
+- Positive: easier AI-assisted changes due to predictable patterns and localized responsibilities.
+- Negative: requires team discipline to avoid bypassing repositories or mixing state layers.
+- Negative: adds initial architectural setup overhead versus ad hoc feature coding.

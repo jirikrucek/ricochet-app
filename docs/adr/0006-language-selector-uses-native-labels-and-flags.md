@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-08-03
+- Updated: 2026-08-03
 
 ## Context
 
@@ -26,10 +27,10 @@ English is mapped to the GB flag rather than a generic/placeholder flag (`xx`) o
 
 ## Alternatives Considered
 
-- Generic `xx` placeholder flag for English — avoids implying a specific country, but was rejected in favor of GB for visual consistency with the other rows.
-- Custom composite GB/US flag asset — not an ISO 3166 code, would require a bespoke asset and rendering path outside the flag library; rejected as disproportionate scope for this problem.
-- `react-circle-flags` (loading SVGs from `react-circle-flags.pages.dev` at runtime) — initially used, then rejected: a third-party CDN dependency for a fixed set of six flags is an unnecessary availability, privacy, and CSP risk with no benefit over vendoring the assets directly.
+- Generic `xx` placeholder flag for English. Rejected: avoids implying a specific country, but GB keeps visual consistency with the other rows.
+- Custom composite GB/US flag asset. Rejected: not an ISO 3166 code, would require a bespoke asset and rendering path outside the flag library; disproportionate scope for this problem.
+- `react-circle-flags` (loading SVGs from `react-circle-flags.pages.dev` at runtime). Rejected: initially used, but a third-party CDN dependency for a fixed set of six flags is an unnecessary availability, privacy, and CSP risk with no benefit over vendoring the assets directly.
 
 ## Notes
 
-This extends ADR 0005 (frontend localization with i18next), which defines the supported language codes but not how they are labeled or iconified in the selector UI.
+- This extends ADR 0005 (frontend localization with i18next), which defines the supported language codes but not how they are labeled or iconified in the selector UI.

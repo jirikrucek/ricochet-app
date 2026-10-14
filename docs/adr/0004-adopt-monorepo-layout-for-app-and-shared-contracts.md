@@ -2,6 +2,7 @@
 
 - Status: Superseded by ADR 0007
 - Created: 2026-07-21
+- Updated: 2026-08-10
 
 ## Context
 
@@ -24,22 +25,21 @@ Within `apps/web/src`, organize feature code by domain modules aligned with ADR 
 
 Keep repository-level docs and architecture records at root and under `docs/adr`, and keep OpenSpec assets under the existing `openspec` directory used by this codebase.
 
-## Consequences
-
-- Positive:
-  - Keeps the only frontend surface self-contained, so styling changes stay close to the components they serve.
-  - Preserves a clear boundary between app code and shared contracts without inventing an extra workspace.
-  - Reduces workspace, dependency, and TypeScript project-reference overhead.
-- Tradeoffs:
-  - If the product later gains another frontend surface, shared styling will need to be extracted intentionally at that time.
-  - Requires discipline to keep styling organized inside `apps/web` instead of letting it sprawl.
-
 ## Alternatives Considered
 
-- Separate `packages/styling` workspace for shared styling: rejected because there is no second frontend surface to justify the extra boundary.
-- Single-package app with colocated contracts and styling: simpler initially, but weakens the distinction between app code and cross-package contracts.
-- Domain packages per feature from day one: stronger isolation, but unnecessary upfront complexity for current project scope.
+- Separate `packages/styling` workspace for shared styling. Rejected: there is no second frontend surface to justify the extra boundary.
+- Single-package app with colocated contracts and styling. Rejected: simpler initially, but weakens the distinction between app code and cross-package contracts.
+- Domain packages per feature from day one. Rejected: stronger isolation, but unnecessary upfront complexity for current project scope.
+
+## Consequences
+
+- Positive: keeps the only frontend surface self-contained, so styling changes stay close to the components they serve.
+- Positive: preserves a clear boundary between app code and shared contracts without inventing an extra workspace.
+- Positive: reduces workspace, dependency, and TypeScript project-reference overhead.
+- Negative: if the product later gains another frontend surface, shared styling will need to be extracted intentionally at that time.
+- Negative: requires discipline to keep styling organized inside `apps/web` instead of letting it sprawl.
 
 ## Notes
 
-This ADR defines repository structure and ownership boundaries. Technology decisions remain in ADR 0001 and ADR 0002.
+- This ADR defines repository structure and ownership boundaries. Technology decisions remain in ADR 0001 and ADR 0002.
+- Superseded by ADR 0007, which collapsed the repository to a single package.

@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-10-05
+- Updated: 2026-10-05
 
 ## Context
 
@@ -21,5 +22,5 @@ For the requirement "Logo stays sharp at any display density or zoom level" that
 
 ## Consequences
 
-- A change that only makes the logo look wrong (colours, shape) is not caught by E2E. The artwork is vendored and rarely changes (ADR 0008).
-- Revisiting this means replacing the lint rule together with a plan for how baselines are produced in every environment.
+- Negative: a change that only makes the logo look wrong (colours, shape) is not caught by E2E. The artwork is vendored and rarely changes (ADR 0008).
+- Follow-up: revisiting this means replacing the lint rule together with a plan for how baselines are produced in every environment.
