@@ -15,6 +15,7 @@ Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guide
 - Status: Proposed | Accepted | Deprecated | Superseded by ADR NNNN
 - Created: YYYY-MM-DD
 - Updated: YYYY-MM-DD
+- Supersedes: ADR NNNN (when replacing an existing decision)
 
 ## Context
 
