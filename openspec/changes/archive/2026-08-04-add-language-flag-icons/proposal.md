@@ -26,7 +26,7 @@ _None._
 - `apps/web/src/localization/languages.ts` — add static native-name and country-code maps.
 - `apps/web/src/localization/locales/{en,cs,de,pl,nl,hu}.ts` — remove dead `languages.*` keys.
 - `apps/web/src/assets/flags/{gb,cz,de,pl,nl,hu}.svg` — vendored flag SVGs (no new runtime dependency).
-- `docs/adr/0006-language-selector-uses-native-labels-and-flags.md` — new ADR recording the native-label + flag decision, extending ADR 0005.
+- `docs/adr/ADR0006-language-selector-uses-native-labels-and-flags.md` — new ADR recording the native-label + flag decision, extending ADR 0005.
 
 ## Out of Scope
 

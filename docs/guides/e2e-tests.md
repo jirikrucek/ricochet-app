@@ -2,7 +2,7 @@
 
 The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the dev container and in GitHub Actions. It starts its own `vite dev` server on `127.0.0.1:4173`. Set `E2E_PORT` to use another port. The run fails fast if the port is already taken.
 
-Tests assert structure (roles, attributes, sizes), not pixels, because screenshots differ per OS. ESLint rejects `toHaveScreenshot` and `toMatchSnapshot` in `tests/e2e` (see [ADR 0009](../adr/0009-e2e-tests-do-not-use-pixel-snapshots.md)).
+Tests assert structure (roles, attributes, sizes), not pixels, because screenshots differ per OS. ESLint rejects `toHaveScreenshot` and `toMatchSnapshot` in `tests/e2e` (see [ADR 0009](../adr/ADR0009-e2e-tests-do-not-use-pixel-snapshots.md)).
 
 ## macOS
 

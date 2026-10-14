@@ -94,9 +94,9 @@ When creating, reading, updating, or triaging an issue or PR, use the `gh` CLI p
 
 When applying a triage label, use one of: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Full mapping in `docs/guides/triage-labels.md`.
 
-### Domain docs
+### ADRs
 
-Before exploring the codebase for a task, read `docs/guides/domain.md` for how to consult `GLOSSARY.md` and `docs/adr/`.
+Before exploring the codebase for a task, read ADRs in `docs/adr/` that touch the area you're about to work in. Read `docs/guides/adrs.md`.
 
 ### E2E tests
 

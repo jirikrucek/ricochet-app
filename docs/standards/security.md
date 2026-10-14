@@ -1,6 +1,6 @@
 # Security
 
-This project uses Supabase with the client-side anon key exposed to the browser (see [ADR 0001](../adr/0001-adopt-spa-platform-and-core-stack.md)). Row-Level Security (RLS) is the only access control boundary between that key and the database — there is no server tier in front of it.
+This project uses Supabase with the client-side anon key exposed to the browser (see [ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core-stack.md)). Row-Level Security (RLS) is the only access control boundary between that key and the database — there is no server tier in front of it.
 
 For any change that adds or edits a Supabase migration:
 - Read this file first.

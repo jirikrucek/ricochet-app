@@ -1,6 +1,6 @@
 # Project Structure
 
-This project is a single npm package (see [ADR 0007](../adr/0007-adopt-single-package-layout.md)). There is one `package.json`, one `src/`, at the repository root — no `apps/*` or `packages/*` workspaces.
+This project is a single npm package (see [ADR 0007](../adr/ADR0007-adopt-single-package-layout.md)). There is one `package.json`, one `src/`, at the repository root — no `apps/*` or `packages/*` workspaces.
 
 For any change that adds, moves, or renames files:
 - Read this file first to place the file in the right folder.

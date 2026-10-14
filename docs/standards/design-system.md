@@ -11,7 +11,7 @@ For all UI work:
 
 ## Vendored artwork
 
-The "no custom hex values" rule governs UI styling. Vendored artwork rendered as an image keeps its intrinsic colours inside the asset file: the brand logo (`src/assets/brand/`), the favicon (`public/favicon.svg`) and the flag SVGs (`src/assets/flags/`). Don't map those fills to tokens, and don't reuse their hex values in component styles. See [ADR 0008](../adr/0008-vendored-brand-artwork-keeps-its-own-colours.md).
+The "no custom hex values" rule governs UI styling. Vendored artwork rendered as an image keeps its intrinsic colours inside the asset file: the brand logo (`src/assets/brand/`), the favicon (`public/favicon.svg`) and the flag SVGs (`src/assets/flags/`). Don't map those fills to tokens, and don't reuse their hex values in component styles. See [ADR 0008](../adr/ADR0008-vendored-brand-artwork-keeps-its-own-colours.md).
 
 ## Setup status
 
