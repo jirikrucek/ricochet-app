@@ -11,6 +11,15 @@ const hu = {
     closeMenu: 'Menü bezárása',
     menuTitle: 'Menü',
   },
+  players: {
+    heading: 'Játékosok',
+    caption: 'Játékosok listája',
+    columns: {
+      surname: 'Vezetéknév',
+      firstName: 'Keresztnév',
+      nationality: 'Nemzetiség',
+    },
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

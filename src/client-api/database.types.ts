@@ -34,7 +34,40 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      players: {
+        Row: {
+          created_at: string;
+          first_name: string;
+          id: number;
+          nationality: string;
+          sex: Database['public']['Enums']['player_sex'];
+          surname: string;
+          surname_prefix: string | null;
+          surname_suffix: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          first_name: string;
+          id?: never;
+          nationality: string;
+          sex: Database['public']['Enums']['player_sex'];
+          surname: string;
+          surname_prefix?: string | null;
+          surname_suffix?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          first_name?: string;
+          id?: never;
+          nationality?: string;
+          sex?: Database['public']['Enums']['player_sex'];
+          surname?: string;
+          surname_prefix?: string | null;
+          surname_suffix?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -43,7 +76,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      player_sex: 'male' | 'female';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -173,6 +206,8 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      player_sex: ['male', 'female'],
+    },
   },
 } as const;

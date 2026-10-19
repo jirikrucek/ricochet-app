@@ -8,5 +8,12 @@ type FlagProps = Omit<ComponentProps<'img'>, 'src'> & {
 };
 
 export function Flag({ countryCode, alt = '', ...props }: FlagProps) {
-  return <img src={flagSrc(countryCode)} alt={alt} {...props} />;
+  return (
+    <img
+      src={flagSrc(countryCode)}
+      alt={alt}
+      data-country={countryCode.toUpperCase()}
+      {...props}
+    />
+  );
 }

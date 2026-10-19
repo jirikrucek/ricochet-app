@@ -22,17 +22,17 @@
 
 ## 4. Slice: list players in a table (schema → API → UI)
 
-- [ ] 4.1 Write failing integration tests: `supabase/seed.sql` holds exactly 100 **players**, 40 female, 24 CZ, 4 HU, and no female GB, covering all six **nationalities**, both **sexes**, a **surname prefix**, a jr./sr. pair, the surnames the spec scenarios name, and shared surnames (`seed.integration.test.ts`)
-- [ ] 4.2 Write failing integration tests for access: with the publishable key, a `select` returns the **players**; insert, update, and delete are each refused, and the row count and a sample row are unchanged afterwards
-- [ ] 4.3 Write the migration `supabase/migrations/<timestamp>_create_players.sql` per D1 and D2: `player_sex` enum, `players` columns, the `nationality` check, the non-blank checks, the `nulls not distinct` natural unique key, RLS enabled, one `select` policy for `anon` and `authenticated`, and revoked insert/update/delete/truncate grants
-- [ ] 4.4 Write `supabase/seed.sql` with 100 fictional **players**, run `supabase db reset`, and confirm 4.1 and 4.2 pass
-- [ ] 4.5 Regenerate `src/client-api/database.types.ts` with `npm run supabase:types`
-- [ ] 4.6 Write failing unit tests with **mock data** for `toPlayer(row)` (maps every field, `null` prefix and suffix become absent, rejects an unknown **nationality** or **sex**) and `formatSurname(player)` (`[prefix] surname [suffix]`, leaving out missing parts)
-- [ ] 4.7 Implement `Player`, `Nationality`, `Sex`, the Zod row schema, `toPlayer`, and `formatSurname` in `src/domain/players/` until 4.6 passes
-- [ ] 4.8 Write a failing integration test for `fetchPlayerRows()` against the **seed data** (explicit columns, 100 rows, throws on a Supabase error), then implement it in `src/client-api/players/` with a comment on the PostgREST `max_rows` limit
-- [ ] 4.9 Write a failing integration test for `usePlayers()` in `src/features/players/api/` (query key `['players']`, returns 100 mapped **players**), then implement it
-- [ ] 4.10 Write failing E2E tests in `tests/e2e/players/` for the scenarios "Players shown with surname, first name, and nationality", "Surname shown with its prefix and suffix", "Table kept on a phone", "Anonymous visitor reads players", and "Visitor cannot change player data" (insert, update, and delete through Playwright's `request` against the local PostgREST with the publishable key, then the overview still lists the same **players**)
-- [ ] 4.11 Replace the placeholder in `src/routes/players/index.tsx` with a `PlayerOverview` component in `src/features/players/components/` that renders the table (visually hidden caption, Surname, First name, and Nationality columns, a fixed narrow Nationality column, wrapping cells), with the heading, caption, and column headers translated in all six locale files, until 4.10 passes
+- [x] 4.1 Write failing integration tests: `supabase/seed.sql` holds exactly 100 **players**, 40 female, 24 CZ, 4 HU, and no female GB, covering all six **nationalities**, both **sexes**, a **surname prefix**, a jr./sr. pair, the surnames the spec scenarios name, and shared surnames (`seed.integration.test.ts`)
+- [x] 4.2 Write failing integration tests for access: with the publishable key, a `select` returns the **players**; insert, update, and delete are each refused, and the row count and a sample row are unchanged afterwards
+- [x] 4.3 Write the migration `supabase/migrations/<timestamp>_create_players.sql` per D1 and D2: `player_sex` enum, `players` columns, the `nationality` check, the non-blank checks, the `nulls not distinct` natural unique key, RLS enabled, one `select` policy for `anon` and `authenticated`, and revoked insert/update/delete/truncate grants
+- [x] 4.4 Write `supabase/seed.sql` with 100 fictional **players**, run `supabase db reset`, and confirm 4.1 and 4.2 pass
+- [x] 4.5 Regenerate `src/client-api/database.types.ts` with `npm run supabase:types`
+- [x] 4.6 Write failing unit tests with **mock data** for `toPlayer(row)` (maps every field, `null` prefix and suffix become absent, rejects an unknown **nationality** or **sex**) and `formatSurname(player)` (`[prefix] surname [suffix]`, leaving out missing parts)
+- [x] 4.7 Implement `Player`, `Nationality`, `Sex`, the Zod row schema, `toPlayer`, and `formatSurname` in `src/domain/players/` until 4.6 passes
+- [x] 4.8 Write a failing integration test for `fetchPlayerRows()` against the **seed data** (explicit columns, 100 rows, throws on a Supabase error), then implement it in `src/client-api/players/` with a comment on the PostgREST `max_rows` limit
+- [x] 4.9 Write a failing integration test for `usePlayers()` in `src/features/players/api/` (query key `['players']`, returns 100 mapped **players**), then implement it
+- [x] 4.10 Write failing E2E tests in `tests/e2e/players/` for the scenarios "Players shown with surname, first name, and nationality", "Surname shown with its prefix and suffix", "Table kept on a phone", "Anonymous visitor reads players", and "Visitor cannot change player data" (insert, update, and delete through Playwright's `request` against the local PostgREST with the publishable key, then the overview still lists the same **players**)
+- [x] 4.11 Replace the placeholder in `src/routes/players/index.tsx` with a `PlayerOverview` component in `src/features/players/components/` that renders the table (visually hidden caption, Surname, First name, and Nationality columns, a fixed narrow Nationality column, wrapping cells), with the heading, caption, and column headers translated in all six locale files, until 4.10 passes
 
 ## 5. Slice: nationality flags with localized country names
 

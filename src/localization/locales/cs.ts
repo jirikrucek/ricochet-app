@@ -11,6 +11,15 @@ const cs = {
     closeMenu: 'Zavřít menu',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Hráči',
+    caption: 'Seznam hráčů',
+    columns: {
+      surname: 'Příjmení',
+      firstName: 'Jméno',
+      nationality: 'Národnost',
+    },
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

@@ -11,6 +11,15 @@ const pl = {
     closeMenu: 'Zamknij menu',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Gracze',
+    caption: 'Lista graczy',
+    columns: {
+      surname: 'Nazwisko',
+      firstName: 'Imię',
+      nationality: 'Narodowość',
+    },
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

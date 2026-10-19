@@ -11,6 +11,15 @@ const nl = {
     closeMenu: 'Menu sluiten',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Spelers',
+    caption: 'Lijst van spelers',
+    columns: {
+      surname: 'Achternaam',
+      firstName: 'Voornaam',
+      nationality: 'Nationaliteit',
+    },
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },
