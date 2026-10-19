@@ -19,6 +19,15 @@ The app has a Players section in its nav, but the page behind it only shows a he
   - Page states: loading, an error with Retry (reported per the observability standard), "No players yet" when the table is empty, and "No players match the selected filters" with a Clear filters action.
 - Add translations for all new UI text, country names, and sex labels in all six supported languages.
 - Run tests against a local Supabase: CI starts Supabase in Docker, applies migrations and **seed data**, and passes its URL and anon key to integration and E2E tests. Locally, `supabase start` becomes a prerequisite for `npm run test:all`.
+- Add a testing standard (`docs/standards/testing.md`) that sets the data rules for every test level:
+  - Unit tests use **mock data** only and never reach Supabase.
+  - Integration and E2E tests run against the local Supabase with **seed data**.
+  - E2E tests intercept Supabase requests only for states the **seed data** can't produce, such as an empty table or a server error.
+  - **Production data** is never used by any test, never committed, and never loaded into local or CI databases.
+  - **Seed data** and **mock data** are fictional.
+
+  `AGENTS.md` gets a pointer to it, and the Definition of Done checks tests against it.
+- Update the E2E guide (`docs/guides/e2e-tests.md`). It will say that Docker and a running local Supabase (`supabase start`) are required before integration and E2E tests on macOS, in the dev container, and in CI. It will also cover how the tests get the local URL and anon key, how to reset to **seed data** (`supabase db reset`), and that CI starts Supabase itself.
 
 ## Capabilities
 
@@ -47,7 +56,9 @@ _None._
   - Integration tests run the repository and hook against the local Supabase **seed data**.
   - Playwright E2E tests cover listing, sorting, filtering, and URL state against the **seed data**. Only the "No players yet" and error scenarios intercept `/rest/v1/players` to return an empty list or a 500.
 - `.github/workflows/verification-checks.yml`: a step that starts local Supabase and exports its URL and anon key before the integration and E2E tests (adds roughly 1–3 minutes).
-- `docs/guides/e2e-tests.md`: document the local Supabase prerequisite.
+- `docs/standards/testing.md`: new standard for test data per test level (**mock data**, **seed data**, interception, no **production data**).
+- `AGENTS.md`: a "Testing" entry under Standards pointing to `docs/standards/testing.md`.
+- `docs/guides/e2e-tests.md`: the local Supabase prerequisite (Docker, `supabase start`, environment variables, `supabase db reset`) for each environment, and how CI starts Supabase.
 - Production: the product owner applies the migration and runs the **production data** script by hand. Previews share the production database, so both steps run once. The migration only adds a table, so it is safe to apply before merging.
 
 ## Out of Scope
