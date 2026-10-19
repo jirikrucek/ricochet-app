@@ -15,6 +15,7 @@ The app has a Players section in its nav, but the page behind it only shows a he
   - A table at every viewport width with three columns: Surname (shown as `[prefix] surname [suffix]`), First name, and **Nationality** as a flag only. Each flag has an accessible name and a tooltip with the country name in the current UI language.
   - The Surname column header sorts ascending or descending and shows the direction (`aria-sort`). The default is ascending. Sorting is language-aware and case-insensitive in the current UI language. It ignores the **surname prefix** ("de Vries" files under V), and breaks ties by first name, then **surname suffix** (no suffix first when ascending). Descending reverses every key.
   - Two single-select filters above the table, each with an "All" option, combined with AND: **nationality** (flag plus localized country name, offering only nationalities present in the data) and **sex**. On phones the filters stack.
+  - Filtering, sorting, and page slicing are one pure domain function in `src/domain/players/`, rendered with Shadcn `table` markup, without a table library. A new ADR records this choice over TanStack Table and the triggers for revisiting it, such as several sortable columns, multi-column sorting, column visibility, row selection, or several complex tables.
   - Client-side pagination: all **players** are fetched once, then filtered, sorted, and sliced in the browser.
     - Below the table: a "Players per page" selector (10 / 25 / 50, default 25), a summary of the filtered results ("Showing 26–50 of 84"), and numbered page links with Previous/Next.
     - On wide screens the links show the first page, the last page, and the current page ±1, with ellipses between them. The current page is marked `aria-current="page"`, Previous is disabled on the first page, and Next on the last.
@@ -64,6 +65,7 @@ _None._
   - Playwright E2E tests cover listing, sorting, filtering, pagination, and URL state against the **seed data**. Only the "No players yet" and error scenarios intercept `/rest/v1/players` to return an empty list or a 500.
 - `.github/workflows/verification-checks.yml`: a step that starts local Supabase and exports its URL and anon key before the integration and E2E tests (adds roughly 1–3 minutes).
 - `docs/standards/testing.md`: new standard for test data per test level (**mock data**, **seed data**, interception, no **production data**).
+- `docs/adr/`: a new ADR deciding against TanStack Table for this table: a plain domain query function and Shadcn `table` markup are used instead, with triggers for revisiting the decision.
 - `AGENTS.md`: a "Testing" entry under Standards pointing to `docs/standards/testing.md`.
 - `docs/guides/e2e-tests.md`: the local Supabase prerequisite (Docker, `supabase start`, environment variables, `supabase db reset`) for each environment, and how CI starts Supabase.
 - Production: the product owner applies the migration and runs the **production data** script by hand. Previews share the production database, so both steps run once. The migration only adds a table, so it is safe to apply before merging.
@@ -83,6 +85,7 @@ _None._
 - Showing **sex** or the country name as a column in the **player overview**.
 - Server-side pagination, filtering, or sorting (a follow-up if the number of **players** grows into the thousands).
 - "Load more" or infinite scroll.
+- Adopting TanStack Table, or any other table library. The new ADR records why, and when to reconsider it.
 
 ## Traceability
 
