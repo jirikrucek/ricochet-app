@@ -1,11 +1,9 @@
 import { defineConfig } from 'vitest/config';
 
+import { integrationProject } from './vitest.integration.config';
+import { resolve, unitProjects } from './vitest.unit.config';
+
 export default defineConfig({
-  test: {
-    include: [
-      'src/**/*.test.ts',
-      'src/**/*.unit.test.ts',
-      'src/**/*.integration.test.ts',
-    ],
-  },
+  resolve,
+  test: { projects: [...unitProjects, integrationProject()] },
 });

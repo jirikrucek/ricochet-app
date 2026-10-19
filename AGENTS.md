@@ -55,6 +55,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 - Validate new tests have non-trivial assertions (no `expect(true).toBe(true)` or empty blocks).
 - Ensure unit under test is not mocked out (mock external I/O only).
 - Confirm zero skipped tests (`it.skip`/`describe.skip`).
+- Check new and modified tests against `docs/standards/testing.md` (data per test level, local Supabase only, no **production data**).
 
 #### Phase 5: Definition of Done Final Report
 
@@ -84,6 +85,10 @@ When adding or editing a Supabase migration (tables, RLS policies), read `docs/s
 ### Observability
 
 When adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability.md` first.
+
+### Testing
+
+When adding or editing a test (unit, integration, or E2E), or test configuration, read `docs/standards/testing.md` first.
 
 ## Guides
 
