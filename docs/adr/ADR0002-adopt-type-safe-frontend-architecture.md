@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-21
-- Updated: 2026-07-21
+- Updated: 2026-10-19
 
 ## Context
 
@@ -26,7 +26,6 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
   - Use Zod schemas for runtime validation and static type inference.
 - UI system:
   - Use Shadcn UI components with Tailwind CSS and CSS design tokens.
-  - Use TanStack Table for data-heavy table views; introduce TanStack Virtual when dataset size requires virtualization.
 - FE/BE decoupling:
   - React components do not call backend clients directly.
   - Access data via repository/service interfaces and shared contracts.

@@ -90,7 +90,7 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 | `src/domain/` | Pure business logic: Zod schemas, TypeScript types, scoring/bracket/permission rules, and mapper functions translating infrastructure row shapes into domain types (e.g. `toPlayer(row): Player`). No React, no Supabase, no `fetch`. |
 | `src/client-api/` | Dumb Supabase client setup and raw query/RPC wrappers. Returns raw or generated (`database.types.ts`) shapes — no domain knowledge, no mapping. The only folder allowed to import `@supabase/supabase-js`. |
 | `src/features/` | Feature UI: components, feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `client-api` — it calls the repository, runs the result through a `domain` mapper, and returns a domain type; `components/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
-| `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. |
+| `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. A route may import `domain` schemas and types to validate its path and search params (e.g. `validateSearch`), but the rules themselves stay in `domain`. |
 | `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
 | `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, schema, presentational component, and the composed `LanguageSelect` widget). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it without needing an `app → features` boundary. `LanguageSelect` composes `ui/select` and has no app-shell knowledge (no branding, no nav, no layout grid) — it belongs with the rest of the language-selection capability, not with `app/layout`'s chrome. |
 | `src/lib/` | Small generic helpers (e.g. `cn()`) with no business meaning. If a helper encodes a business rule, it belongs in `domain/` instead. |
@@ -103,7 +103,7 @@ Layers are ordered leaf-to-root. An arrow means "is allowed to import from":
 
 ```text
 app ────────────► ui, localization, lib
-routes ─────────► app, features, lib
+routes ─────────► app, features, domain, lib
 features ───────► domain, ui, localization, lib, features/*/api (own feature only)
 features/*/api ─► client-api, domain, lib                       (own feature only)
 client-api ─────► lib
@@ -119,7 +119,7 @@ Rules of thumb:
 - **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client. Its mapper functions take a structurally-typed input they declare themselves, rather than importing `client-api`'s generated types — that's what lets `client-api` return raw rows without `domain` ever depending on `client-api`.
 - **`client-api` has no domain knowledge and is the only place `@supabase/supabase-js` may be imported.** It returns raw or generated shapes; translating those into domain types is `domain`'s job (via a mapper), invoked from `features/*/api` (ADR 0003).
 - **`features` cannot import from other `features`, and only `features/*/api` may import `client-api`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
-- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries.
+- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `client-api`.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
 - **`ui` never imports `domain`, `client-api`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
 - **`localization → ui` is one-directional.** `localization` composes `ui` primitives (e.g. `language-selection/LanguageSelect.tsx` uses `ui/select`) to build its own reusable widgets; `ui` still never imports back from `localization` — no cycle.
@@ -195,7 +195,7 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
             allow: {
               to: {
                 element: {
-                  types: ['app', 'features', 'lib'],
+                  types: ['app', 'features', 'domain', 'lib'],
                 },
               },
             },

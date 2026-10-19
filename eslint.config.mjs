@@ -132,7 +132,7 @@ export default tseslint.config(
               allow: {
                 to: {
                   element: {
-                    types: ['app', 'features', 'lib'],
+                    types: ['app', 'features', 'domain', 'lib'],
                   },
                 },
               },
