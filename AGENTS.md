@@ -27,7 +27,6 @@
 
 - Must use Conventional Commits when creating commit messages
 - Must use Conventional Branch when creating branches
-- When a document (ADR, guide, standard) needs to be created or updated in the `docs/` folder, do so as soon as possible
 
 ### Definition of Done
 
