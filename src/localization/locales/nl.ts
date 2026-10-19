@@ -14,6 +14,12 @@ const nl = {
   players: {
     heading: 'Spelers',
     caption: 'Lijst van spelers',
+    loading: 'Spelers worden geladen',
+    error: {
+      message: 'De spelers konden niet worden geladen.',
+      retry: 'Opnieuw proberen',
+    },
+    empty: 'Nog geen spelers',
     columns: {
       surname: 'Achternaam',
       firstName: 'Voornaam',

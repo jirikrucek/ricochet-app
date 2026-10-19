@@ -14,6 +14,12 @@ const cs = {
   players: {
     heading: 'Hráči',
     caption: 'Seznam hráčů',
+    loading: 'Načítání hráčů',
+    error: {
+      message: 'Hráče se nepodařilo načíst.',
+      retry: 'Zkusit znovu',
+    },
+    empty: 'Zatím žádní hráči',
     columns: {
       surname: 'Příjmení',
       firstName: 'Jméno',

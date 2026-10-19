@@ -14,6 +14,12 @@ const hu = {
   players: {
     heading: 'Játékosok',
     caption: 'Játékosok listája',
+    loading: 'Játékosok betöltése',
+    error: {
+      message: 'Nem sikerült betölteni a játékosokat.',
+      retry: 'Újra',
+    },
+    empty: 'Még nincsenek játékosok',
     columns: {
       surname: 'Vezetéknév',
       firstName: 'Keresztnév',

@@ -14,6 +14,12 @@ const de = {
   players: {
     heading: 'Spieler',
     caption: 'Liste der Spieler',
+    loading: 'Spieler werden geladen',
+    error: {
+      message: 'Die Spieler konnten nicht geladen werden.',
+      retry: 'Erneut versuchen',
+    },
+    empty: 'Noch keine Spieler',
     columns: {
       surname: 'Nachname',
       firstName: 'Vorname',

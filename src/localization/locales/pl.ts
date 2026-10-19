@@ -14,6 +14,12 @@ const pl = {
   players: {
     heading: 'Gracze',
     caption: 'Lista graczy',
+    loading: 'Wczytywanie graczy',
+    error: {
+      message: 'Nie udało się wczytać graczy.',
+      retry: 'Spróbuj ponownie',
+    },
+    empty: 'Nie ma jeszcze graczy',
     columns: {
       surname: 'Nazwisko',
       firstName: 'Imię',

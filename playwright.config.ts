@@ -36,7 +36,13 @@ export default defineConfig({
     // the port makes runs depend on the machine's state.
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { ...supabaseEnv },
+    env: {
+      ...supabaseEnv,
+      // Points Sentry at the dev server itself, so tests can intercept the
+      // envelopes it sends and assert that a failure was reported. Nothing
+      // leaves the machine.
+      VITE_SENTRY_DSN: `http://e2e@127.0.0.1:${port}/1`,
+    },
   },
   projects: [
     {

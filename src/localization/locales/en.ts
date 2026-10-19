@@ -14,6 +14,12 @@ const en = {
   players: {
     heading: 'Players',
     caption: 'List of players',
+    loading: 'Loading players',
+    error: {
+      message: "Players couldn't be loaded.",
+      retry: 'Retry',
+    },
+    empty: 'No players yet',
     columns: {
       surname: 'Surname',
       firstName: 'First name',

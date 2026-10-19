@@ -6,6 +6,7 @@ import {
   type Player,
 } from '../../../domain/players/player';
 import { Flag } from '../../../localization/Flag';
+import { Button } from '../../../ui/button';
 import {
   Table,
   TableBody,
@@ -23,12 +24,72 @@ const cellClassName = 'whitespace-normal wrap-break-word';
 
 export function PlayerOverview() {
   const { t } = useTranslation();
-  const { data: players = [] } = usePlayers();
 
   return (
     <div className="flex flex-col gap-lg">
       <h1 className="type-display-xl m-0 text-ink">{t('players.heading')}</h1>
-      <PlayerTable players={players} />
+      <PlayerOverviewContent />
+    </div>
+  );
+}
+
+// Failures reach Sentry through the shared QueryCache.onError
+// (docs/standards/observability.md), so the states here only inform the
+// visitor.
+function PlayerOverviewContent() {
+  const { t } = useTranslation();
+  const {
+    data: players,
+    isPending,
+    isError,
+    isFetching,
+    refetch,
+  } = usePlayers();
+
+  if (isPending) {
+    return <PlayerTableSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div role="alert" className="flex flex-col items-start gap-base">
+        <p className="type-body-md m-0 text-ink">
+          {t('players.error.message')}
+        </p>
+        <Button
+          variant="outline"
+          disabled={isFetching}
+          onClick={() => void refetch()}
+        >
+          {t('players.error.retry')}
+        </Button>
+      </div>
+    );
+  }
+
+  if (players.length === 0) {
+    return <p className="type-body-md m-0 text-muted">{t('players.empty')}</p>;
+  }
+
+  return <PlayerTable players={players} />;
+}
+
+function PlayerTableSkeleton() {
+  const { t } = useTranslation();
+
+  return (
+    <div
+      role="status"
+      aria-label={t('players.loading')}
+      className="flex flex-col gap-md"
+    >
+      {Array.from({ length: 8 }, (_, index) => (
+        <div
+          key={index}
+          aria-hidden="true"
+          className="h-lg animate-pulse rounded-xs bg-surface-strong"
+        />
+      ))}
     </div>
   );
 }

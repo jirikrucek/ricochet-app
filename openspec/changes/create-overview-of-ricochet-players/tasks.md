@@ -42,9 +42,9 @@
 
 ## 6. Slice: loading, error, and empty states
 
-- [ ] 6.1 Write failing component unit tests with **mock data** and a fresh `QueryClient` (`retry: false`): skeleton while pending, error message with Retry that calls `refetch()`, and "No players yet" with no pagination for an empty list
-- [ ] 6.2 Write failing E2E tests for "Loading", "Fetching fails" (intercept `**/rest/v1/players*` with a 500 and assert the failure reaches the existing Sentry reporting, using a longer timeout for the default retries), "Retry after a failure" (500, then pass-through), and "No players exist" (intercept with `[]`)
-- [ ] 6.3 Implement the states in `PlayerOverview` with their texts in all six locale files until 6.1 and 6.2 pass; add no component-level error reporting, relying on `QueryCache.onError` per `docs/standards/observability.md`
+- [x] 6.1 Write failing component unit tests with **mock data** and a fresh `QueryClient` (`retry: false`): skeleton while pending, error message with Retry that calls `refetch()`, and "No players yet" with no pagination for an empty list
+- [x] 6.2 Write failing E2E tests for "Loading", "Fetching fails" (intercept `**/rest/v1/players*` with a 500 and assert the failure reaches the existing Sentry reporting, using a longer timeout for the default retries), "Retry after a failure" (500, then pass-through), and "No players exist" (intercept with `[]`)
+- [x] 6.3 Implement the states in `PlayerOverview` with their texts in all six locale files until 6.1 and 6.2 pass; add no component-level error reporting, relying on `QueryCache.onError` per `docs/standards/observability.md`
 
 ## 7. Slice: sort by surname, with the direction in the URL
 
