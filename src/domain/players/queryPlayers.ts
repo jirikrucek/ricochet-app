@@ -1,4 +1,4 @@
-import type { Player } from './player';
+import { nationalities, type Nationality, type Player } from './player';
 import type { PlayerOverviewView } from './playerOverviewSearch';
 
 export type PlayerOverviewResult = {
@@ -26,6 +26,19 @@ export function queryPlayers(
   view: PlayerOverviewView,
   locale: string,
 ): PlayerOverviewResult {
-  const rows = [...players].sort(playerComparator(locale, view.sort));
+  const rows = players
+    .filter(
+      (player) =>
+        view.nationality === 'all' || player.nationality === view.nationality,
+    )
+    .sort(playerComparator(locale, view.sort));
   return { rows };
+}
+
+// The nationalities the filter offers: only those some player has.
+export function presentNationalities(
+  players: readonly Player[],
+): Nationality[] {
+  const present = new Set(players.map((player) => player.nationality));
+  return nationalities.filter((nationality) => present.has(nationality));
 }

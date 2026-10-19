@@ -7,7 +7,7 @@ import {
   playerOverviewSearchDefaults,
   type PlayerOverviewView,
 } from './playerOverviewSearch';
-import { queryPlayers } from './queryPlayers';
+import { presentNationalities, queryPlayers } from './queryPlayers';
 
 function view(overrides: Partial<PlayerOverviewView> = {}): PlayerOverviewView {
   return { ...playerOverviewSearchDefaults, ...overrides };
@@ -150,5 +150,51 @@ describe('queryPlayers sorting', () => {
     queryPlayers(players, view(), 'en');
 
     expect(surnames(players)).toEqual(['Wagner', 'Bakker']);
+  });
+});
+
+describe('queryPlayers nationality filter', () => {
+  const players = [
+    buildPlayer({ surname: 'Novák', nationality: 'CZ' }),
+    buildPlayer({ surname: 'Wagner', nationality: 'DE' }),
+    buildPlayer({ surname: 'Nowak', nationality: 'PL' }),
+    buildPlayer({ surname: 'Schmidt', nationality: 'DE' }),
+  ];
+
+  it("lets every player through with 'all'", () => {
+    expect(
+      queryPlayers(players, view({ nationality: 'all' }), 'en').rows,
+    ).toHaveLength(4);
+  });
+
+  it('keeps only players of the chosen nationality', () => {
+    const { rows } = queryPlayers(players, view({ nationality: 'DE' }), 'en');
+
+    expect(surnames(rows)).toEqual(['Schmidt', 'Wagner']);
+  });
+
+  it('returns no rows when no player has the nationality', () => {
+    expect(
+      queryPlayers(players, view({ nationality: 'GB' }), 'en').rows,
+    ).toEqual([]);
+  });
+});
+
+describe('presentNationalities', () => {
+  it('returns each nationality present among the players once', () => {
+    const players = [
+      buildPlayer({ nationality: 'NL' }),
+      buildPlayer({ nationality: 'CZ' }),
+      buildPlayer({ nationality: 'NL' }),
+    ];
+
+    const present = presentNationalities(players);
+
+    expect(present).toHaveLength(2);
+    expect(new Set(present)).toEqual(new Set(['CZ', 'NL']));
+  });
+
+  it('returns nothing for no players', () => {
+    expect(presentNationalities([])).toEqual([]);
   });
 });

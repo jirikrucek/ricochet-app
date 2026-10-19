@@ -20,6 +20,10 @@ const en = {
       retry: 'Retry',
     },
     empty: 'No players yet',
+    filters: {
+      all: 'All',
+      nationality: 'Nationality',
+    },
     columns: {
       surname: 'Surname',
       firstName: 'First name',

@@ -18,3 +18,21 @@ describe('playerOverviewSearchSchema sort', () => {
     expect(parse({ sort: 'sideways' }).sort).toBe('asc');
   });
 });
+
+describe('playerOverviewSearchSchema nationality', () => {
+  it("defaults to 'all'", () => {
+    expect(parse({}).nationality).toBe('all');
+  });
+
+  it('keeps a known nationality code', () => {
+    expect(parse({ nationality: 'CZ' }).nationality).toBe('CZ');
+  });
+
+  it("falls back to 'all' for an unknown code", () => {
+    expect(parse({ nationality: 'FR' }).nationality).toBe('all');
+  });
+
+  it('keeps the other params when the nationality is unknown', () => {
+    expect(parse({ nationality: 'FR', sort: 'desc' }).sort).toBe('desc');
+  });
+});

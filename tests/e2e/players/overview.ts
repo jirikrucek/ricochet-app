@@ -123,3 +123,22 @@ export function surnameHeader(page: Page) {
 export function surnameSortButton(page: Page) {
   return surnameHeader(page).getByRole('button', { name: 'Surname' });
 }
+
+export function filterSelect(page: Page, label: string) {
+  return page.getByRole('combobox', { name: label, exact: true });
+}
+
+export async function chooseFilter(page: Page, label: string, option: string) {
+  await filterSelect(page, label).click();
+  await page.getByRole('option', { name: option, exact: true }).click();
+}
+
+// Nationality codes of the listed rows, read from the flags.
+export async function shownNationalities(page: Page) {
+  await expectPlayersListed(page);
+  return bodyRows(page)
+    .locator('img[data-country]')
+    .evaluateAll((flags) =>
+      flags.map((flag) => flag.getAttribute('data-country')),
+    );
+}

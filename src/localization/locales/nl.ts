@@ -20,6 +20,10 @@ const nl = {
       retry: 'Opnieuw proberen',
     },
     empty: 'Nog geen spelers',
+    filters: {
+      all: 'Alle',
+      nationality: 'Nationaliteit',
+    },
     columns: {
       surname: 'Achternaam',
       firstName: 'Voornaam',

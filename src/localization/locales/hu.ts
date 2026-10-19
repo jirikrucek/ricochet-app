@@ -20,6 +20,10 @@ const hu = {
       retry: 'Újra',
     },
     empty: 'Még nincsenek játékosok',
+    filters: {
+      all: 'Összes',
+      nationality: 'Nemzetiség',
+    },
     columns: {
       surname: 'Vezetéknév',
       firstName: 'Keresztnév',

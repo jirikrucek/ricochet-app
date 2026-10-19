@@ -20,6 +20,10 @@ const cs = {
       retry: 'Zkusit znovu',
     },
     empty: 'Zatím žádní hráči',
+    filters: {
+      all: 'Vše',
+      nationality: 'Národnost',
+    },
     columns: {
       surname: 'Příjmení',
       firstName: 'Jméno',

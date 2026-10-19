@@ -20,6 +20,10 @@ const pl = {
       retry: 'Spróbuj ponownie',
     },
     empty: 'Nie ma jeszcze graczy',
+    filters: {
+      all: 'Wszystkie',
+      nationality: 'Narodowość',
+    },
     columns: {
       surname: 'Nazwisko',
       firstName: 'Imię',

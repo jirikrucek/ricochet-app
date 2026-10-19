@@ -8,8 +8,14 @@ import {
   type Nationality,
   type Player,
 } from '../../../domain/players/player';
-import type { SortDirection } from '../../../domain/players/playerOverviewSearch';
-import { queryPlayers } from '../../../domain/players/queryPlayers';
+import type {
+  PlayerOverviewView,
+  SortDirection,
+} from '../../../domain/players/playerOverviewSearch';
+import {
+  presentNationalities,
+  queryPlayers,
+} from '../../../domain/players/queryPlayers';
 import { Flag } from '../../../localization/Flag';
 import { Button } from '../../../ui/button';
 import {
@@ -23,6 +29,7 @@ import {
 } from '../../../ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
 import { usePlayers } from '../api/usePlayers';
+import { FilterSelect, type FilterOption } from './FilterSelect';
 
 const routeApi = getRouteApi('/players/');
 
@@ -94,16 +101,78 @@ function PlayerView({ players }: { players: Player[] }) {
     [players, search, locale],
   );
 
-  const toggleSort = () =>
-    void navigate({
-      search: (prev) => ({
-        ...prev,
-        sort: prev.sort === 'desc' ? 'asc' : 'desc',
-      }),
-    });
+  const changeView = (change: Partial<PlayerOverviewView>) =>
+    void navigate({ search: (prev) => ({ ...prev, ...change }) });
 
   return (
-    <PlayerTable rows={rows} sort={search.sort} onToggleSort={toggleSort} />
+    <div className="flex flex-col gap-lg">
+      <div className="flex flex-col gap-base tablet:flex-row">
+        <NationalityFilter
+          players={players}
+          locale={locale}
+          value={search.nationality}
+          onChange={(nationality) => changeView({ nationality })}
+        />
+      </div>
+      <PlayerTable
+        rows={rows}
+        sort={search.sort}
+        onToggleSort={() =>
+          changeView({ sort: search.sort === 'desc' ? 'asc' : 'desc' })
+        }
+      />
+    </div>
+  );
+}
+
+function NationalityFilter({
+  players,
+  locale,
+  value,
+  onChange,
+}: {
+  players: Player[];
+  locale: string;
+  value: Nationality | 'all';
+  onChange: (value: Nationality | 'all') => void;
+}) {
+  const { t } = useTranslation();
+
+  const options = useMemo<FilterOption<Nationality | 'all'>[]>(() => {
+    const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
+    const countries = presentNationalities(players)
+      .map((nationality) => ({
+        nationality,
+        name: t(`countries.${nationality}`),
+      }))
+      .sort((a, b) => collator.compare(a.name, b.name));
+
+    return [
+      { value: 'all', label: t('players.filters.all') },
+      ...countries.map(({ nationality, name }) => ({
+        value: nationality,
+        label: (
+          <>
+            <Flag
+              countryCode={nationality}
+              aria-hidden="true"
+              className="size-4 shrink-0"
+            />
+            {name}
+          </>
+        ),
+      })),
+    ];
+  }, [players, locale, t]);
+
+  return (
+    <FilterSelect
+      id="player-nationality-filter"
+      label={t('players.filters.nationality')}
+      value={value}
+      options={options}
+      onChange={onChange}
+    />
   );
 }
 

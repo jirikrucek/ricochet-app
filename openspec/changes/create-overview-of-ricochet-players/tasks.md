@@ -56,10 +56,10 @@
 
 ## 8. Slice: filter by nationality
 
-- [ ] 8.1 Write failing unit tests with **mock data** for the **nationality** filter in `queryPlayers` (`'all'` lets everything through) and for `presentNationalities(players)`, plus schema tests for `nationality` (`all` by default, an unknown code falls back to `all`)
-- [ ] 8.2 Implement them in `src/domain/players/` until 8.1 passes
-- [ ] 8.3 Write failing E2E tests for every scenario of "Visitor can filter players by nationality" and the "an unknown nationality code" example; for "Only nationalities present among players are offered", intercept the response with CZ and NL **players** only, because the **seed data** has all six
-- [ ] 8.4 Add the **nationality** select above the table ("All" first, then flag plus localized country name sorted with the same collator) writing `nationality` to the URL, with its label in all six locale files, until 8.3 passes
+- [x] 8.1 Write failing unit tests with **mock data** for the **nationality** filter in `queryPlayers` (`'all'` lets everything through) and for `presentNationalities(players)`, plus schema tests for `nationality` (`all` by default, an unknown code falls back to `all`)
+- [x] 8.2 Implement them in `src/domain/players/` until 8.1 passes
+- [x] 8.3 Write failing E2E tests for every scenario of "Visitor can filter players by nationality" and the "an unknown nationality code" example; for "Only nationalities present among players are offered", intercept the response with CZ and NL **players** only, because the **seed data** has all six
+- [x] 8.4 Add the **nationality** select above the table ("All" first, then flag plus localized country name sorted with the same collator) writing `nationality` to the URL, with its label in all six locale files, until 8.3 passes
 
 ## 9. Slice: filter by sex, combined filters, and the no-match state
 
