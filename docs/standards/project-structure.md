@@ -55,6 +55,8 @@ ricochet-app/
 │   ├── localization/               # i18next setup + language-selection UI (hook, component)
 │   │   ├── i18n.ts
 │   │   ├── languages.ts                  # shared by i18n.ts and language-selection/
+│   │   ├── flags.ts                       # country code → flag asset, shared by the language selector and features
+│   │   ├── Flag.tsx                       # shared flag image component
 │   │   ├── locales/                       # per-language dictionaries + the resources.ts aggregator
 │   │   └── language-selection/            # composed widget rendered by app/layout/TopNav.tsx
 │   │       ├── useLanguageSelection.ts
