@@ -33,6 +33,14 @@ const nl = {
       message: 'Geen spelers voldoen aan de gekozen filters',
       clearFilters: 'Filters wissen',
     },
+    pagination: {
+      label: 'Paginering',
+      previous: 'Vorige',
+      next: 'Volgende',
+      pageSize: 'Spelers per pagina',
+      summary: '{{from}}–{{to}} van {{total}}',
+      pageOf: 'Pagina {{page}} van {{count}}',
+    },
     columns: {
       surname: 'Achternaam',
       firstName: 'Voornaam',

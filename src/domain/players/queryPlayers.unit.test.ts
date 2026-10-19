@@ -229,3 +229,56 @@ describe('queryPlayers sex filter', () => {
     expect(surnames(rows)).toEqual(['Nowak']);
   });
 });
+
+describe('queryPlayers page slicing', () => {
+  // Surnames P01…P30 sort in creation order.
+  const players = Array.from({ length: 30 }, (_, index) =>
+    buildPlayer({
+      surname: `P${String(index + 1).padStart(2, '0')}`,
+      sex: index < 12 ? 'female' : 'male',
+    }),
+  );
+
+  it('returns the requested page with the total and page count', () => {
+    const result = queryPlayers(players, view({ page: 2, pageSize: 10 }), 'en');
+
+    expect(surnames(result.rows)).toEqual(
+      Array.from({ length: 10 }, (_, i) => `P${11 + i}`),
+    );
+    expect(result).toMatchObject({ total: 30, page: 2, pageCount: 3 });
+  });
+
+  it('returns the remaining players on the last page', () => {
+    const result = queryPlayers(players, view({ page: 2, pageSize: 25 }), 'en');
+
+    expect(result.rows).toHaveLength(5);
+    expect(result).toMatchObject({ total: 30, page: 2, pageCount: 2 });
+  });
+
+  it('counts and pages only the filtered players', () => {
+    const result = queryPlayers(
+      players,
+      view({ sex: 'female', pageSize: 10, page: 2 }),
+      'en',
+    );
+
+    expect(result.rows).toHaveLength(2);
+    expect(result).toMatchObject({ total: 12, page: 2, pageCount: 2 });
+  });
+
+  it('falls back to page 1 for a page beyond the last', () => {
+    const result = queryPlayers(players, view({ page: 9, pageSize: 10 }), 'en');
+
+    expect(result.page).toBe(1);
+    expect(surnames(result.rows)[0]).toBe('P01');
+  });
+
+  it('has one page and no rows when nothing matches', () => {
+    expect(queryPlayers(players, view({ nationality: 'GB' }), 'en')).toEqual({
+      rows: [],
+      total: 0,
+      page: 1,
+      pageCount: 1,
+    });
+  });
+});

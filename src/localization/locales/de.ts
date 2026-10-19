@@ -33,6 +33,14 @@ const de = {
       message: 'Keine Spieler entsprechen den gewählten Filtern',
       clearFilters: 'Filter zurücksetzen',
     },
+    pagination: {
+      label: 'Seitennavigation',
+      previous: 'Zurück',
+      next: 'Weiter',
+      pageSize: 'Spieler pro Seite',
+      summary: '{{from}}–{{to}} von {{total}}',
+      pageOf: 'Seite {{page}} von {{count}}',
+    },
     columns: {
       surname: 'Nachname',
       firstName: 'Vorname',

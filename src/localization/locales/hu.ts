@@ -33,6 +33,14 @@ const hu = {
       message: 'Egy játékos sem felel meg a kiválasztott szűrőknek',
       clearFilters: 'Szűrők törlése',
     },
+    pagination: {
+      label: 'Lapozás',
+      previous: 'Előző',
+      next: 'Következő',
+      pageSize: 'Játékos oldalanként',
+      summary: '{{from}}–{{to}} / {{total}}',
+      pageOf: '{{page}}. oldal / {{count}}',
+    },
     columns: {
       surname: 'Vezetéknév',
       firstName: 'Keresztnév',

@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { getRouteApi } from '@tanstack/react-router';
+import { useEffect, useMemo } from 'react';
+import { getRouteApi, useRouter } from '@tanstack/react-router';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -32,6 +32,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
 import { usePlayers } from '../api/usePlayers';
 import { FilterSelect, type FilterOption } from './FilterSelect';
+import { PlayerPagination } from './PlayerPagination';
 
 const routeApi = getRouteApi('/players/');
 
@@ -98,13 +99,19 @@ function PlayerView({ players }: { players: Player[] }) {
   const navigate = routeApi.useNavigate();
   const locale = i18n.resolvedLanguage ?? i18n.language;
 
-  const { rows } = useMemo(
+  const { rows, total, page, pageCount } = useMemo(
     () => queryPlayers(players, search, locale),
     [players, search, locale],
   );
 
+  // Every view change returns to page 1 in the same navigation, so each
+  // change is one history entry.
   const changeView = (change: Partial<PlayerOverviewView>) =>
-    void navigate({ search: (prev) => ({ ...prev, ...change }) });
+    void navigate({
+      search: (prev) => ({ ...prev, ...change, page: undefined }),
+    });
+
+  useCanonicalPage(search.page, page);
 
   return (
     <div className="flex flex-col gap-lg">
@@ -117,21 +124,53 @@ function PlayerView({ players }: { players: Player[] }) {
         />
         <SexFilter value={search.sex} onChange={(sex) => changeView({ sex })} />
       </div>
-      {rows.length === 0 ? (
+      {total === 0 ? (
         <NoMatch
           onClearFilters={() => changeView({ nationality: 'all', sex: 'all' })}
         />
       ) : (
-        <PlayerTable
-          rows={rows}
-          sort={search.sort}
-          onToggleSort={() =>
-            changeView({ sort: search.sort === 'desc' ? 'asc' : 'desc' })
-          }
-        />
+        <>
+          <PlayerTable
+            rows={rows}
+            sort={search.sort}
+            onToggleSort={() =>
+              changeView({ sort: search.sort === 'desc' ? 'asc' : 'desc' })
+            }
+          />
+          <PlayerPagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={search.pageSize}
+            total={total}
+            onPageSizeChange={(pageSize) => changeView({ pageSize })}
+          />
+        </>
       )}
     </div>
   );
+}
+
+// A page beyond the last, or an invalid one, renders page 1 (queryPlayers).
+// Once the players are loaded and the page count is known, replace the URL so
+// the address bar matches what is shown, without a new history entry.
+function useCanonicalPage(requestedPage: number, effectivePage: number) {
+  const router = useRouter();
+  const navigate = routeApi.useNavigate();
+
+  // Runs when the validated or effective page changes, which is after the
+  // route has resolved, so the URL read here is the one being shown.
+  useEffect(() => {
+    const rawPage = new URLSearchParams(router.state.location.searchStr).get(
+      'page',
+    );
+    const canonicalPage = effectivePage === 1 ? null : String(effectivePage);
+    if (rawPage !== canonicalPage) {
+      void navigate({
+        search: (prev) => ({ ...prev, page: undefined }),
+        replace: true,
+      });
+    }
+  }, [requestedPage, effectivePage, router, navigate]);
 }
 
 function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {

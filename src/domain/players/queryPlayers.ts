@@ -2,7 +2,13 @@ import { nationalities, type Nationality, type Player } from './player';
 import type { PlayerOverviewView } from './playerOverviewSearch';
 
 export type PlayerOverviewResult = {
+  // The players on the effective page.
   rows: Player[];
+  // Players matching the filters, across all pages.
+  total: number;
+  // The effective page: 1 when the requested page is beyond the last.
+  page: number;
+  pageCount: number;
 };
 
 // Case-insensitive but accent-aware, in the collation of the UI language
@@ -21,12 +27,14 @@ function playerComparator(locale: string, direction: 'asc' | 'desc') {
       collator.compare(a.surnameSuffix ?? '', b.surnameSuffix ?? ''));
 }
 
+// Filter, then sort, then slice: one entry point keeps that order and the
+// page fallback in one tested place (ADR 0010).
 export function queryPlayers(
   players: readonly Player[],
   view: PlayerOverviewView,
   locale: string,
 ): PlayerOverviewResult {
-  const rows = players
+  const matching = players
     .filter(
       (player) =>
         (view.nationality === 'all' ||
@@ -34,7 +42,18 @@ export function queryPlayers(
         (view.sex === 'all' || player.sex === view.sex),
     )
     .sort(playerComparator(locale, view.sort));
-  return { rows };
+
+  const total = matching.length;
+  const pageCount = Math.max(1, Math.ceil(total / view.pageSize));
+  const page = view.page > pageCount ? 1 : view.page;
+  const start = (page - 1) * view.pageSize;
+
+  return {
+    rows: matching.slice(start, start + view.pageSize),
+    total,
+    page,
+    pageCount,
+  };
 }
 
 // The nationalities the filter offers: only those some player has.

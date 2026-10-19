@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
@@ -23,6 +24,10 @@ Object.assign(process.env, supabaseEnv);
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
+  // Playwright's default (half the cores) starts 7 browsers on a 14-core dev
+  // container, which overloads the single dev server and times out page
+  // loads. Cap it at 4; smaller machines such as the CI runner keep the default.
+  workers: Math.min(4, Math.max(1, Math.floor(os.availableParallelism() / 2))),
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     channel: undefined,

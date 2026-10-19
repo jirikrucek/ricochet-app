@@ -50,3 +50,31 @@ describe('playerOverviewSearchSchema sex', () => {
     expect(parse({ sex: 'unknown' }).sex).toBe('all');
   });
 });
+
+describe('playerOverviewSearchSchema page', () => {
+  it('defaults to 1', () => {
+    expect(parse({}).page).toBe(1);
+  });
+
+  it('keeps a positive whole page number', () => {
+    expect(parse({ page: 3 }).page).toBe(3);
+  });
+
+  it.each(['abc', 0, -2, 1.5])('falls back to 1 for %s', (page) => {
+    expect(parse({ page }).page).toBe(1);
+  });
+});
+
+describe('playerOverviewSearchSchema pageSize', () => {
+  it('defaults to 25', () => {
+    expect(parse({}).pageSize).toBe(25);
+  });
+
+  it.each([10, 25, 50])('keeps %i', (pageSize) => {
+    expect(parse({ pageSize }).pageSize).toBe(pageSize);
+  });
+
+  it.each([7, 'abc', 100])('falls back to 25 for %s', (pageSize) => {
+    expect(parse({ pageSize }).pageSize).toBe(25);
+  });
+});

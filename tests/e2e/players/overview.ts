@@ -80,21 +80,20 @@ async function shownPlayers(page: Page): Promise<ShownPlayer[]> {
   );
 }
 
-// Every player of a view in display order, read at 50 per page. Stops when a
-// page repeats the previous one (a page beyond the last falls back to page 1).
+// Every player of a view in display order, read at 50 per page until the
+// summary's last row is the total.
 export async function playersAcrossPages(page: Page, search = '') {
   const all: ShownPlayer[] = [];
-  let previous = '';
   for (let pageNumber = 1; pageNumber <= 10; pageNumber++) {
     const params = new URLSearchParams(search);
     params.set('pageSize', '50');
     if (pageNumber > 1) params.set('page', String(pageNumber));
     await openOverview(page, params.toString());
-    const players = await shownPlayers(page);
-    const key = JSON.stringify(players);
-    if (key === previous) break;
-    previous = key;
-    all.push(...players);
+    all.push(...(await shownPlayers(page)));
+    // Any UI language: the summary is the one text with "from–to … total".
+    const text = await page.getByText(/^\D*\d+–\d+\D+\d+\D*$/).innerText();
+    const [, , to, total] = /(\d+)–(\d+)\D+(\d+)/.exec(text)!.map(Number);
+    if (to >= total) break;
   }
   return all;
 }
@@ -174,4 +173,32 @@ export async function seededPlayers(
 
 export function asNameSet(players: ShownPlayer[]) {
   return new Set(players.map((p) => `${p.firstName} ${p.surname}`));
+}
+
+// The visible pagination: the numbered variant from 744px, the compact one
+// below. The hidden variant is display:none, so it isn't in the a11y tree.
+export function pagination(page: Page) {
+  return page.getByRole('navigation', { name: 'Pagination' });
+}
+
+// The pagination as it reads, e.g. "Previous 1 2 … 10 Next".
+export async function paginationText(page: Page) {
+  const items = await pagination(page)
+    .locator('li')
+    .evaluateAll((lis) =>
+      lis.map((li) =>
+        li.querySelector('[data-slot="pagination-ellipsis"]')
+          ? '…'
+          : (li.textContent ?? '').trim(),
+      ),
+    );
+  return items.join(' ');
+}
+
+export function summary(page: Page) {
+  return page.getByText(/^Showing \d+–\d+ of \d+$/);
+}
+
+export function pageSizeSelect(page: Page) {
+  return filterSelect(page, 'Players per page');
 }

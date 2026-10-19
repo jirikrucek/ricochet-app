@@ -71,12 +71,12 @@
 
 ## 10. Slice: pagination with page links on wide screens
 
-- [ ] 10.1 Write failing unit tests for `pageRange(current, count)` in `src/lib/`: the spec examples `1 2 … 10`, `1 … 9 10`, `1 … 4 5 6 … 10`, and `1 2 3 4`, plus a single page and a one-page gap at either end
-- [ ] 10.2 Implement `pageRange` until 10.1 passes
-- [ ] 10.3 Write failing unit tests with **mock data** for slicing in `queryPlayers` (`{ rows, total, page, pageCount }`, `pageCount = max(1, ceil(total / pageSize))`, a `page` beyond `pageCount` becomes 1) and schema tests for `page` (positive int, default 1, `abc` falls back to 1) and `pageSize` (10, 25, or 50, default 25, `7` falls back to 25)
-- [ ] 10.4 Implement slicing and the `page` and `pageSize` schema fields until 10.3 passes
-- [ ] 10.5 Write failing E2E tests at 1280px for every scenario of "Player overview is paginated with a visitor-chosen page size", "Page links show a compact page range on wide screens", and "Pagination hides what does not apply"; for every example of "View change resets the page"; for "Back and forward walk through views" and "Shared link opens the same view"; and for the `pageSize=7`, `page=abc`, and `page=9` examples (asserting that the URL is then replaced without `page`)
-- [ ] 10.6 Add the pagination below the table: "Players per page" selector, the "Showing X–Y of Z" summary, and numbered TanStack Router `<Link>`s with `aria-current="page"` and Previous/Next rendered as `aria-disabled="true"` at the ends; hide the page links for one page and all pagination for no results; make every view change drop `page` in one `navigate` call; replace an out-of-range `page` after the data loads; translate all texts in six locale files; continue until 10.5 passes
+- [x] 10.1 Write failing unit tests for `pageRange(current, count)` in `src/lib/`: the spec examples `1 2 … 10`, `1 … 9 10`, `1 … 4 5 6 … 10`, and `1 2 3 4`, plus a single page and a one-page gap at either end
+- [x] 10.2 Implement `pageRange` until 10.1 passes
+- [x] 10.3 Write failing unit tests with **mock data** for slicing in `queryPlayers` (`{ rows, total, page, pageCount }`, `pageCount = max(1, ceil(total / pageSize))`, a `page` beyond `pageCount` becomes 1) and schema tests for `page` (positive int, default 1, `abc` falls back to 1) and `pageSize` (10, 25, or 50, default 25, `7` falls back to 25)
+- [x] 10.4 Implement slicing and the `page` and `pageSize` schema fields until 10.3 passes
+- [x] 10.5 Write failing E2E tests at 1280px for every scenario of "Player overview is paginated with a visitor-chosen page size", "Page links show a compact page range on wide screens", and "Pagination hides what does not apply"; for every example of "View change resets the page"; for "Back and forward walk through views" and "Shared link opens the same view"; and for the `pageSize=7`, `page=abc`, and `page=9` examples (asserting that the URL is then replaced without `page`)
+- [x] 10.6 Add the pagination below the table: "Players per page" selector, the "Showing X–Y of Z" summary, and numbered TanStack Router `<Link>`s with `aria-current="page"` and Previous/Next rendered as `aria-disabled="true"` at the ends; hide the page links for one page and all pagination for no results; make every view change drop `page` in one `navigate` call; replace an out-of-range `page` after the data loads; translate all texts in six locale files; continue until 10.5 passes
 
 ## 11. Slice: compact pagination and orientation after a page change
 

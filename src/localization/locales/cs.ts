@@ -33,6 +33,14 @@ const cs = {
       message: 'Vybraným filtrům neodpovídá žádný hráč',
       clearFilters: 'Zrušit filtry',
     },
+    pagination: {
+      label: 'Stránkování',
+      previous: 'Předchozí',
+      next: 'Další',
+      pageSize: 'Hráčů na stránku',
+      summary: 'Zobrazeno {{from}}–{{to}} z {{total}}',
+      pageOf: 'Strana {{page}} z {{count}}',
+    },
     columns: {
       surname: 'Příjmení',
       firstName: 'Jméno',

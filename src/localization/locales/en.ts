@@ -33,6 +33,14 @@ const en = {
       message: 'No players match the selected filters',
       clearFilters: 'Clear filters',
     },
+    pagination: {
+      label: 'Pagination',
+      previous: 'Previous',
+      next: 'Next',
+      pageSize: 'Players per page',
+      summary: 'Showing {{from}}–{{to}} of {{total}}',
+      pageOf: 'Page {{page}} of {{count}}',
+    },
     columns: {
       surname: 'Surname',
       firstName: 'First name',

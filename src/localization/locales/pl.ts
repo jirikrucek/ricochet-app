@@ -33,6 +33,14 @@ const pl = {
       message: 'Żaden gracz nie pasuje do wybranych filtrów',
       clearFilters: 'Wyczyść filtry',
     },
+    pagination: {
+      label: 'Paginacja',
+      previous: 'Poprzednia',
+      next: 'Następna',
+      pageSize: 'Graczy na stronę',
+      summary: 'Wyświetlono {{from}}–{{to}} z {{total}}',
+      pageOf: 'Strona {{page}} z {{count}}',
+    },
     columns: {
       surname: 'Nazwisko',
       firstName: 'Imię',
