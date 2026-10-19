@@ -18,6 +18,7 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlayerRowInput } from '../../../domain/players/player';
+import { playerOverviewSearchSchema } from '../../../domain/players/playerOverviewSearch';
 import { buildPlayerRow } from '../../../domain/players/playerMocks';
 import i18n from '../../../localization/i18n';
 import { PlayerOverview } from './PlayerOverview';
@@ -38,6 +39,7 @@ function renderPlayerOverview(path = '/players') {
   const playersRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/players/',
+    validateSearch: playerOverviewSearchSchema,
     component: PlayerOverview,
   });
   const router = createRouter({

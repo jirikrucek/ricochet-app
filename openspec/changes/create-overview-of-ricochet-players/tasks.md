@@ -48,11 +48,11 @@
 
 ## 7. Slice: sort by surname, with the direction in the URL
 
-- [ ] 7.1 Write failing unit tests with **mock data** for the sort in `queryPlayers(players, view, locale)`: ascending by default; ignores the **surname prefix**; ignores case; follows the locale (`cs` puts "Horák" before "Chládek", `en` the reverse); breaks ties by first name, then by **surname suffix** with no suffix first; `desc` reverses every key
-- [ ] 7.2 Write failing unit tests for `playerOverviewSearchSchema` with only `sort`: `asc` by default and an unknown direction falls back to `asc`
-- [ ] 7.3 Implement the sort part of `queryPlayers` (an `Intl.Collator` with `sensitivity: 'accent'`) and the `sort` field of the search schema in `src/domain/players/` until 7.1 and 7.2 pass
-- [ ] 7.4 Write failing E2E tests for every scenario of "Players are sorted by surname" and "Surname column header toggles and announces the sort direction", and the "an unknown sort direction" example of "Invalid URL values fall back to the defaults"
-- [ ] 7.5 Wire `validateSearch` and `stripSearchParams(defaults)` into the route, and add the Surname header `<button>` inside the `<th>` with `aria-sort` and a lucide direction icon; re-sort with `useMemo` keyed on the players, the search, and `i18n.language`, until 7.4 passes
+- [x] 7.1 Write failing unit tests with **mock data** for the sort in `queryPlayers(players, view, locale)`: ascending by default; ignores the **surname prefix**; ignores case; follows the locale (`cs` puts "Horák" before "Chládek", `en` the reverse); breaks ties by first name, then by **surname suffix** with no suffix first; `desc` reverses every key
+- [x] 7.2 Write failing unit tests for `playerOverviewSearchSchema` with only `sort`: `asc` by default and an unknown direction falls back to `asc`
+- [x] 7.3 Implement the sort part of `queryPlayers` (an `Intl.Collator` with `sensitivity: 'accent'`) and the `sort` field of the search schema in `src/domain/players/` until 7.1 and 7.2 pass
+- [x] 7.4 Write failing E2E tests for every scenario of "Players are sorted by surname" and "Surname column header toggles and announces the sort direction", and the "an unknown sort direction" example of "Invalid URL values fall back to the defaults"
+- [x] 7.5 Wire `validateSearch` and `stripSearchParams(defaults)` into the route, and add the Surname header `<button>` inside the `<th>` with `aria-sort` and a lucide direction icon; re-sort with `useMemo` keyed on the players, the search, and `i18n.language`, until 7.4 passes
 
 ## 8. Slice: filter by nationality
 

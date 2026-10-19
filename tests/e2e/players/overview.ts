@@ -63,3 +63,63 @@ export async function useUiLanguage(page: Page, language: string) {
     localStorage.setItem('i18nextLng', lng);
   }, language);
 }
+
+export type ShownPlayer = { surname: string; firstName: string };
+
+async function shownPlayers(page: Page): Promise<ShownPlayer[]> {
+  await expectPlayersListed(page);
+  // One round trip for all rows; per-row role queries are slow at 50 rows.
+  return bodyRows(page).evaluateAll((rows) =>
+    rows.map((row) => {
+      const [surname, firstName] = Array.from(
+        row.querySelectorAll('td'),
+        (cell) => (cell.textContent ?? '').trim(),
+      );
+      return { surname, firstName };
+    }),
+  );
+}
+
+// Every player of a view in display order, read at 50 per page. Stops when a
+// page repeats the previous one (a page beyond the last falls back to page 1).
+export async function playersAcrossPages(page: Page, search = '') {
+  const all: ShownPlayer[] = [];
+  let previous = '';
+  for (let pageNumber = 1; pageNumber <= 10; pageNumber++) {
+    const params = new URLSearchParams(search);
+    params.set('pageSize', '50');
+    if (pageNumber > 1) params.set('page', String(pageNumber));
+    await openOverview(page, params.toString());
+    const players = await shownPlayers(page);
+    const key = JSON.stringify(players);
+    if (key === previous) break;
+    previous = key;
+    all.push(...players);
+  }
+  return all;
+}
+
+export function indexOfPlayer(
+  players: ShownPlayer[],
+  surname: string,
+  firstName?: string,
+) {
+  const index = players.findIndex(
+    (p) =>
+      p.surname === surname &&
+      (firstName === undefined || p.firstName === firstName),
+  );
+  expect(
+    index,
+    `${firstName ?? ''} ${surname} should be listed`,
+  ).toBeGreaterThanOrEqual(0);
+  return index;
+}
+
+export function surnameHeader(page: Page) {
+  return playersTable(page).getByRole('columnheader', { name: 'Surname' });
+}
+
+export function surnameSortButton(page: Page) {
+  return surnameHeader(page).getByRole('button', { name: 'Surname' });
+}

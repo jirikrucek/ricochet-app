@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { getRouteApi } from '@tanstack/react-router';
+import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -5,6 +8,8 @@ import {
   type Nationality,
   type Player,
 } from '../../../domain/players/player';
+import type { SortDirection } from '../../../domain/players/playerOverviewSearch';
+import { queryPlayers } from '../../../domain/players/queryPlayers';
 import { Flag } from '../../../localization/Flag';
 import { Button } from '../../../ui/button';
 import {
@@ -18,6 +23,8 @@ import {
 } from '../../../ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
 import { usePlayers } from '../api/usePlayers';
+
+const routeApi = getRouteApi('/players/');
 
 // Cells wrap instead of scrolling, so the table fits a 320px viewport.
 const cellClassName = 'whitespace-normal wrap-break-word';
@@ -71,7 +78,33 @@ function PlayerOverviewContent() {
     return <p className="type-body-md m-0 text-muted">{t('players.empty')}</p>;
   }
 
-  return <PlayerTable players={players} />;
+  return <PlayerView players={players} />;
+}
+
+// The URL is the only view state (ADR 0002): this reads the validated search,
+// derives the rows, and turns every view change into one navigation.
+function PlayerView({ players }: { players: Player[] }) {
+  const { i18n } = useTranslation();
+  const search = routeApi.useSearch();
+  const navigate = routeApi.useNavigate();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
+
+  const { rows } = useMemo(
+    () => queryPlayers(players, search, locale),
+    [players, search, locale],
+  );
+
+  const toggleSort = () =>
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        sort: prev.sort === 'desc' ? 'asc' : 'desc',
+      }),
+    });
+
+  return (
+    <PlayerTable rows={rows} sort={search.sort} onToggleSort={toggleSort} />
+  );
 }
 
 function PlayerTableSkeleton() {
@@ -94,16 +127,37 @@ function PlayerTableSkeleton() {
   );
 }
 
-function PlayerTable({ players }: { players: Player[] }) {
+function PlayerTable({
+  rows,
+  sort,
+  onToggleSort,
+}: {
+  rows: Player[];
+  sort: SortDirection;
+  onToggleSort: () => void;
+}) {
   const { t } = useTranslation();
+  const SortIcon = sort === 'asc' ? ArrowUpIcon : ArrowDownIcon;
+  const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
 
   return (
     <Table className="table-fixed">
       <TableCaption className="sr-only">{t('players.caption')}</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className={cellClassName}>
-            {t('players.columns.surname')}
+          <TableHead aria-sort={ariaSort} className={cellClassName}>
+            <button
+              type="button"
+              onClick={onToggleSort}
+              className="-mx-xs inline-flex items-center gap-xs rounded-xs px-xs text-left font-medium outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {t('players.columns.surname')}
+              <SortIcon
+                aria-hidden="true"
+                data-sort-indicator={ariaSort}
+                className="size-4 shrink-0"
+              />
+            </button>
           </TableHead>
           <TableHead className={cellClassName}>
             {t('players.columns.firstName')}
@@ -114,7 +168,7 @@ function PlayerTable({ players }: { players: Player[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {players.map((player) => (
+        {rows.map((player) => (
           <TableRow key={player.id}>
             <TableCell className={cellClassName}>
               {formatSurname(player)}
