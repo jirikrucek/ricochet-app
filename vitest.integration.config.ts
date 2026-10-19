@@ -1,4 +1,7 @@
-import { defineConfig, type TestProjectInlineConfiguration } from 'vitest/config';
+import {
+  defineConfig,
+  type TestProjectInlineConfiguration,
+} from 'vitest/config';
 
 import { localSupabaseEnv } from './tests/support/localSupabaseEnv';
 import { resolve } from './vitest.unit.config';

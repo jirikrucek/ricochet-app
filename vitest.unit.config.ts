@@ -1,5 +1,8 @@
 import path from 'node:path';
-import { defineConfig, type TestProjectInlineConfiguration } from 'vitest/config';
+import {
+  defineConfig,
+  type TestProjectInlineConfiguration,
+} from 'vitest/config';
 
 // Unit tests use mock data only and never reach Supabase
 // (docs/standards/testing.md). Component tests (.tsx) need a DOM.
