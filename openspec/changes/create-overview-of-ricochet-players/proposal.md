@@ -18,7 +18,7 @@ The app has a Players section in its nav, but the page behind it only shows a he
   - Filtering, sorting, and page slicing are one pure domain function in `src/domain/players/`, rendered with Shadcn `table` markup, without a table library. A new ADR records this choice over TanStack Table and the triggers for revisiting it, such as several sortable columns, multi-column sorting, column visibility, row selection, or several complex tables.
   - Client-side pagination: all **players** are fetched once, then filtered, sorted, and sliced in the browser.
     - Below the table: a "Players per page" selector (10 / 25 / 50, default 25), a summary of the filtered results ("Showing 26–50 of 84"), and numbered page links with Previous/Next.
-    - On wide screens the links show the first page, the last page, and the current page ±1, with ellipses between them. The current page is marked `aria-current="page"`, Previous is disabled on the first page, and Next on the last.
+    - On wide screens the links show the first page, the last page, and the current page ±1, with ellipses between them. A gap of only one page shows that page's number instead of an ellipsis. The current page is marked `aria-current="page"`, Previous is disabled on the first page, and Next on the last.
     - Below 744px the links compact to "Previous · Page 2 of 4 · Next", with the summary and page-size selector stacked above.
     - With one page of results, the summary and page-size selector still show but the page links are hidden. With no results, all pagination is hidden.
     - Changing a filter, the sort direction, or the page size, or using Clear filters, returns to page 1.

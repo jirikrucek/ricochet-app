@@ -170,7 +170,7 @@ The system SHALL show the filtered and sorted **players** one page at a time. Be
 - **THEN** the summary reads "Showing 1–25 of 40"
 
 ### Requirement: Page links show a compact page range on wide screens
-From 744px upward the system SHALL show numbered page links with Previous and Next. The links SHALL include the first page, the last page, and the current page with one page on each side, with an ellipsis for each gap. The current page SHALL be marked with `aria-current="page"`. Previous SHALL be disabled on the first page and Next on the last page.
+From 744px upward the system SHALL show numbered page links with Previous and Next. The links SHALL include the first page, the last page, and the current page with one page on each side, with an ellipsis for each gap of two or more pages. A gap of exactly one page SHALL show that page's number instead of an ellipsis. The current page SHALL be marked with `aria-current="page"`. Previous SHALL be disabled on the first page and Next on the last page.
 
 #### Scenario: First page of several
 - **GIVEN** 100 players exist
@@ -193,6 +193,11 @@ From 744px upward the system SHALL show numbered page links with Previous and Ne
 - **AND** the visitor has chosen 10 players per page
 - **WHEN** the visitor is on page 5
 - **THEN** the page links read "Previous 1 … 4 5 6 … 10 Next"
+
+#### Scenario: One-page gap shows the page number
+- **GIVEN** 100 players exist
+- **WHEN** the visitor is on page 1 at the default 25 players per page
+- **THEN** the page links read "Previous 1 2 3 4 Next" with no ellipsis
 
 #### Scenario: Going to a numbered page
 - **GIVEN** 100 players exist
