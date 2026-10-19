@@ -91,7 +91,10 @@ export async function playersAcrossPages(page: Page, search = '') {
     await openOverview(page, params.toString());
     all.push(...(await shownPlayers(page)));
     // Any UI language: the summary is the one text with "from–to … total".
-    const text = await page.getByText(/^\D*\d+–\d+\D+\d+\D*$/).innerText();
+    const text = await page
+      .getByRole('paragraph')
+      .filter({ hasText: /^\D*\d+–\d+\D+\d+\D*$/ })
+      .innerText();
     const [, , to, total] = /(\d+)–(\d+)\D+(\d+)/.exec(text)!.map(Number);
     if (to >= total) break;
   }
@@ -195,8 +198,12 @@ export async function paginationText(page: Page) {
   return items.join(' ');
 }
 
+// The visible summary paragraph (the live region repeats it after a page
+// change).
 export function summary(page: Page) {
-  return page.getByText(/^Showing \d+–\d+ of \d+$/);
+  return page
+    .getByRole('paragraph')
+    .filter({ hasText: /^Showing \d+–\d+ of \d+$/ });
 }
 
 export function pageSizeSelect(page: Page) {

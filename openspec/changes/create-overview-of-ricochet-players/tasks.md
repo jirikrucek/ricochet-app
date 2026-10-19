@@ -80,9 +80,9 @@
 
 ## 11. Slice: compact pagination and orientation after a page change
 
-- [ ] 11.1 Write failing E2E tests for "Compact pagination on a phone" at 375px and for "Moving to the next page" (top of the table in view, focus on the caption, summary in the polite live region)
-- [ ] 11.2 Render the compact "Previous · Page N of M · Next" variant and the stacked summary and selector below `tablet`, switching both variants with `hidden tablet:flex` and its inverse
-- [ ] 11.3 Add the effect keyed on `page` (skipped on first render) that scrolls the table into view and focuses the `tabIndex={-1}` caption, and the visually hidden `aria-live="polite"` region updated only on page changes, until 11.1 passes
+- [x] 11.1 Write failing E2E tests for "Compact pagination on a phone" at 375px and for "Moving to the next page" (top of the table in view, focus on the caption, summary in the polite live region)
+- [x] 11.2 Render the compact "Previous · Page N of M · Next" variant and the stacked summary and selector below `tablet`, switching both variants with `hidden tablet:flex` and its inverse
+- [x] 11.3 Add the effect keyed on `page` (skipped on first render) that scrolls the table into view and focuses the `tabIndex={-1}` caption, and the visually hidden `aria-live="polite"` region updated only on page changes, until 11.1 passes
 
 ## 12. Slice: translation coverage
 

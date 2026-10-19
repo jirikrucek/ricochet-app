@@ -70,7 +70,12 @@ export function PlayerPagination({
           onChange={(value) => onPageSizeChange(Number(value) as PageSize)}
         />
       </div>
-      {pageCount > 1 && <PageLinks page={page} pageCount={pageCount} />}
+      {pageCount > 1 && (
+        <>
+          <PageLinks page={page} pageCount={pageCount} />
+          <CompactPageLinks page={page} pageCount={pageCount} />
+        </>
+      )}
     </div>
   );
 }
@@ -81,7 +86,10 @@ function PageLinks({ page, pageCount }: { page: number; pageCount: number }) {
   const next = t('players.pagination.next');
 
   return (
-    <Pagination aria-label={t('players.pagination.label')}>
+    <Pagination
+      aria-label={t('players.pagination.label')}
+      className="hidden tablet:flex"
+    >
       <PaginationContent>
         <PaginationItem>
           {page > 1 ? (
@@ -109,6 +117,56 @@ function PageLinks({ page, pageCount }: { page: number; pageCount: number }) {
             )}
           </PaginationItem>
         ))}
+        <PaginationItem>
+          {page < pageCount ? (
+            <PaginationNext text={next} render={<PageLink page={page + 1} />} />
+          ) : (
+            <PaginationDisabled>{next}</PaginationDisabled>
+          )}
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+
+// Below 744px: "Previous · Page N of M · Next". Both variants are rendered and
+// switched in CSS, so the hidden one is display:none and out of the a11y tree.
+function CompactPageLinks({
+  page,
+  pageCount,
+}: {
+  page: number;
+  pageCount: number;
+}) {
+  const { t } = useTranslation();
+  const previous = t('players.pagination.previous');
+  const next = t('players.pagination.next');
+
+  return (
+    <Pagination
+      aria-label={t('players.pagination.label')}
+      className="flex tablet:hidden"
+    >
+      <PaginationContent className="w-full justify-between gap-xs">
+        <PaginationItem>
+          {page > 1 ? (
+            <PaginationPrevious
+              text={previous}
+              render={<PageLink page={page - 1} />}
+            />
+          ) : (
+            <PaginationDisabled>{previous}</PaginationDisabled>
+          )}
+        </PaginationItem>
+        <PaginationItem aria-hidden="true" className="text-muted">
+          ·
+        </PaginationItem>
+        <PaginationItem className="type-body-md text-ink">
+          {t('players.pagination.pageOf', { page, count: pageCount })}
+        </PaginationItem>
+        <PaginationItem aria-hidden="true" className="text-muted">
+          ·
+        </PaginationItem>
         <PaginationItem>
           {page < pageCount ? (
             <PaginationNext text={next} render={<PageLink page={page + 1} />} />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { getRouteApi, useRouter } from '@tanstack/react-router';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -94,7 +94,7 @@ function PlayerOverviewContent() {
 // The URL is the only view state (ADR 0002): this reads the validated search,
 // derives the rows, and turns every view change into one navigation.
 function PlayerView({ players }: { players: Player[] }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const search = routeApi.useSearch();
   const navigate = routeApi.useNavigate();
   const locale = i18n.resolvedLanguage ?? i18n.language;
@@ -112,6 +112,15 @@ function PlayerView({ players }: { players: Player[] }) {
     });
 
   useCanonicalPage(search.page, page);
+  const { tableRef, captionRef, announcement } = usePageChangeOrientation(
+    search,
+    page,
+    t('players.pagination.summary', {
+      from: (page - 1) * search.pageSize + 1,
+      to: Math.min(page * search.pageSize, total),
+      total,
+    }),
+  );
 
   return (
     <div className="flex flex-col gap-lg">
@@ -131,6 +140,8 @@ function PlayerView({ players }: { players: Player[] }) {
       ) : (
         <>
           <PlayerTable
+            tableRef={tableRef}
+            captionRef={captionRef}
             rows={rows}
             sort={search.sort}
             onToggleSort={() =>
@@ -146,8 +157,43 @@ function PlayerView({ players }: { players: Player[] }) {
           />
         </>
       )}
+      <div aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
     </div>
   );
+}
+
+// After the visitor changes the page (a page link, Previous/Next, back or
+// forward), scroll to the top of the table, focus its caption, and announce
+// the new summary. A view change also returns to page 1, but it isn't a page
+// change, so it neither moves focus nor announces. Skipped on first render.
+function usePageChangeOrientation(
+  search: PlayerOverviewView,
+  page: number,
+  summary: string,
+) {
+  const tableRef = useRef<HTMLTableElement>(null);
+  const captionRef = useRef<HTMLTableCaptionElement>(null);
+  const [announcement, setAnnouncement] = useState('');
+  const previous = useRef({ search, page });
+
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = { search, page };
+    const viewChanged =
+      before.search.sort !== search.sort ||
+      before.search.nationality !== search.nationality ||
+      before.search.sex !== search.sex ||
+      before.search.pageSize !== search.pageSize;
+    if (before.page === page || viewChanged) return;
+
+    tableRef.current?.scrollIntoView({ block: 'start' });
+    captionRef.current?.focus({ preventScroll: true });
+    setAnnouncement(summary);
+  }, [search, page, summary]);
+
+  return { tableRef, captionRef, announcement };
 }
 
 // A page beyond the last, or an invalid one, renders page 1 (queryPlayers).
@@ -284,10 +330,14 @@ function PlayerTableSkeleton() {
 }
 
 function PlayerTable({
+  tableRef,
+  captionRef,
   rows,
   sort,
   onToggleSort,
 }: {
+  tableRef: Ref<HTMLTableElement>;
+  captionRef: Ref<HTMLTableCaptionElement>;
   rows: Player[];
   sort: SortDirection;
   onToggleSort: () => void;
@@ -297,8 +347,11 @@ function PlayerTable({
   const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
 
   return (
-    <Table className="table-fixed">
-      <TableCaption className="sr-only">{t('players.caption')}</TableCaption>
+    // scroll-mt keeps the table's top clear of the sticky top nav.
+    <Table ref={tableRef} className="scroll-mt-nav-height table-fixed">
+      <TableCaption ref={captionRef} tabIndex={-1} className="sr-only">
+        {t('players.caption')}
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead aria-sort={ariaSort} className={cellClassName}>
