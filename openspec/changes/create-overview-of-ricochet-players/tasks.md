@@ -98,4 +98,4 @@
 
 - [x] 14.1 Check that every scenario in `specs/players/player-overview/spec.md` is covered by an E2E test, and that no test uses `toHaveScreenshot`, `it.skip`, or **production data**
 - [x] 14.2 Run `npx openspec validate create-overview-of-ricochet-players --type change --strict`
-- [ ] 14.3 Run the Definition of Done from `AGENTS.md`, including the new testing standard and ADR 0010 and ADR 0011
+- [x] 14.3 Run the Definition of Done from `AGENTS.md`, including the new testing standard and ADR 0010 and ADR 0011
