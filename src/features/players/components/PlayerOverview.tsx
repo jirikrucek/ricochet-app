@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import {
   formatSurname,
+  sexes,
   type Nationality,
   type Player,
+  type Sex,
 } from '../../../domain/players/player';
 import type {
   PlayerOverviewView,
@@ -113,15 +115,61 @@ function PlayerView({ players }: { players: Player[] }) {
           value={search.nationality}
           onChange={(nationality) => changeView({ nationality })}
         />
+        <SexFilter value={search.sex} onChange={(sex) => changeView({ sex })} />
       </div>
-      <PlayerTable
-        rows={rows}
-        sort={search.sort}
-        onToggleSort={() =>
-          changeView({ sort: search.sort === 'desc' ? 'asc' : 'desc' })
-        }
-      />
+      {rows.length === 0 ? (
+        <NoMatch
+          onClearFilters={() => changeView({ nationality: 'all', sex: 'all' })}
+        />
+      ) : (
+        <PlayerTable
+          rows={rows}
+          sort={search.sort}
+          onToggleSort={() =>
+            changeView({ sort: search.sort === 'desc' ? 'asc' : 'desc' })
+          }
+        />
+      )}
     </div>
+  );
+}
+
+function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex flex-col items-start gap-base">
+      <p className="type-body-md m-0 text-muted">
+        {t('players.noMatch.message')}
+      </p>
+      <Button variant="outline" onClick={onClearFilters}>
+        {t('players.noMatch.clearFilters')}
+      </Button>
+    </div>
+  );
+}
+
+function SexFilter({
+  value,
+  onChange,
+}: {
+  value: Sex | 'all';
+  onChange: (value: Sex | 'all') => void;
+}) {
+  const { t } = useTranslation();
+  const options: FilterOption<Sex | 'all'>[] = [
+    { value: 'all', label: t('players.filters.all') },
+    ...sexes.map((sex) => ({ value: sex, label: t(`players.sex.${sex}`) })),
+  ];
+
+  return (
+    <FilterSelect
+      id="player-sex-filter"
+      label={t('players.filters.sex')}
+      value={value}
+      options={options}
+      onChange={onChange}
+    />
   );
 }
 

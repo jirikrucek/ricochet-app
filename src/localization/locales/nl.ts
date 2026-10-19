@@ -23,6 +23,15 @@ const nl = {
     filters: {
       all: 'Alle',
       nationality: 'Nationaliteit',
+      sex: 'Geslacht',
+    },
+    sex: {
+      male: 'Man',
+      female: 'Vrouw',
+    },
+    noMatch: {
+      message: 'Geen spelers voldoen aan de gekozen filters',
+      clearFilters: 'Filters wissen',
     },
     columns: {
       surname: 'Achternaam',

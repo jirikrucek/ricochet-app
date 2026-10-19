@@ -23,6 +23,15 @@ const hu = {
     filters: {
       all: 'Összes',
       nationality: 'Nemzetiség',
+      sex: 'Nem',
+    },
+    sex: {
+      male: 'Férfi',
+      female: 'Nő',
+    },
+    noMatch: {
+      message: 'Egy játékos sem felel meg a kiválasztott szűrőknek',
+      clearFilters: 'Szűrők törlése',
     },
     columns: {
       surname: 'Vezetéknév',

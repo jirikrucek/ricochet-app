@@ -29,7 +29,9 @@ export function queryPlayers(
   const rows = players
     .filter(
       (player) =>
-        view.nationality === 'all' || player.nationality === view.nationality,
+        (view.nationality === 'all' ||
+          player.nationality === view.nationality) &&
+        (view.sex === 'all' || player.sex === view.sex),
     )
     .sort(playerComparator(locale, view.sort));
   return { rows };

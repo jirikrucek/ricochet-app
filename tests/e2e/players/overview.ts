@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type APIRequestContext, type Page } from '@playwright/test';
 
 export { DESKTOP, PHONE, expectNoHorizontalOverflow } from '../app-shell/shell';
 
@@ -141,4 +141,37 @@ export async function shownNationalities(page: Page) {
     .evaluateAll((flags) =>
       flags.map((flag) => flag.getAttribute('data-country')),
     );
+}
+
+// The players a PostgREST filter returns from the local seed, as the overview
+// shows them, for comparing a filtered view with the data behind it.
+export async function seededPlayers(
+  request: APIRequestContext,
+  filter: Record<string, string> = {},
+): Promise<ShownPlayer[]> {
+  const { playersUrl, headers } = localSupabase();
+  const params = new URLSearchParams({
+    select: 'first_name,surname_prefix,surname,surname_suffix',
+  });
+  for (const [column, value] of Object.entries(filter)) {
+    params.set(column, `eq.${value}`);
+  }
+  const response = await request.get(`${playersUrl}?${params}`, { headers });
+  expect(response.ok()).toBe(true);
+  const rows = (await response.json()) as {
+    first_name: string;
+    surname_prefix: string | null;
+    surname: string;
+    surname_suffix: string | null;
+  }[];
+  return rows.map((row) => ({
+    surname: [row.surname_prefix, row.surname, row.surname_suffix]
+      .filter(Boolean)
+      .join(' '),
+    firstName: row.first_name,
+  }));
+}
+
+export function asNameSet(players: ShownPlayer[]) {
+  return new Set(players.map((p) => `${p.firstName} ${p.surname}`));
 }

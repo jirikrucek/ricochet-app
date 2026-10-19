@@ -23,6 +23,15 @@ const cs = {
     filters: {
       all: 'Vše',
       nationality: 'Národnost',
+      sex: 'Pohlaví',
+    },
+    sex: {
+      male: 'Muž',
+      female: 'Žena',
+    },
+    noMatch: {
+      message: 'Vybraným filtrům neodpovídá žádný hráč',
+      clearFilters: 'Zrušit filtry',
     },
     columns: {
       surname: 'Příjmení',

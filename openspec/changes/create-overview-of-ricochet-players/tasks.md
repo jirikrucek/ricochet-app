@@ -63,11 +63,11 @@
 
 ## 9. Slice: filter by sex, combined filters, and the no-match state
 
-- [ ] 9.1 Write failing unit tests with **mock data** for the **sex** filter and for AND with **nationality** in `queryPlayers`, plus schema tests for `sex` (`all` by default, an unknown value falls back to `all`)
-- [ ] 9.2 Implement them in `src/domain/players/` until 9.1 passes
-- [ ] 9.3 Write failing component unit tests for "No players match the selected filters" with Clear filters, which resets **nationality** and **sex** and keeps the sort
-- [ ] 9.4 Write failing E2E tests for every scenario of "Visitor can filter players by sex" and "Filters combine and adapt to narrow screens", for "No players match the filters" and "Clearing filters from the no-match state", for "Reload keeps the view" and "Default view has a clean URL", and for the "an unknown sex" example
-- [ ] 9.5 Add the **sex** select (All, Male, Female, labelled via `players.sex.*` in all six locale files), the `flex-col tablet:flex-row` filter layout, and the no-match state with Clear filters, until 9.3 and 9.4 pass
+- [x] 9.1 Write failing unit tests with **mock data** for the **sex** filter and for AND with **nationality** in `queryPlayers`, plus schema tests for `sex` (`all` by default, an unknown value falls back to `all`)
+- [x] 9.2 Implement them in `src/domain/players/` until 9.1 passes
+- [x] 9.3 Write failing component unit tests for "No players match the selected filters" with Clear filters, which resets **nationality** and **sex** and keeps the sort
+- [x] 9.4 Write failing E2E tests for every scenario of "Visitor can filter players by sex" and "Filters combine and adapt to narrow screens", for "No players match the filters" and "Clearing filters from the no-match state", for "Reload keeps the view" and "Default view has a clean URL", and for the "an unknown sex" example
+- [x] 9.5 Add the **sex** select (All, Male, Female, labelled via `players.sex.*` in all six locale files), the `flex-col tablet:flex-row` filter layout, and the no-match state with Clear filters, until 9.3 and 9.4 pass
 
 ## 10. Slice: pagination with page links on wide screens
 

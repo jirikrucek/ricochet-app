@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { nationalitySchema } from './player';
+import { nationalitySchema, sexSchema } from './player';
 
 // The player overview's view lives in the URL (ADR 0002). Each field falls
 // back to its default on its own, so one bad param never breaks the others,
@@ -11,6 +11,7 @@ export type SortDirection = (typeof sortDirections)[number];
 export const playerOverviewSearchDefaults = {
   sort: 'asc',
   nationality: 'all',
+  sex: 'all',
 } as const satisfies Record<string, unknown>;
 
 export const playerOverviewSearchSchema = z.object({
@@ -22,6 +23,10 @@ export const playerOverviewSearchSchema = z.object({
     .union([nationalitySchema, z.literal('all')])
     .default(playerOverviewSearchDefaults.nationality)
     .catch(playerOverviewSearchDefaults.nationality),
+  sex: z
+    .union([sexSchema, z.literal('all')])
+    .default(playerOverviewSearchDefaults.sex)
+    .catch(playerOverviewSearchDefaults.sex),
 });
 
 export type PlayerOverviewView = z.output<typeof playerOverviewSearchSchema>;

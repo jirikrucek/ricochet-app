@@ -36,3 +36,17 @@ describe('playerOverviewSearchSchema nationality', () => {
     expect(parse({ nationality: 'FR', sort: 'desc' }).sort).toBe('desc');
   });
 });
+
+describe('playerOverviewSearchSchema sex', () => {
+  it("defaults to 'all'", () => {
+    expect(parse({}).sex).toBe('all');
+  });
+
+  it('keeps a known sex', () => {
+    expect(parse({ sex: 'female' }).sex).toBe('female');
+  });
+
+  it("falls back to 'all' for an unknown value", () => {
+    expect(parse({ sex: 'unknown' }).sex).toBe('all');
+  });
+});

@@ -198,3 +198,34 @@ describe('presentNationalities', () => {
     expect(presentNationalities([])).toEqual([]);
   });
 });
+
+describe('queryPlayers sex filter', () => {
+  const players = [
+    buildPlayer({ surname: 'Nováková', nationality: 'CZ', sex: 'female' }),
+    buildPlayer({ surname: 'Novák', nationality: 'CZ', sex: 'male' }),
+    buildPlayer({ surname: 'Nowak', nationality: 'PL', sex: 'male' }),
+    buildPlayer({ surname: 'Kowalska', nationality: 'PL', sex: 'female' }),
+  ];
+
+  it("lets both sexes through with 'all'", () => {
+    expect(queryPlayers(players, view({ sex: 'all' }), 'en').rows).toHaveLength(
+      4,
+    );
+  });
+
+  it('keeps only players of the chosen sex', () => {
+    const { rows } = queryPlayers(players, view({ sex: 'female' }), 'en');
+
+    expect(surnames(rows)).toEqual(['Kowalska', 'Nováková']);
+  });
+
+  it('combines the sex and nationality filters with AND', () => {
+    const { rows } = queryPlayers(
+      players,
+      view({ nationality: 'PL', sex: 'male' }),
+      'en',
+    );
+
+    expect(surnames(rows)).toEqual(['Nowak']);
+  });
+});

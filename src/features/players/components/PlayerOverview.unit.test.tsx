@@ -6,6 +6,7 @@ import {
   createRouter,
   Outlet,
   RouterProvider,
+  stripSearchParams,
 } from '@tanstack/react-router';
 import {
   act,
@@ -18,7 +19,10 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlayerRowInput } from '../../../domain/players/player';
-import { playerOverviewSearchSchema } from '../../../domain/players/playerOverviewSearch';
+import {
+  playerOverviewSearchDefaults,
+  playerOverviewSearchSchema,
+} from '../../../domain/players/playerOverviewSearch';
 import { buildPlayerRow } from '../../../domain/players/playerMocks';
 import i18n from '../../../localization/i18n';
 import { PlayerOverview } from './PlayerOverview';
@@ -39,7 +43,9 @@ function renderPlayerOverview(path = '/players') {
   const playersRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/players/',
+    // Same search handling as src/routes/players/index.tsx.
     validateSearch: playerOverviewSearchSchema,
+    search: { middlewares: [stripSearchParams(playerOverviewSearchDefaults)] },
     component: PlayerOverview,
   });
   const router = createRouter({
@@ -107,5 +113,43 @@ describe('PlayerOverview states', () => {
     expect(screen.queryByRole('table')).toBeNull();
     expect(screen.queryByRole('navigation')).toBeNull();
     expect(screen.queryByText(/Showing/)).toBeNull();
+  });
+});
+
+describe('PlayerOverview with filters that match no players', () => {
+  const rows = [
+    buildPlayerRow({ surname: 'Smith', nationality: 'GB', sex: 'male' }),
+    buildPlayerRow({ surname: 'Nováková', nationality: 'CZ', sex: 'female' }),
+  ];
+
+  it('shows the no-match message with Clear filters instead of the table', async () => {
+    fetchPlayerRows.mockResolvedValue(rows);
+
+    renderPlayerOverview('/players?nationality=GB&sex=female');
+
+    expect(
+      await screen.findByText('No players match the selected filters'),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeTruthy();
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+
+  it('Clear filters resets nationality and sex and keeps the sort', async () => {
+    fetchPlayerRows.mockResolvedValue(rows);
+    const { router } = renderPlayerOverview(
+      '/players?nationality=GB&sex=female&sort=desc',
+    );
+
+    const clear = await screen.findByRole('button', { name: 'Clear filters' });
+    await act(async () => {
+      fireEvent.click(clear);
+    });
+
+    expect(await screen.findByRole('cell', { name: 'Smith' })).toBeTruthy();
+    expect(screen.getByRole('cell', { name: 'Nováková' })).toBeTruthy();
+    expect(router.state.location.search).toEqual({ sort: 'desc' });
+    expect(
+      screen.queryByText('No players match the selected filters'),
+    ).toBeNull();
   });
 });

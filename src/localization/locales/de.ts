@@ -23,6 +23,15 @@ const de = {
     filters: {
       all: 'Alle',
       nationality: 'Nationalität',
+      sex: 'Geschlecht',
+    },
+    sex: {
+      male: 'Männlich',
+      female: 'Weiblich',
+    },
+    noMatch: {
+      message: 'Keine Spieler entsprechen den gewählten Filtern',
+      clearFilters: 'Filter zurücksetzen',
     },
     columns: {
       surname: 'Nachname',
