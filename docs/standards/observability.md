@@ -27,7 +27,7 @@ Use `Sentry.logger.*` (from `src/app/observability/sentry.ts`) instead of `conso
   // GOOD
   Sentry.logger.error('tournament_load_failed', { tournamentId: id, error: err.message });
   ```
-- Never log Supabase access/refresh tokens, the anon key, or full user records — allowlist fields.
+- Never log Supabase access/refresh tokens, the publishable key, or full user records — allowlist fields.
 - `Sentry.logger.*` is for diagnostic detail; `Sentry.captureException` (already wired for query/mutation/render errors) remains the right call for actual failures — don't replace that with `logger.error`.
 - `console.*` should not appear in application code once this is in place — it isn't structured and isn't captured anywhere.
 
