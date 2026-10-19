@@ -91,11 +91,11 @@
 
 ## 13. Production data handoff
 
-- [ ] 13.1 Write the idempotent **production data** script in the gitignored `supabase/data/` from `supabase/data/players-ranking-2026-04.md`: 84 **players** in one transaction, `insert … on conflict (natural key) do update set sex = excluded.sex`, with the three spelling fixes, the corrected **nationality**, split **surname prefixes** and **surname suffixes**, and the confirmed **sex**; confirm with `git status` that nothing under `supabase/data/` is tracked, and never run it against a local or CI database
+- [x] 13.1 Write the idempotent **production data** script in the gitignored `supabase/data/` from `supabase/data/players-ranking-2026-04.md`: 84 **players** in one transaction, `insert … on conflict (natural key) do update set sex = excluded.sex`, with the three spelling fixes, the corrected **nationality**, split **surname prefixes** and **surname suffixes**, and the confirmed **sex**; confirm with `git status` that nothing under `supabase/data/` is tracked, and never run it against a local or CI database
 - [ ] 13.2 Hand the migration plan in `design.md` to the product owner: set `VITE_SUPABASE_PUBLISHABLE_KEY` in Vercel, apply the migration, run the script, and check for 84 rows and a working anonymous `select`, all before the merge
 
 ## 14. Verification
 
-- [ ] 14.1 Check that every scenario in `specs/players/player-overview/spec.md` is covered by an E2E test, and that no test uses `toHaveScreenshot`, `it.skip`, or **production data**
-- [ ] 14.2 Run `npx openspec validate create-overview-of-ricochet-players --type change --strict`
+- [x] 14.1 Check that every scenario in `specs/players/player-overview/spec.md` is covered by an E2E test, and that no test uses `toHaveScreenshot`, `it.skip`, or **production data**
+- [x] 14.2 Run `npx openspec validate create-overview-of-ricochet-players --type change --strict`
 - [ ] 14.3 Run the Definition of Done from `AGENTS.md`, including the new testing standard and ADR 0010 and ADR 0011
