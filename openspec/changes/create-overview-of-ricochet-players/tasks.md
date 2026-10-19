@@ -86,8 +86,8 @@
 
 ## 12. Slice: translation coverage
 
-- [ ] 12.1 Write the failing E2E Scenario Outline "Page text follows the UI language" for English, Czech, German, Polish, Dutch, and Hungarian (column headers, filter labels, pagination)
-- [ ] 12.2 Fill any missing or untranslated keys until 12.1 and the locale parity check in `src/localization/locales/resources.integration.test.ts` pass
+- [x] 12.1 Write the failing E2E Scenario Outline "Page text follows the UI language" for English, Czech, German, Polish, Dutch, and Hungarian (column headers, filter labels, pagination)
+- [x] 12.2 Fill any missing or untranslated keys until 12.1 and the locale parity check in `src/localization/locales/resources.integration.test.ts` pass
 
 ## 13. Production data handoff
 
