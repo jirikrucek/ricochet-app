@@ -1,6 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-import { formatSurname, type Player } from '../../../domain/players/player';
+import {
+  formatSurname,
+  type Nationality,
+  type Player,
+} from '../../../domain/players/player';
 import { Flag } from '../../../localization/Flag';
 import {
   Table,
@@ -11,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
 import { usePlayers } from '../api/usePlayers';
 
 // Cells wrap instead of scrolling, so the table fits a 320px viewport.
@@ -55,11 +60,40 @@ function PlayerTable({ players }: { players: Player[] }) {
             </TableCell>
             <TableCell className={cellClassName}>{player.firstName}</TableCell>
             <TableCell>
-              <Flag countryCode={player.nationality} className="h-4 w-auto" />
+              <NationalityFlag nationality={player.nationality} />
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+// A flag only, named by the localized country name. Focusable, so the tooltip
+// opens on keyboard focus as well as on hover.
+function NationalityFlag({ nationality }: { nationality: Nationality }) {
+  const { t } = useTranslation();
+  const countryName = t(`countries.${nationality}`);
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <span
+            role="img"
+            aria-label={countryName}
+            tabIndex={0}
+            className="inline-flex rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          />
+        }
+      >
+        <Flag
+          countryCode={nationality}
+          aria-hidden="true"
+          className="size-5 shrink-0"
+        />
+      </TooltipTrigger>
+      <TooltipContent>{countryName}</TooltipContent>
+    </Tooltip>
   );
 }

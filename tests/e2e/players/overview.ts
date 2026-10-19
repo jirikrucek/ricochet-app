@@ -55,3 +55,11 @@ export function localSupabase() {
     headers: { apikey: key, Authorization: `Bearer ${key}` },
   };
 }
+
+// Sets the UI language the way the language selector persists it, before the
+// app boots.
+export async function useUiLanguage(page: Page, language: string) {
+  await page.addInitScript((lng) => {
+    localStorage.setItem('i18nextLng', lng);
+  }, language);
+}

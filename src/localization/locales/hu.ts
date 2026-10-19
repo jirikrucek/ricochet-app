@@ -20,6 +20,14 @@ const hu = {
       nationality: 'Nemzetiség',
     },
   },
+  countries: {
+    CZ: 'Csehország',
+    DE: 'Németország',
+    HU: 'Magyarország',
+    PL: 'Lengyelország',
+    NL: 'Hollandia',
+    GB: 'Egyesült Királyság',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

@@ -20,6 +20,14 @@ const cs = {
       nationality: 'Národnost',
     },
   },
+  countries: {
+    CZ: 'Česko',
+    DE: 'Německo',
+    HU: 'Maďarsko',
+    PL: 'Polsko',
+    NL: 'Nizozemsko',
+    GB: 'Spojené království',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

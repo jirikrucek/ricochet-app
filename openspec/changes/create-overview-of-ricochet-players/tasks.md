@@ -36,9 +36,9 @@
 
 ## 5. Slice: nationality flags with localized country names
 
-- [ ] 5.1 Write failing E2E tests for "Flag named in the current UI language" and "Tooltip shows the country name" (hover and keyboard focus)
-- [ ] 5.2 Add `countries.CZ|DE|HU|PL|NL|GB` to all six locale files
-- [ ] 5.3 Render each Nationality cell as a tooltip trigger around `Flag` with `role="img"`, an `aria-label` set to the localized country name, and `tabIndex={0}`, until 5.1 passes
+- [x] 5.1 Write failing E2E tests for "Flag named in the current UI language" and "Tooltip shows the country name" (hover and keyboard focus)
+- [x] 5.2 Add `countries.CZ|DE|HU|PL|NL|GB` to all six locale files
+- [x] 5.3 Render each Nationality cell as a tooltip trigger around `Flag` with `role="img"`, an `aria-label` set to the localized country name, and `tabIndex={0}`, until 5.1 passes
 
 ## 6. Slice: loading, error, and empty states
 
