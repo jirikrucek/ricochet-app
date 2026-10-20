@@ -91,7 +91,7 @@
 
 ## 13. Production data handoff
 
-- [x] 13.1 Write the idempotent **production data** script in the gitignored `supabase/data/` from `supabase/data/players-ranking-2026-04.md`: 84 **players** in one transaction, `insert … on conflict (natural key) do update set sex = excluded.sex`, with the three spelling fixes, the corrected **nationality**, split **surname prefixes** and **surname suffixes**, and the confirmed **sex**; confirm with `git status` that nothing under `supabase/data/` is tracked, and never run it against a local or CI database
+- [x] 13.1 Write the idempotent **production data** script in the gitignored `supabase/data/` from `supabase/data/20261019_players.md`: 84 **players** in one transaction, `insert … on conflict (natural key) do update set sex = excluded.sex`, with the three spelling fixes, the corrected **nationality**, split **surname prefixes** and **surname suffixes**, and the confirmed **sex**; confirm with `git status` that nothing under `supabase/data/` is tracked, and never run it against a local or CI database
 - [ ] 13.2 Hand the migration plan in `design.md` to the product owner: set `VITE_SUPABASE_PUBLISHABLE_KEY` in Vercel, apply the migration, run the script, and check for 84 rows and a working anonymous `select`, all before the merge
 
 ## 14. Verification
