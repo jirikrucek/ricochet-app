@@ -39,8 +39,8 @@ create policy "Players are readable by every visitor"
   to anon, authenticated
   using (true);
 
--- New tables aren't exposed to the API roles by default, so grant the read.
+-- Supabase's default privileges grant the API roles every privilege on a new
+-- table in `public`, so start from nothing and grant only the read. Even a
+-- later mistaken "for all" policy then can't open writes.
+revoke all on public.players from anon, authenticated;
 grant select on public.players to anon, authenticated;
-
--- Defence in depth: even a later mistaken "for all" policy can't open writes.
-revoke insert, update, delete, truncate on public.players from anon, authenticated;

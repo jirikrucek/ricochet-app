@@ -19,7 +19,10 @@ export function useCanonicalPage(requestedPage: number, effectivePage: number) {
     const canonicalPage = effectivePage === 1 ? null : String(effectivePage);
     if (rawPage !== canonicalPage) {
       void navigate({
-        search: (prev) => ({ ...prev, page: undefined }),
+        search: (prev) => ({
+          ...prev,
+          page: effectivePage === 1 ? undefined : effectivePage,
+        }),
         replace: true,
       });
     }

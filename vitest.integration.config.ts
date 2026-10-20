@@ -3,11 +3,10 @@ import {
   type TestProjectInlineConfiguration,
 } from 'vitest/config';
 
-import { localSupabaseEnv } from './tests/support/localSupabaseEnv';
 import { resolve } from './vitest.unit.config';
 
-// Process env set here wins over .env* files, so integration tests reach only
-// the local Supabase the helper found (docs/standards/testing.md).
+// The global setup finds the local Supabase when this project runs, so
+// selecting only the unit projects never needs it.
 export function integrationProject(): TestProjectInlineConfiguration {
   return {
     extends: true,
@@ -15,7 +14,7 @@ export function integrationProject(): TestProjectInlineConfiguration {
       name: 'integration',
       include: ['src/**/*.integration.test.ts'],
       environment: 'node',
-      env: localSupabaseEnv(),
+      globalSetup: './tests/support/vitestLocalSupabase.ts',
     },
   };
 }

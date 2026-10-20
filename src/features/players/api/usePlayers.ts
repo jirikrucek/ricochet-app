@@ -7,9 +7,15 @@ import { fetchPlayers } from '../../../repositories/players/fetchPlayers';
 // (docs/standards/observability.md).
 export const playersQueryKey = ['players'] as const;
 
+// The players change only when someone loads them by hand, so a visit within
+// this window reuses the cached list instead of refetching on every mount and
+// window focus.
+const staleTime = 5 * 60 * 1000;
+
 export function usePlayers() {
   return useQuery({
     queryKey: playersQueryKey,
     queryFn: () => fetchPlayers(),
+    staleTime,
   });
 }

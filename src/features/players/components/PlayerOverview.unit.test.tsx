@@ -184,3 +184,25 @@ describe('PlayerOverview pagination ends', () => {
     expect(next?.hasAttribute('href')).toBe(false);
   });
 });
+
+describe('PlayerOverview canonical page', () => {
+  const rows = Array.from({ length: 30 }, (_, index) =>
+    buildPlayer({
+      id: index + 1,
+      surname: `Player${String(index).padStart(2, '0')}`,
+    }),
+  );
+
+  it('keeps the page when the URL spells a valid page differently', async () => {
+    fetchPlayers.mockResolvedValue(rows);
+
+    const { router } = renderPlayerOverview('/players?pageSize=10&page=2.0');
+
+    await screen.findByText('Player10');
+    await vi.waitFor(() =>
+      expect(router.state.location.search).toEqual({ pageSize: 10, page: 2 }),
+    );
+    expect(screen.getByText('Player10')).toBeTruthy();
+    expect(screen.queryByText('Player00')).toBeNull();
+  });
+});
