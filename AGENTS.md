@@ -54,7 +54,6 @@ Execute phases in sequence before concluding any change to the codebase (feature
 - Validate new tests have non-trivial assertions (no `expect(true).toBe(true)` or empty blocks).
 - Ensure unit under test is not mocked out (mock external I/O only).
 - Confirm zero skipped tests (`it.skip`/`describe.skip`).
-- Check new and modified tests against `docs/standards/testing.md` (data per test level, local Supabase only, no **production data**).
 
 #### Phase 5: Definition of Done Final Report
 
@@ -105,7 +104,7 @@ Before exploring the codebase for a task, read ADRs in `docs/adr/` that touch th
 
 ### E2E tests
 
-When running, writing, or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
+When running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
 
 ### Deployment
 
