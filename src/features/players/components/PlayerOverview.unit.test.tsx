@@ -63,6 +63,9 @@ function renderPlayerOverview(path = '/players') {
 
 beforeEach(async () => {
   fetchPlayers.mockReset();
+  // jsdom doesn't implement it; the router calls it to reset scroll on every
+  // navigation.
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
   await i18n.changeLanguage('en');
 });
 

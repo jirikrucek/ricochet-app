@@ -29,8 +29,9 @@ Set these in the Vercel project settings for both Preview and Production. Vite i
 
 The key variable was renamed from `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY`. The app throws at start-up without the new name, and Vite inlines it at build time, so before deploying a version that uses it:
 
-1. In Vercel, for both Preview and Production, add `VITE_SUPABASE_PUBLISHABLE_KEY` with the `sb_publishable_…` key and remove `VITE_SUPABASE_ANON_KEY`.
+1. In Vercel, for both Preview and Production, add `VITE_SUPABASE_PUBLISHABLE_KEY` with the `sb_publishable_…` key. Keep `VITE_SUPABASE_ANON_KEY` for now, so a rollback to the previous build still starts.
 2. Redeploy, so the build picks the new value up.
+3. Once the new build is live and working, remove `VITE_SUPABASE_ANON_KEY`.
 
 ## Releasing a database change
 
