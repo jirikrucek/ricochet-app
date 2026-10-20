@@ -11,6 +11,50 @@ const nl = {
     closeMenu: 'Menu sluiten',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Spelers',
+    caption: 'Lijst van spelers',
+    loading: 'Spelers worden geladen',
+    error: {
+      message: 'De spelers konden niet worden geladen.',
+      retry: 'Opnieuw proberen',
+    },
+    empty: 'Nog geen spelers',
+    filters: {
+      all: 'Alle',
+      nationality: 'Nationaliteit',
+      sex: 'Geslacht',
+    },
+    sex: {
+      male: 'Man',
+      female: 'Vrouw',
+    },
+    noMatch: {
+      message: 'Geen spelers voldoen aan de gekozen filters',
+      clearFilters: 'Filters wissen',
+    },
+    pagination: {
+      label: 'Paginering',
+      previous: 'Vorige',
+      next: 'Volgende',
+      pageSize: 'Spelers per pagina',
+      summary: '{{from}}–{{to}} van {{total}}',
+      pageOf: 'Pagina {{page}} van {{count}}',
+    },
+    columns: {
+      surname: 'Achternaam',
+      firstName: 'Voornaam',
+      nationality: 'Nationaliteit',
+    },
+  },
+  countries: {
+    CZ: 'Tsjechië',
+    DE: 'Duitsland',
+    HU: 'Hongarije',
+    PL: 'Polen',
+    NL: 'Nederland',
+    GB: 'Verenigd Koninkrijk',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

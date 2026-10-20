@@ -11,6 +11,50 @@ const pl = {
     closeMenu: 'Zamknij menu',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Gracze',
+    caption: 'Lista graczy',
+    loading: 'Wczytywanie graczy',
+    error: {
+      message: 'Nie udało się wczytać graczy.',
+      retry: 'Spróbuj ponownie',
+    },
+    empty: 'Nie ma jeszcze graczy',
+    filters: {
+      all: 'Wszystkie',
+      nationality: 'Narodowość',
+      sex: 'Płeć',
+    },
+    sex: {
+      male: 'Mężczyzna',
+      female: 'Kobieta',
+    },
+    noMatch: {
+      message: 'Żaden gracz nie pasuje do wybranych filtrów',
+      clearFilters: 'Wyczyść filtry',
+    },
+    pagination: {
+      label: 'Paginacja',
+      previous: 'Poprzednia',
+      next: 'Następna',
+      pageSize: 'Graczy na stronę',
+      summary: 'Wyświetlono {{from}}–{{to}} z {{total}}',
+      pageOf: 'Strona {{page}} z {{count}}',
+    },
+    columns: {
+      surname: 'Nazwisko',
+      firstName: 'Imię',
+      nationality: 'Narodowość',
+    },
+  },
+  countries: {
+    CZ: 'Czechy',
+    DE: 'Niemcy',
+    HU: 'Węgry',
+    PL: 'Polska',
+    NL: 'Niderlandy',
+    GB: 'Wielka Brytania',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

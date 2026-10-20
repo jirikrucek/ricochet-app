@@ -51,8 +51,16 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run test:unit
 
-      - name: Integration tests
+      # Integration and E2E tests read the local URL and publishable key
+      # through tests/support/localSupabaseEnv.ts, so no secrets are needed.
+      # Unused services are excluded to cut start-up time.
+      - name: Start local Supabase
+        id: supabase
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime
+
+      - name: Integration tests
+        if: ${{ !cancelled() && steps.supabase.outcome == 'success' }}
         run: npm run test:integration
 
       - name: Install Playwright browser
@@ -63,7 +71,7 @@ jobs:
           npx playwright install-deps chromium
 
       - name: E2E tests
-        if: ${{ !cancelled() && steps.playwright.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.playwright.outcome == 'success' && steps.supabase.outcome == 'success' }}
         run: npm run test:e2e
 
       - name: Upload Playwright report

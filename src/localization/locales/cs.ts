@@ -11,6 +11,50 @@ const cs = {
     closeMenu: 'Zavřít menu',
     menuTitle: 'Menu',
   },
+  players: {
+    heading: 'Hráči',
+    caption: 'Seznam hráčů',
+    loading: 'Načítání hráčů',
+    error: {
+      message: 'Hráče se nepodařilo načíst.',
+      retry: 'Zkusit znovu',
+    },
+    empty: 'Zatím žádní hráči',
+    filters: {
+      all: 'Vše',
+      nationality: 'Národnost',
+      sex: 'Pohlaví',
+    },
+    sex: {
+      male: 'Muž',
+      female: 'Žena',
+    },
+    noMatch: {
+      message: 'Vybraným filtrům neodpovídá žádný hráč',
+      clearFilters: 'Zrušit filtry',
+    },
+    pagination: {
+      label: 'Stránkování',
+      previous: 'Předchozí',
+      next: 'Další',
+      pageSize: 'Hráčů na stránku',
+      summary: 'Zobrazeno {{from}}–{{to}} z {{total}}',
+      pageOf: 'Strana {{page}} z {{count}}',
+    },
+    columns: {
+      surname: 'Příjmení',
+      firstName: 'Jméno',
+      nationality: 'Národnost',
+    },
+  },
+  countries: {
+    CZ: 'Česko',
+    DE: 'Německo',
+    HU: 'Maďarsko',
+    PL: 'Polsko',
+    NL: 'Nizozemsko',
+    GB: 'Spojené království',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

@@ -54,4 +54,5 @@ function Button({
   );
 }
 
-export { Button };
+// eslint-disable-next-line react-refresh/only-export-components -- shared with ui/pagination, as in Shadcn upstream
+export { Button, buttonVariants };

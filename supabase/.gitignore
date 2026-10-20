@@ -2,6 +2,9 @@
 .branches
 .temp
 
+# Production data scripts and their sources, run by hand; never committed
+data/
+
 # dotenvx
 .env.keys
 .env.local

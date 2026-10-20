@@ -1,12 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
+import { createFileRoute, stripSearchParams } from '@tanstack/react-router';
 
-function PlayersPage() {
-  const { t } = useTranslation();
-
-  return <h1 className="type-display-xl m-0 text-ink">{t('nav.players')}</h1>;
-}
+import {
+  playerOverviewSearchDefaults,
+  playerOverviewSearchSchema,
+} from '../../domain/players/playerOverviewSearch';
+import { PlayerOverview } from '../../features/players/components/PlayerOverview';
 
 export const Route = createFileRoute('/players/')({
-  component: PlayersPage,
+  validateSearch: playerOverviewSearchSchema,
+  // Default values never show in the URL, so the default view is `/players`.
+  search: { middlewares: [stripSearchParams(playerOverviewSearchDefaults)] },
+  component: PlayerOverview,
 });

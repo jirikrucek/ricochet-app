@@ -11,6 +11,50 @@ const hu = {
     closeMenu: 'Menü bezárása',
     menuTitle: 'Menü',
   },
+  players: {
+    heading: 'Játékosok',
+    caption: 'Játékosok listája',
+    loading: 'Játékosok betöltése',
+    error: {
+      message: 'Nem sikerült betölteni a játékosokat.',
+      retry: 'Újra',
+    },
+    empty: 'Még nincsenek játékosok',
+    filters: {
+      all: 'Összes',
+      nationality: 'Nemzetiség',
+      sex: 'Nem',
+    },
+    sex: {
+      male: 'Férfi',
+      female: 'Nő',
+    },
+    noMatch: {
+      message: 'Egy játékos sem felel meg a kiválasztott szűrőknek',
+      clearFilters: 'Szűrők törlése',
+    },
+    pagination: {
+      label: 'Lapozás',
+      previous: 'Előző',
+      next: 'Következő',
+      pageSize: 'Játékos oldalanként',
+      summary: '{{from}}–{{to}} / {{total}}',
+      pageOf: '{{page}}. oldal / {{count}}',
+    },
+    columns: {
+      surname: 'Vezetéknév',
+      firstName: 'Keresztnév',
+      nationality: 'Nemzetiség',
+    },
+  },
+  countries: {
+    CZ: 'Csehország',
+    DE: 'Németország',
+    HU: 'Magyarország',
+    PL: 'Lengyelország',
+    NL: 'Hollandia',
+    GB: 'Egyesült Királyság',
+  },
   footer: {
     legal: '© {{year}} Ricochet App',
   },

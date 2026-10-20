@@ -1,8 +1,8 @@
 # ADR 0003: Establish Domain Boundaries and Repository Seams
 
-- Status: Accepted
+- Status: Superseded by ADR 0012
 - Created: 2026-07-21
-- Updated: 2026-08-11
+- Updated: 2026-10-20
 
 ## Context
 
