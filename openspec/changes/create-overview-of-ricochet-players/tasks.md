@@ -1,7 +1,7 @@
 ## 1. Prefactoring: publishable key
 
-- [x] 1.1 Rename `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/client-api/supabaseClient.ts` (keeping the fail-fast error, renamed), `src/vite-env.d.ts`, and `.env.example` (D10)
-- [x] 1.2 Change "anon key" to "publishable key" in `docs/standards/security.md` and `docs/standards/observability.md`, and list the required Vercel variables, including keeping `VITE_SUPABASE_ANON_KEY` until the new build is live, in `docs/guides/deployment.md`
+- [x] 1.1 Read the key from `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/client-api/supabaseClient.ts` (keeping the fail-fast error, renamed), `src/vite-env.d.ts`, and `.env.example` (D10)
+- [x] 1.2 Change "anon key" to "publishable key" in `docs/standards/security.md` and `docs/standards/observability.md`, and list the required Vercel variables in `docs/guides/deployment.md`
 - [x] 1.3 Verify: `npm run typecheck`, `npm run build`, and the existing E2E suite pass with a local `.env.local` that sets the new variable
 
 ## 2. Prefactoring: test infrastructure for a local Supabase

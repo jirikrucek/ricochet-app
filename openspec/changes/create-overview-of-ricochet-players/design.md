@@ -222,7 +222,7 @@ flowchart LR
 
 ### D10. The app uses the publishable key instead of the legacy anon key
 
-- Rename `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
+- Read the key from `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
 - The publishable key runs requests as the `anon` role, so the RLS policy (`to anon, authenticated`) and the revoked grants (D2) apply unchanged.
 - Local and CI runs use the CLI's `PUBLISHABLE_KEY` (D8). The installed Supabase CLI (v2.119) already reports it in `supabase status -o json`.
 - Update the wording in `docs/standards/security.md` and `docs/standards/observability.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment.md`.
@@ -242,11 +242,11 @@ flowchart LR
 
 ## Migration Plan
 
-1. Before merge, the product owner copies the publishable key from the Supabase dashboard (API keys) into Vercel as `VITE_SUPABASE_PUBLISHABLE_KEY` for preview and production. `VITE_SUPABASE_ANON_KEY` stays in place until the merged build is live, then gets removed.
+1. Before merge, the product owner copies the publishable key from the Supabase dashboard (API keys) into Vercel as `VITE_SUPABASE_PUBLISHABLE_KEY` for preview and production.
 2. Before merge, the product owner applies the migration to the shared Supabase project (`supabase db push` or the SQL editor). It only adds a table, an enum, and a policy, so the deployed app is unaffected.
 3. The product owner runs the **production data** script once, then checks that 84 rows exist and that an anonymous `select` works.
 4. Merge. Vercel deploys the new `/players` page, and previews and production both read the populated table.
-5. **Rollback:** revert the UI commit and redeploy. The reverted build reads `VITE_SUPABASE_ANON_KEY` again, so keep that variable until the new build has proven itself. The table can stay, since it is harmless and read-only. If it has to go, `drop table public.players; drop type player_sex;` by hand, then re-run the script after re-applying.
+5. **Rollback:** revert the UI commit and redeploy. The table can stay, since it is harmless and read-only. If it has to go, `drop table public.players; drop type player_sex;` by hand, then re-run the script after re-applying.
 
 ## Open Questions
 

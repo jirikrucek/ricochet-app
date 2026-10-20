@@ -25,14 +25,6 @@ Set these in the Vercel project settings for both Preview and Production. Vite i
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | The publishable key (`sb_publishable_…`) from the Supabase dashboard, under API keys. The app fails at start-up without it. |
 | `VITE_SENTRY_DSN` | No | The Sentry DSN. Leave unset to disable error reporting (see `docs/standards/observability.md`). |
 
-### Renaming `VITE_SUPABASE_ANON_KEY`
-
-The key variable was renamed from `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY`. The app throws at start-up without the new name, and Vite inlines it at build time, so before deploying a version that uses it:
-
-1. In Vercel, for both Preview and Production, add `VITE_SUPABASE_PUBLISHABLE_KEY` with the `sb_publishable_…` key. Keep `VITE_SUPABASE_ANON_KEY` for now, so a rollback to the previous build still starts.
-2. Redeploy, so the build picks the new value up.
-3. Once the new build is live and working, remove `VITE_SUPABASE_ANON_KEY`.
-
 ## Releasing a database change
 
 A migration, and the data the app needs in it, are not part of the Vercel deploy. They reach the shared database by hand, so run them in this order. A frontend that is deployed first shows its error state until the table exists and holds rows.
