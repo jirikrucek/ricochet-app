@@ -79,14 +79,14 @@ export default tseslint.config(
         { type: 'app', pattern: 'src/app/**', partialMatch: false },
         { type: 'domain', pattern: 'src/domain/**', partialMatch: false },
         {
-          type: 'client-api',
-          pattern: 'src/client-api/**',
+          type: 'repositories',
+          pattern: 'src/repositories/**',
           partialMatch: false,
         },
         // More specific than 'features' below — must be declared first,
         // since the matcher takes the first element pattern that matches
         // a file. This is the only part of a feature allowed to import
-        // client-api.
+        // repositories.
         {
           type: 'features-api',
           pattern: 'src/features/*/api/**',
@@ -122,7 +122,7 @@ export default tseslint.config(
           policies: [
             {
               from: { element: { type: 'app' } },
-              // add 'domain', 'client-api' here once an auth session store lands
+              // add 'domain', 'repositories' here once an auth session store lands
               allow: {
                 to: { element: { types: ['ui', 'localization', 'lib'] } },
               },
@@ -167,12 +167,12 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'features-api' } },
-              // the seam: calls client-api, maps the result through a
-              // domain mapper, and returns a domain type to the rest of
+              // the seam: wraps a repository (which already returns
+              // domain types) in TanStack Query hooks for the rest of
               // the feature (ADR 0003)
               allow: [
                 {
-                  to: { element: { types: ['client-api', 'domain', 'lib'] } },
+                  to: { element: { types: ['repositories', 'domain', 'lib'] } },
                 },
                 {
                   to: {
@@ -185,8 +185,10 @@ export default tseslint.config(
               ],
             },
             {
-              from: { element: { type: 'client-api' } },
-              allow: { to: { element: { type: 'lib' } } },
+              from: { element: { type: 'repositories' } },
+              // the adapter: maps Supabase rows to domain types and
+              // validates them with domain schemas (ADR 0003)
+              allow: { to: { element: { types: ['domain', 'lib'] } } },
             },
             {
               from: { element: { type: 'ui' } },
@@ -214,10 +216,11 @@ export default tseslint.config(
                   },
                 },
               },
-              message: 'Import Supabase only inside src/client-api (ADR 0003).',
+              message:
+                'Import Supabase only inside src/repositories (ADR 0003).',
             },
             {
-              from: { element: { type: 'client-api' } },
+              from: { element: { type: 'repositories' } },
               allow: {
                 to: {
                   module: {

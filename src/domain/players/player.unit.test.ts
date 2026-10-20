@@ -1,48 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatSurname, toPlayer } from './player';
-import { buildPlayer, buildPlayerRow } from './playerMocks';
-
-describe('toPlayer', () => {
-  it('maps every field of a row', () => {
-    const row = buildPlayerRow({
-      id: 7,
-      first_name: 'Pieter',
-      surname_prefix: 'de',
-      surname: 'Vries',
-      surname_suffix: 'jr.',
-      nationality: 'NL',
-      sex: 'male',
-    });
-
-    expect(toPlayer(row)).toEqual({
-      id: 7,
-      firstName: 'Pieter',
-      surnamePrefix: 'de',
-      surname: 'Vries',
-      surnameSuffix: 'jr.',
-      nationality: 'NL',
-      sex: 'male',
-    });
-  });
-
-  it('leaves out a null surname prefix and suffix', () => {
-    const player = toPlayer(
-      buildPlayerRow({ surname_prefix: null, surname_suffix: null }),
-    );
-
-    expect(player).not.toHaveProperty('surnamePrefix');
-    expect(player).not.toHaveProperty('surnameSuffix');
-  });
-
-  it('rejects an unknown nationality', () => {
-    expect(() => toPlayer(buildPlayerRow({ nationality: 'FR' }))).toThrow();
-  });
-
-  it('rejects an unknown sex', () => {
-    expect(() => toPlayer(buildPlayerRow({ sex: 'other' }))).toThrow();
-  });
-});
+import { formatSurname } from './player';
+import { buildPlayer } from './playerMocks';
 
 describe('formatSurname', () => {
   it('shows the surname alone when there is no prefix or suffix', () => {

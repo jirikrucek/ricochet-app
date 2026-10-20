@@ -99,3 +99,11 @@
 - [x] 14.1 Check that every scenario in `specs/players/player-overview/spec.md` is covered by an E2E test, and that no test uses `toHaveScreenshot`, `it.skip`, or **production data**
 - [x] 14.2 Run `npx openspec validate create-overview-of-ricochet-players --type change --strict`
 - [x] 14.3 Run the Definition of Done from `AGENTS.md`, including the new testing standard and ADR 0010 and ADR 0011
+
+## 15. Refactor: repositories own the row mapping (decided 2026-10-20)
+
+- [x] 15.1 Rename `src/client-api/` to `src/repositories/` (including the `supabase:types` script and the ESLint boundary element), and let `repositories` import `domain`
+- [x] 15.2 Make `playerSchema` in `src/domain/players/player.ts` the only player schema and infer `Player` from it; remove `PlayerRowInput`, `playerRowSchema`, and `toPlayer` from the domain
+- [x] 15.3 Move `toPlayer` to `src/repositories/players/toPlayer.ts` (generated row type in, validated `Player` out) with its unit tests and row mock builders, and replace `fetchPlayerRows()` with `fetchPlayers(): Promise<Player[]>`; `usePlayers()` wraps it in `useQuery`
+- [x] 15.4 Update `docs/standards/project-structure.md`, `docs/standards/testing.md`, `docs/guides/e2e-tests.md`, design D3, and the proposal impact list
+- [ ] 15.5 Record the decision in ADR 0003

@@ -1,6 +1,6 @@
 -- Seed data: 100 fictional players for local runs and CI (docs/standards/testing.md).
 -- Never put production data here. E2E expectations depend on these rows, and
--- src/client-api/players/seed.integration.test.ts checks the agreed facts:
+-- src/repositories/players/seed.integration.test.ts checks the agreed facts:
 -- 100 players, 40 female, 24 CZ, 4 HU, no female GB, all six nationalities,
 -- surname prefixes (de Vries files under V), a jr./sr. pair with the same name,
 -- Horák/Chládek (Czech sorts "Ch" after "H"), Macbeth/MacDonald (case), and

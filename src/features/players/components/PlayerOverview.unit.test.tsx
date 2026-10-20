@@ -18,21 +18,21 @@ import {
 } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PlayerRowInput } from '../../../domain/players/player';
+import type { Player } from '../../../domain/players/player';
 import {
   playerOverviewSearchDefaults,
   playerOverviewSearchSchema,
 } from '../../../domain/players/playerOverviewSearch';
-import { buildPlayerRow } from '../../../domain/players/playerMocks';
+import { buildPlayer } from '../../../domain/players/playerMocks';
 import i18n from '../../../localization/i18n';
 import { PlayerOverview } from './PlayerOverview';
 
-// Mock data only (docs/standards/testing.md): the Supabase call is the one
-// piece of external I/O, so it is the only thing mocked.
-const fetchPlayerRows = vi.fn<() => Promise<PlayerRowInput[]>>();
+// Mock data only (docs/standards/testing.md): the players repository is the
+// one piece of external I/O, so it is the only thing mocked.
+const fetchPlayers = vi.fn<() => Promise<Player[]>>();
 
-vi.mock('../../../client-api/players/fetchPlayerRows', () => ({
-  fetchPlayerRows: () => fetchPlayerRows(),
+vi.mock('../../../repositories/players/fetchPlayers', () => ({
+  fetchPlayers: () => fetchPlayers(),
 }));
 
 function renderPlayerOverview(path = '/players') {
@@ -62,7 +62,7 @@ function renderPlayerOverview(path = '/players') {
 }
 
 beforeEach(async () => {
-  fetchPlayerRows.mockReset();
+  fetchPlayers.mockReset();
   await i18n.changeLanguage('en');
 });
 
@@ -72,7 +72,7 @@ afterEach(() => {
 
 describe('PlayerOverview states', () => {
   it('shows a loading skeleton instead of the table while players are fetched', async () => {
-    fetchPlayerRows.mockReturnValue(new Promise(() => {}));
+    fetchPlayers.mockReturnValue(new Promise(() => {}));
 
     renderPlayerOverview();
 
@@ -83,10 +83,10 @@ describe('PlayerOverview states', () => {
   });
 
   it('shows an error message whose Retry fetches the players again', async () => {
-    fetchPlayerRows
+    fetchPlayers
       .mockRejectedValueOnce(new Error('network down'))
       .mockResolvedValueOnce([
-        buildPlayerRow({ first_name: 'Jana', surname: 'Nováková' }),
+        buildPlayer({ firstName: 'Jana', surname: 'Nováková' }),
       ]);
 
     renderPlayerOverview();
@@ -100,12 +100,12 @@ describe('PlayerOverview states', () => {
     });
 
     expect(await screen.findByRole('cell', { name: 'Nováková' })).toBeTruthy();
-    expect(fetchPlayerRows).toHaveBeenCalledTimes(2);
+    expect(fetchPlayers).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('shows "No players yet" without table or pagination for an empty list', async () => {
-    fetchPlayerRows.mockResolvedValue([]);
+    fetchPlayers.mockResolvedValue([]);
 
     renderPlayerOverview();
 
@@ -118,12 +118,12 @@ describe('PlayerOverview states', () => {
 
 describe('PlayerOverview with filters that match no players', () => {
   const rows = [
-    buildPlayerRow({ surname: 'Smith', nationality: 'GB', sex: 'male' }),
-    buildPlayerRow({ surname: 'Nováková', nationality: 'CZ', sex: 'female' }),
+    buildPlayer({ surname: 'Smith', nationality: 'GB', sex: 'male' }),
+    buildPlayer({ surname: 'Nováková', nationality: 'CZ', sex: 'female' }),
   ];
 
   it('shows the no-match message with Clear filters instead of the table', async () => {
-    fetchPlayerRows.mockResolvedValue(rows);
+    fetchPlayers.mockResolvedValue(rows);
 
     renderPlayerOverview('/players?nationality=GB&sex=female');
 
@@ -135,7 +135,7 @@ describe('PlayerOverview with filters that match no players', () => {
   });
 
   it('Clear filters resets nationality and sex and keeps the sort', async () => {
-    fetchPlayerRows.mockResolvedValue(rows);
+    fetchPlayers.mockResolvedValue(rows);
     const { router } = renderPlayerOverview(
       '/players?nationality=GB&sex=female&sort=desc',
     );

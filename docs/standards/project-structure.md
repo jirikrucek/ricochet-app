@@ -28,18 +28,17 @@ ricochet-app/
 │   │   ├── auth/                      # Role/permission rules, session shape
 │   │   └── shared/                    # Cross-domain primitives (branded IDs, Result type, base Zod schemas)
 │   │
-│   ├── client-api/               # Dumb Supabase client + raw queries. No domain knowledge. (ADR 0003)
+│   ├── repositories/             # Supabase adapter: queries, row → domain mapping. (ADR 0003)
 │   │   ├── supabaseClient.ts
-│   │   ├── database.types.ts          # Generated via `supabase gen types`
-│   │   ├── players/                    # returns raw/generated row shapes, not domain types
+│   │   ├── database.types.ts          # Generated via `npm run supabase:types`
+│   │   ├── players/                    # fetchPlayers(): Player[]; toPlayer maps and validates a row
 │   │   ├── tournaments/
 │   │   └── auth/
 │   │
 │   ├── features/                 # Feature UI slices, one subfolder per domain module
 │   │   ├── players/
 │   │   │   ├── api/                     # TanStack Query hooks — the only part of a feature
-│   │   │   │                            # allowed to import client-api; maps rows to domain
-│   │   │   │                            # types via a domain mapper before returning
+│   │   │   │                            # allowed to import repositories (query keys, caching)
 │   │   │   ├── components/
 │   │   │   └── store/                    # Feature-local Zustand UI state
 │   │   ├── tournaments/
@@ -89,9 +88,9 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 | Folder | Scope & allowed artifacts |
 | :--- | :--- |
 | `src/app/` | Composition root: provider wiring, global layout chrome, app-shell store. No domain logic, no feature components. |
-| `src/domain/` | Pure business logic: Zod schemas, TypeScript types, scoring/bracket/permission rules, and mapper functions translating infrastructure row shapes into domain types (e.g. `toPlayer(row): Player`). No React, no Supabase, no `fetch`. |
-| `src/client-api/` | Dumb Supabase client setup and raw query/RPC wrappers. Returns raw or generated (`database.types.ts`) shapes — no domain knowledge, no mapping. The only folder allowed to import `@supabase/supabase-js`. |
-| `src/features/` | Feature UI: components, feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `client-api` — it calls the repository, runs the result through a `domain` mapper, and returns a domain type; `components/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
+| `src/domain/` | Pure business logic: domain types and the Zod schemas they are inferred from (e.g. `playerSchema` → `Player`), and scoring/bracket/permission/query rules. Knows nothing about storage: no database column names, no React, no Supabase, no `fetch`. |
+| `src/repositories/` | The Supabase adapter: the client, the generated `database.types.ts`, and one repository per domain module (e.g. `repositories/players/fetchPlayers`). A repository queries Supabase, maps each row to a domain type, and validates it with the domain schema, so it returns domain types, never rows. The only folder allowed to import `@supabase/supabase-js`. |
+| `src/features/` | Feature UI: components, feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `repositories` — it wraps a repository call in TanStack Query hooks (query keys, caching, retries); `components/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
 | `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. A route may import `domain` schemas and types to validate its path and search params (e.g. `validateSearch`), but the rules themselves stay in `domain`. |
 | `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
 | `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, schema, presentational component, and the composed `LanguageSelect` widget). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it without needing an `app → features` boundary. `LanguageSelect` composes `ui/select` and has no app-shell knowledge (no branding, no nav, no layout grid) — it belongs with the rest of the language-selection capability, not with `app/layout`'s chrome. |
@@ -107,25 +106,25 @@ Layers are ordered leaf-to-root. An arrow means "is allowed to import from":
 app ────────────► ui, localization, lib
 routes ─────────► app, features, domain, lib
 features ───────► domain, ui, localization, lib, features/*/api (own feature only)
-features/*/api ─► client-api, domain, lib                       (own feature only)
-client-api ─────► lib
+features/*/api ─► repositories, domain, lib                     (own feature only)
+repositories ───► domain, lib
 ui ─────────────► lib
 localization ───► ui, lib
 domain ─────────► domain (its own `shared/` submodule only)
 lib ────────────► (nothing)
 ```
 
-`features/*/api` is a distinct boundary from the rest of `features` — see [ESLint boundaries](#eslint-boundaries-configuration) (`features-api` vs `features`). It is the one seam allowed to import `client-api`; everything else in a feature (`components/`, `store/`) cannot, even though both live under `src/features/`.
+`features/*/api` is a distinct boundary from the rest of `features` — see [ESLint boundaries](#eslint-boundaries-configuration) (`features-api` vs `features`). It is the one seam allowed to import `repositories`; everything else in a feature (`components/`, `store/`) cannot, even though both live under `src/features/`.
 
 Rules of thumb:
-- **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client. Its mapper functions take a structurally-typed input they declare themselves, rather than importing `client-api`'s generated types — that's what lets `client-api` return raw rows without `domain` ever depending on `client-api`.
-- **`client-api` has no domain knowledge and is the only place `@supabase/supabase-js` may be imported.** It returns raw or generated shapes; translating those into domain types is `domain`'s job (via a mapper), invoked from `features/*/api` (ADR 0003).
-- **`features` cannot import from other `features`, and only `features/*/api` may import `client-api`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
-- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `client-api`.
+- **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client, and it never learns how data is stored: no row shapes, no column names.
+- **`repositories` depend on `domain`, never the other way round, and are the only place `@supabase/supabase-js` may be imported.** A repository maps generated row types to domain types and validates them with the domain's Zod schemas, so a renamed column fails typechecking at the query and a value the database types can't narrow fails at parse time (ADR 0003).
+- **`features` cannot import from other `features`, and only `features/*/api` may import `repositories`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
+- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `repositories`.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
-- **`ui` never imports `domain`, `client-api`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
+- **`ui` never imports `domain`, `repositories`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
 - **`localization → ui` is one-directional.** `localization` composes `ui` primitives (e.g. `language-selection/LanguageSelect.tsx` uses `ui/select`) to build its own reusable widgets; `ui` still never imports back from `localization` — no cycle.
-- **`app` does not depend on `domain` or `client-api` yet.** There's no auth implementation today, so there's nothing for an app-shell session store to bootstrap. When auth work starts, extend the `app` rule in the project boundary policy to allow `domain` and `client-api` — a small, intentional change to the policy, not a restructure.
+- **`app` does not depend on `domain` or `repositories` yet.** There's no auth implementation today, so there's nothing for an app-shell session store to bootstrap. When auth work starts, extend the `app` rule in the project boundary policy to allow `domain` and `repositories` — a small, intentional change to the policy, not a restructure.
 
 ## ESLint boundaries configuration
 
@@ -148,14 +147,14 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
       { type: 'app', pattern: 'src/app/**', partialMatch: false },
       { type: 'domain', pattern: 'src/domain/**', partialMatch: false },
       {
-        type: 'client-api',
-        pattern: 'src/client-api/**',
+        type: 'repositories',
+        pattern: 'src/repositories/**',
         partialMatch: false,
       },
       // More specific than 'features' below — must be declared first,
       // since the matcher takes the first element pattern that matches
       // a file. This is the only part of a feature allowed to import
-      // client-api.
+      // repositories.
       {
         type: 'features-api',
         pattern: 'src/features/*/api/**',
@@ -234,7 +233,7 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
             from: { element: { type: 'features-api' } },
             allow: [
               {
-                to: { element: { types: ['client-api', 'domain', 'lib'] } },
+                to: { element: { types: ['repositories', 'domain', 'lib'] } },
               },
               {
                 to: {
@@ -247,8 +246,8 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
             ],
           },
           {
-            from: { element: { type: 'client-api' } },
-            allow: { to: { element: { type: 'lib' } } },
+            from: { element: { type: 'repositories' } },
+            allow: { to: { element: { types: ['domain', 'lib'] } } },
           },
           {
             from: { element: { type: 'ui' } },
@@ -276,10 +275,10 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
                 },
               },
             },
-            message: 'Import Supabase only inside src/client-api (ADR 0003).',
+            message: 'Import Supabase only inside src/repositories (ADR 0003).',
           },
           {
-            from: { element: { type: 'client-api' } },
+            from: { element: { type: 'repositories' } },
             allow: {
               to: {
                 module: {

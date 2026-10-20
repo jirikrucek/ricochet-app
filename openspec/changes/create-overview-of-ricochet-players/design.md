@@ -1,10 +1,10 @@
 ## Context
 
-The `/players` route (`src/routes/players/index.tsx`) renders only a heading. Nothing reads from Supabase yet: `src/client-api/` contains only the client and an empty generated `database.types.ts`, `src/domain/players/` is an empty folder, and `supabase/` has no migrations or seed. This change adds the first table, the first read path through the repository seam (ADR 0003), and the first test runs that need a database.
+The `/players` route (`src/routes/players/index.tsx`) renders only a heading. Nothing reads from Supabase yet: `src/client-api/` (renamed to `src/repositories/` in this change) contains only the client and an empty generated `database.types.ts`, `src/domain/players/` is an empty folder, and `supabase/` has no migrations or seed. This change adds the first table, the first read path through the repository seam (ADR 0003), and the first test runs that need a database.
 
 Constraints that shape the design:
 
-- **Layering** (ADR 0003, ADR 0007, `docs/standards/project-structure.md`). `client-api` returns raw rows. `domain` maps and holds the rules and imports nothing else from `src/`. Only `features/players/api/` may import `client-api`. `routes` may import `app`, `features`, `domain`, and `lib`. The `domain` import was allowed in this change, so a route can validate its search params with a domain schema; `routes` still can't import `ui`, `localization`, or `client-api`.
+- **Layering** (ADR 0003, ADR 0007, `docs/standards/project-structure.md`). `repositories` (formerly `client-api`) query Supabase, map rows to domain types, and validate them with domain schemas. `domain` holds the types, schemas, and rules, knows nothing about storage, and imports nothing else from `src/`. Only `features/players/api/` may import `repositories`. `routes` may import `app`, `features`, `domain`, and `lib`. The `domain` import was allowed in this change, so a route can validate its search params with a domain schema; `routes` still can't import `ui`, `localization`, or `repositories`.
 - **Security** (`docs/standards/security.md`). The browser holds the Supabase key, and RLS is the only access boundary. The app uses the publishable key (`sb_publishable_…`), which runs requests as the `anon` Postgres role, the same as the legacy anon key it replaces (D10).
 - **Observability** (`docs/standards/observability.md`). The shared `QueryCache.onError` already sends every failed query to Sentry with its query key.
 - **Data separation.** **Production data** (84 real **players**) lives only in the shared preview/production database, loaded by hand. **Seed data** (100 fictional **players**) serves local runs and CI. **Mock data** is only for unit tests.
@@ -69,12 +69,11 @@ flowchart TB
 
   subgraph feature["features/players/"]
     overview["components/PlayerOverview<br/>states, filters, table, pagination"]
-    hook["api/usePlayers.ts<br/>useQuery → toPlayer"]
+    hook["api/usePlayers.ts<br/>useQuery(fetchPlayers)"]
   end
 
   subgraph domain["domain/players/"]
-    model["player.ts<br/>Player, Nationality, Sex, Zod schemas"]
-    mapper["toPlayer(row)"]
+    model["player.ts<br/>playerSchema → Player, Nationality, Sex"]
     query["queryPlayers(players, view, locale)"]
     sschema["playerOverviewSearchSchema"]
   end
@@ -83,8 +82,9 @@ flowchart TB
     range["pageRange(current, count)"]
   end
 
-  subgraph clientapi["client-api/players/"]
-    repo["fetchPlayerRows()"]
+  subgraph repositories["repositories/players/"]
+    repo["fetchPlayers(): Player[]"]
+    mapper["toPlayer(row)"]
   end
 
   ui["ui/ table, tooltip, select, pagination"]
@@ -99,7 +99,7 @@ flowchart TB
   overview --> ui
   overview --> loc
   hook --> repo
-  hook --> mapper
+  repo --> mapper
   repo --> supabase
   mapper --> model
   query --> model
@@ -129,13 +129,14 @@ In the same migration: `enable row level security`, then one policy `for select 
 
 *Alternative:* RLS only, keeping the default grants. Rejected because a later mistaken `for all` policy would silently open writes. With the revoke in place, it would still fail.
 
-### D3. Read path: fetch everything once, map and validate in `features/players/api`
+### D3. Read path: fetch everything once; the repository maps and validates
 
-- `client-api/players/fetchPlayerRows()` selects the explicit columns `id, first_name, surname, surname_prefix, surname_suffix, nationality, sex`, throws the Supabase error if there is one, and returns raw rows. It does not order the rows, because sorting depends on the language and happens in the domain.
-- `domain/players/toPlayer(row)` parses a structurally typed row with Zod and returns `Player` (`{ id, firstName, surname, surnamePrefix?, surnameSuffix?, nationality, sex }`). If parsing fails, the error goes up to the query, so a schema drift shows up as the error state and is reported, never as a silently partial list.
-- `features/players/api/usePlayers()` is `useQuery({ queryKey: ['players'], queryFn: () => fetchPlayerRows().then(rows => rows.map(toPlayer)) })`. The query key names the table, which meets the correlation rule in the observability standard through the existing `QueryCache.onError`. No component-level reporting is added.
+- `repositories/players/fetchPlayers()` selects the explicit columns `id, first_name, surname, surname_prefix, surname_suffix, nationality, sex`, throws the Supabase error if there is one, and returns `Player[]`. It does not order the rows, because sorting depends on the language and happens in the domain.
+- `repositories/players/toPlayer(row)` takes the generated row type, renames the columns to `Player` fields (`{ id, firstName, surname, surnamePrefix?, surnameSuffix?, nationality, sex }`, a `null` prefix or suffix becomes an absent key), and validates the result with the domain's `playerSchema`. A renamed column fails typechecking at the query; a value the generated types can't narrow (`nationality` is `text`) fails at parse time. The error goes up to the query, so a schema drift shows up as the error state and is reported, never as a silently partial list.
+- `domain/players/playerSchema` is the only player schema, and `Player` is inferred from it. The domain knows no column names.
+- `features/players/api/usePlayers()` is `useQuery({ queryKey: ['players'], queryFn: () => fetchPlayers() })`. The query key names the table, which meets the correlation rule in the observability standard through the existing `QueryCache.onError`. No component-level reporting is added.
 
-*Alternative:* server-side range queries with `order` and `range`. Rejected for now (out of scope). The data is 84 rows, and Postgres collation can't easily follow the active UI language. Revisit if the number of **players** reaches the thousands, or PostgREST's `max_rows` (1000) becomes a risk.
+*Alternatives:* the mapper in `domain` with a hand-declared row shape (the original plan). Rejected on 2026-10-20: it put database column names in the domain and duplicated the generated row type. The mapper in `features/players/api`. Rejected because features can't import each other, so another feature (for example tournaments) couldn't reuse it. Server-side range queries with `order` and `range`. Rejected for now (out of scope). The data is 84 rows, and Postgres collation can't easily follow the active UI language. Revisit if the number of **players** reaches the thousands, or PostgREST's `max_rows` (1000) becomes a risk.
 
 ### D4. One pure domain query function for filter → sort → slice
 
@@ -209,7 +210,7 @@ flowchart LR
 - CI adds one step before the integration tests: `npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime`. The excluded services aren't needed, which cuts start-up time. The tests read the env through the same helper, so no secrets or `$GITHUB_ENV` plumbing are needed.
 - `supabase db reset` reapplies migrations and `seed.sql`. Integration and E2E tests only read players (RLS forbids anything else), so the shared seed is never mutated and the tests can stay `fullyParallel`.
 - E2E tests intercept `**/rest/v1/players*` only for "No players yet" (`[]`) and the error scenarios (HTTP 500, then pass-through for Retry).
-- Unit tests for `toPlayer`, `queryPlayers`, `pageRange`, the search schema, and component states use **mock data** builders in `src/domain/players/` test helpers. Components get a fresh `QueryClient` with `retry: false`.
+- Unit tests for `toPlayer`, `queryPlayers`, `pageRange`, the search schema, and component states use **mock data**: domain builders in `src/domain/players/playerMocks.ts` and row builders in `src/repositories/players/playerRowMocks.ts`. Component tests mock `fetchPlayers`. Components get a fresh `QueryClient` with `retry: false`.
 
 *Alternatives:* committing a `.env.test` with the local publishable key the CLI prints. Rejected because that key is a CLI default that can change between CLI versions, a stale key fails confusingly, and a static file can't check that Supabase is running or that the URL is local. A hosted test project was rejected because it adds a shared mutable dependency and secrets in CI.
 
@@ -217,11 +218,11 @@ flowchart LR
 
 - `supabase/seed.sql` is committed. It holds 100 fictional `insert`s that meet the counts in the spec (40 female, 24 CZ, 4 HU, 0 female GB), plus the edge cases listed in the proposal. A `seed.integration.test.ts` checks these counts against the local database, so a later edit to the seed can't silently break the E2E expectations.
 - The **production data** script (`supabase/data/…sql`, gitignored and already covered by `supabase/.gitignore`) uses `insert … on conflict (natural key) do update set sex = excluded.sex` inside one transaction, so re-running it is safe.
-- `src/client-api/database.types.ts` is regenerated with `supabase gen types typescript --local`, exposed as a `supabase:types` npm script.
+- `src/repositories/database.types.ts` is regenerated with `supabase gen types typescript --local`, exposed as a `supabase:types` npm script.
 
 ### D10. The app uses the publishable key instead of the legacy anon key
 
-- Rename `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/client-api/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
+- Rename `VITE_SUPABASE_ANON_KEY` to `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
 - The publishable key runs requests as the `anon` role, so the RLS policy (`to anon, authenticated`) and the revoked grants (D2) apply unchanged.
 - Local and CI runs use the CLI's `PUBLISHABLE_KEY` (D8). The installed Supabase CLI (v2.119) already reports it in `supabase status -o json`.
 - Update the wording in `docs/standards/security.md` and `docs/standards/observability.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment.md`.
