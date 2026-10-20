@@ -3,7 +3,7 @@ import {
   type TestProjectInlineConfiguration,
 } from 'vitest/config';
 
-import { resolve } from './vitest.unit.config';
+import { resolve } from './vitest.unit.config.ts';
 
 // The global setup finds the local Supabase when this project runs, so
 // selecting only the unit projects never needs it.
