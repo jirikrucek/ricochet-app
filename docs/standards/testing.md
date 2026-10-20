@@ -31,8 +31,13 @@ For any change that adds or edits a test:
 - When a test relies on a count or an edge case in the seed, a seed integration test checks it, so a later edit to the seed fails there first.
 - Every new table that tests depend on gets fictional rows in `supabase/seed.sql`.
 
+## E2E page loads
+
+- Page loads don't depend on the internet. The app bundles third-party assets (webfonts, CDN scripts) instead of loading them from another host, as it does with the Inter font and the flags ([ADR 0006](../adr/ADR0006-language-selector-uses-native-labels-and-flags.md)). Such a request holds up every `page.goto`, and a slow host fails the test.
+- A test that measures layout opens the page with `openAt` or `openOverview`. They wait for the fonts to load, so the test measures the final text widths.
+
 ## Test quality
 
 - Every test has a non-trivial assertion. No `expect(true).toBe(true)` and no empty test bodies.
 - No skipped tests (`it.skip`, `describe.skip`, `test.skip`) in committed code.
-- E2E tests assert structure, never pixels ([ADR 0009](../adr/ADR0009-e2e-tests-do-not-use-pixel-snapshots.md)).
+- E2E tests assert structure (roles, attributes, sizes), never pixels, because screenshots differ per OS ([ADR 0009](../adr/ADR0009-e2e-tests-do-not-use-pixel-snapshots.md)). ESLint rejects `toHaveScreenshot` and `toMatchSnapshot` in `tests/e2e`.

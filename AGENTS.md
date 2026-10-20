@@ -104,7 +104,7 @@ Before exploring the codebase for a task, read ADRs in `docs/adr/` that touch th
 
 ### E2E tests
 
-When running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` for the per-environment setup and the no-pixel-snapshot rule.
+When running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` for the per-environment setup.
 
 ### Deployment
 

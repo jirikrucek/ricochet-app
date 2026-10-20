@@ -9,6 +9,15 @@ type Box = { x: number; y: number; width: number; height: number };
 export async function openAt(page: Page, viewport: Viewport, path = '/') {
   await page.setViewportSize(viewport);
   await page.goto(path);
+  await waitForFonts(page);
+}
+
+// The webfont swaps in after first paint and reflows the text, so a layout
+// measured before it has loaded can differ from one measured after. Faces are
+// only requested once text using them renders, so wait for the shell first.
+export async function waitForFonts(page: Page) {
+  await expect(banner(page)).toBeVisible();
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
 }
 
 export function banner(page: Page) {

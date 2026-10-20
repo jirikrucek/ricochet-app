@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+/* Self-hosted, so loading the app never waits on a third-party font server. */
+@import '@fontsource-variable/inter/opsz.css';
+@import '@fontsource-variable/inter/opsz-italic.css';
 @import 'tailwindcss';
 
 @theme {
@@ -60,7 +62,8 @@
 
   /* Typography */
   --font-sans:
-    'Inter', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+    'Inter Variable', system-ui, -apple-system, Roboto, 'Helvetica Neue',
+    sans-serif;
 
   --text-display-xl: 28px;
   --text-display-lg: 22px;

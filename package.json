@@ -11,6 +11,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright test",
+    "test:e2e:serve": "vite build --outDir dist-e2e --emptyOutDir && vite preview --outDir dist-e2e",
     "test:e2e:setup": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.playwright-browsers\" playwright install chromium",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "prepare": "is-ci || husky",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@fontsource-variable/inter": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
     "@sentry/react": "^11.7.0",
     "@supabase/supabase-js": "^2.117.3",
