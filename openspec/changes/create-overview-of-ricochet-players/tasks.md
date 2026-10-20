@@ -106,4 +106,4 @@
 - [x] 15.2 Make `playerSchema` in `src/domain/players/player.ts` the only player schema and infer `Player` from it; remove `PlayerRowInput`, `playerRowSchema`, and `toPlayer` from the domain
 - [x] 15.3 Move `toPlayer` to `src/repositories/players/toPlayer.ts` (generated row type in, validated `Player` out) with its unit tests and row mock builders, and replace `fetchPlayerRows()` with `fetchPlayers(): Promise<Player[]>`; `usePlayers()` wraps it in `useQuery`
 - [x] 15.4 Update `docs/standards/project-structure.md`, `docs/standards/testing.md`, `docs/guides/e2e-tests.md`, design D3, and the proposal impact list
-- [ ] 15.5 Record the decision in ADR 0003
+- [x] 15.5 Record the decision in ADR 0012, superseding ADR 0003, and point the standard, ESLint messages, and design at it

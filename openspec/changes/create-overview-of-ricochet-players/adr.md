@@ -1,11 +1,13 @@
 # ADR Review Manifest
 
 - Status: completed
-- Review date: 2026-10-19
+- Review date: 2026-10-19, updated 2026-10-20
 
 ## Review Summary
 
 ADR review completed for this change. Every ADR in `docs/adr/` was reviewed against `design.md`. Two decisions met the bar (hard to reverse, surprising without context, and a real trade-off) and were recorded as new ADRs: rendering the **player overview** table without a table library (D4), and limiting tests to a local Supabase with **seed data** (D8). Neither supersedes an existing ADR.
+
+On 2026-10-20, during implementation, D3 changed: repositories now map Supabase rows to domain types instead of the domain owning the mappers. That reverses ADR 0003's 2026-08-11 refinement, so it was recorded as ADR 0012, which supersedes ADR 0003.
 
 These design decisions were reviewed and did not get an ADR:
 
@@ -30,3 +32,4 @@ These design decisions were reviewed and did not get an ADR:
 
 - [ADR 0010: Render Tables Without a Table Library](../../../docs/adr/ADR0010-render-tables-without-a-table-library.md)
 - [ADR 0011: Tests Reach Only a Local Supabase with Seed Data](../../../docs/adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)
+- [ADR 0012: Repositories Map Supabase Rows to Domain Types](../../../docs/adr/ADR0012-repositories-map-supabase-rows-to-domain-types.md) (supersedes ADR 0003)

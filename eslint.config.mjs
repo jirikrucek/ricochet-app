@@ -169,7 +169,7 @@ export default tseslint.config(
               from: { element: { type: 'features-api' } },
               // the seam: wraps a repository (which already returns
               // domain types) in TanStack Query hooks for the rest of
-              // the feature (ADR 0003)
+              // the feature (ADR 0012)
               allow: [
                 {
                   to: { element: { types: ['repositories', 'domain', 'lib'] } },
@@ -187,7 +187,7 @@ export default tseslint.config(
             {
               from: { element: { type: 'repositories' } },
               // the adapter: maps Supabase rows to domain types and
-              // validates them with domain schemas (ADR 0003)
+              // validates them with domain schemas (ADR 0012)
               allow: { to: { element: { types: ['domain', 'lib'] } } },
             },
             {
@@ -217,7 +217,7 @@ export default tseslint.config(
                 },
               },
               message:
-                'Import Supabase only inside src/repositories (ADR 0003).',
+                'Import Supabase only inside src/repositories (ADR 0012).',
             },
             {
               from: { element: { type: 'repositories' } },

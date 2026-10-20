@@ -22,13 +22,13 @@ ricochet-app/
 │   │   ├── layout/                  # Global chrome: TopNav, AppFooter — rendered by routes/__root.tsx
 │   │   └── store/                   # App-shell Zustand store (theme today; session store lands with auth)
 │   │
-│   ├── domain/                   # Pure business logic. No React. No Supabase. (ADR 0003)
+│   ├── domain/                   # Pure business logic. No React. No Supabase. (ADR 0012)
 │   │   ├── players/                  # Player schemas, ranking rules
 │   │   ├── tournaments/               # Bracket algorithms, match scoring rules, Zod schemas
 │   │   ├── auth/                      # Role/permission rules, session shape
 │   │   └── shared/                    # Cross-domain primitives (branded IDs, Result type, base Zod schemas)
 │   │
-│   ├── repositories/             # Supabase adapter: queries, row → domain mapping. (ADR 0003)
+│   ├── repositories/             # Supabase adapter: queries, row → domain mapping. (ADR 0012)
 │   │   ├── supabaseClient.ts
 │   │   ├── database.types.ts          # Generated via `npm run supabase:types`
 │   │   ├── players/                    # fetchPlayers(): Player[]; toPlayer maps and validates a row
@@ -118,7 +118,7 @@ lib ────────────► (nothing)
 
 Rules of thumb:
 - **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client, and it never learns how data is stored: no row shapes, no column names.
-- **`repositories` depend on `domain`, never the other way round, and are the only place `@supabase/supabase-js` may be imported.** A repository maps generated row types to domain types and validates them with the domain's Zod schemas, so a renamed column fails typechecking at the query and a value the database types can't narrow fails at parse time (ADR 0003).
+- **`repositories` depend on `domain`, never the other way round, and are the only place `@supabase/supabase-js` may be imported.** A repository maps generated row types to domain types and validates them with the domain's Zod schemas, so a renamed column fails typechecking at the query and a value the database types can't narrow fails at parse time (ADR 0012).
 - **`features` cannot import from other `features`, and only `features/*/api` may import `repositories`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
 - **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `repositories`.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
@@ -275,7 +275,7 @@ The dependency graph above is enforced by [`eslint-plugin-boundaries`](https://g
                 },
               },
             },
-            message: 'Import Supabase only inside src/repositories (ADR 0003).',
+            message: 'Import Supabase only inside src/repositories (ADR 0012).',
           },
           {
             from: { element: { type: 'repositories' } },
