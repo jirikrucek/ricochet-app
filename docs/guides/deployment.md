@@ -24,5 +24,3 @@ Set these in the Vercel project settings for both Preview and Production. Vite i
 | `VITE_SUPABASE_URL` | Yes | The Supabase project URL. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | The publishable key (`sb_publishable_…`) from the Supabase dashboard, under API keys. The app fails at start-up without it. |
 | `VITE_SENTRY_DSN` | No | The Sentry DSN. Leave unset to disable error reporting (see `docs/standards/observability.md`). |
-
-The app used to read the legacy `VITE_SUPABASE_ANON_KEY`. Keep that variable in Vercel until a build that reads `VITE_SUPABASE_PUBLISHABLE_KEY` is live and has proven itself, so a rollback to an older build still starts. Then remove it.
