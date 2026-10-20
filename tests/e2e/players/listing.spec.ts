@@ -52,6 +52,33 @@ test.describe('Player overview lists every player in a table', () => {
     ]);
     await expectNoHorizontalOverflow(page);
   });
+
+  test('Table kept on a phone with an unbroken long name', async ({ page }) => {
+    // The seed has no names this long, so intercept the players request
+    // (docs/standards/testing.md).
+    await page.route('**/rest/v1/players*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 1,
+            first_name: 'Maximiliánovič'.repeat(3),
+            surname_prefix: 'van der',
+            surname: 'Wolfeschlegelsteinhausenbergerdorff'.repeat(2),
+            surname_suffix: 'Jr.',
+            nationality: 'CZ',
+            sex: 'male',
+          },
+        ]),
+      }),
+    );
+
+    await openOverview(page, '', SMALL_PHONE);
+
+    await expectPlayersListed(page);
+    await expectNoHorizontalOverflow(page);
+  });
 });
 
 test.describe('Player data is public and read-only', () => {

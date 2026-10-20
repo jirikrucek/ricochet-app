@@ -78,7 +78,7 @@ test.describe('Page links show a compact page range on wide screens', () => {
     ).toHaveAttribute('aria-disabled', 'true');
     await expect(
       pagination(page).getByRole('link', { name: 'Previous' }),
-    ).toHaveCount(0);
+    ).not.toHaveAttribute('href');
   });
 
   test('Last page disables Next', async ({ page }) => {
@@ -94,7 +94,7 @@ test.describe('Page links show a compact page range on wide screens', () => {
     ).toHaveAttribute('aria-disabled', 'true');
     await expect(
       pagination(page).getByRole('link', { name: 'Next' }),
-    ).toHaveCount(0);
+    ).not.toHaveAttribute('href');
   });
 
   test('Gaps collapse into ellipses', async ({ page }) => {

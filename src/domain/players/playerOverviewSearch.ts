@@ -11,10 +11,24 @@ export type SortDirection = (typeof sortDirections)[number];
 export const pageSizes = [10, 25, 50] as const;
 export type PageSize = (typeof pageSizes)[number];
 
+// A filter that is either one value or "all" (no filtering).
+export const all = 'all';
+export type OrAll<TValue> = TValue | typeof all;
+
+export function matchesFilter<TValue>(
+  filter: OrAll<TValue>,
+  value: TValue,
+): boolean {
+  return filter === all || filter === value;
+}
+
+const orAll = <TSchema extends z.ZodType>(schema: TSchema) =>
+  z.union([schema, z.literal(all)]);
+
 export const playerOverviewSearchDefaults = {
   sort: 'asc',
-  nationality: 'all',
-  sex: 'all',
+  nationality: all,
+  sex: all,
   page: 1,
   pageSize: 25,
 } as const satisfies Record<string, unknown>;
@@ -24,12 +38,10 @@ export const playerOverviewSearchSchema = z.object({
     .enum(sortDirections)
     .default(playerOverviewSearchDefaults.sort)
     .catch(playerOverviewSearchDefaults.sort),
-  nationality: z
-    .union([nationalitySchema, z.literal('all')])
+  nationality: orAll(nationalitySchema)
     .default(playerOverviewSearchDefaults.nationality)
     .catch(playerOverviewSearchDefaults.nationality),
-  sex: z
-    .union([sexSchema, z.literal('all')])
+  sex: orAll(sexSchema)
     .default(playerOverviewSearchDefaults.sex)
     .catch(playerOverviewSearchDefaults.sex),
   // An out-of-range page is valid here; queryPlayers falls back to page 1
@@ -47,3 +59,15 @@ export const playerOverviewSearchSchema = z.object({
 });
 
 export type PlayerOverviewView = z.output<typeof playerOverviewSearchSchema>;
+
+// True when the two views differ at most in `page`. A change in any other
+// field (sort, a filter, the page size) is a different view that restarts at
+// page 1. Comparing every other key means a new field is covered by default.
+export function isSameViewIgnoringPage(
+  a: PlayerOverviewView,
+  b: PlayerOverviewView,
+): boolean {
+  return (Object.keys(a) as (keyof PlayerOverviewView)[])
+    .filter((key) => key !== 'page')
+    .every((key) => a[key] === b[key]);
+}

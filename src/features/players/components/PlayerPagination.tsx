@@ -23,7 +23,7 @@ type PlayerPaginationProps = {
   page: number;
   pageCount: number;
   pageSize: PageSize;
-  total: number;
+  summary: string;
   onPageSizeChange: (pageSize: PageSize) => void;
 };
 
@@ -46,19 +46,15 @@ export function PlayerPagination({
   page,
   pageCount,
   pageSize,
-  total,
+  summary,
   onPageSizeChange,
 }: PlayerPaginationProps) {
   const { t } = useTranslation();
-  const from = (page - 1) * pageSize + 1;
-  const to = Math.min(page * pageSize, total);
 
   return (
     <div className="flex flex-col gap-base">
       <div className="flex flex-col gap-base tablet:flex-row tablet:items-end tablet:justify-between">
-        <p className="type-body-md m-0 text-muted">
-          {t('players.pagination.summary', { from, to, total })}
-        </p>
+        <p className="type-body-md m-0 text-muted">{summary}</p>
         <FilterSelect
           id="player-page-size"
           label={t('players.pagination.pageSize')}
@@ -80,27 +76,46 @@ export function PlayerPagination({
   );
 }
 
+// Previous and Next render as a disabled link at either end.
+function PreviousItem({ page }: { page: number }) {
+  const { t } = useTranslation();
+  const text = t('players.pagination.previous');
+
+  return (
+    <PaginationItem>
+      {page > 1 ? (
+        <PaginationPrevious text={text} render={<PageLink page={page - 1} />} />
+      ) : (
+        <PaginationDisabled>{text}</PaginationDisabled>
+      )}
+    </PaginationItem>
+  );
+}
+
+function NextItem({ page, pageCount }: { page: number; pageCount: number }) {
+  const { t } = useTranslation();
+  const text = t('players.pagination.next');
+
+  return (
+    <PaginationItem>
+      {page < pageCount ? (
+        <PaginationNext text={text} render={<PageLink page={page + 1} />} />
+      ) : (
+        <PaginationDisabled>{text}</PaginationDisabled>
+      )}
+    </PaginationItem>
+  );
+}
+
 function PageLinks({ page, pageCount }: { page: number; pageCount: number }) {
   const { t } = useTranslation();
-  const previous = t('players.pagination.previous');
-  const next = t('players.pagination.next');
-
   return (
     <Pagination
       aria-label={t('players.pagination.label')}
       className="hidden tablet:flex"
     >
       <PaginationContent>
-        <PaginationItem>
-          {page > 1 ? (
-            <PaginationPrevious
-              text={previous}
-              render={<PageLink page={page - 1} />}
-            />
-          ) : (
-            <PaginationDisabled>{previous}</PaginationDisabled>
-          )}
-        </PaginationItem>
+        <PreviousItem page={page} />
         {pageRange(page, pageCount).map((item, index) => (
           <PaginationItem
             key={item === 'ellipsis' ? `ellipsis-${index}` : item}
@@ -117,13 +132,7 @@ function PageLinks({ page, pageCount }: { page: number; pageCount: number }) {
             )}
           </PaginationItem>
         ))}
-        <PaginationItem>
-          {page < pageCount ? (
-            <PaginationNext text={next} render={<PageLink page={page + 1} />} />
-          ) : (
-            <PaginationDisabled>{next}</PaginationDisabled>
-          )}
-        </PaginationItem>
+        <NextItem page={page} pageCount={pageCount} />
       </PaginationContent>
     </Pagination>
   );
@@ -139,25 +148,13 @@ function CompactPageLinks({
   pageCount: number;
 }) {
   const { t } = useTranslation();
-  const previous = t('players.pagination.previous');
-  const next = t('players.pagination.next');
-
   return (
     <Pagination
       aria-label={t('players.pagination.label')}
       className="flex tablet:hidden"
     >
       <PaginationContent className="w-full justify-between gap-xs">
-        <PaginationItem>
-          {page > 1 ? (
-            <PaginationPrevious
-              text={previous}
-              render={<PageLink page={page - 1} />}
-            />
-          ) : (
-            <PaginationDisabled>{previous}</PaginationDisabled>
-          )}
-        </PaginationItem>
+        <PreviousItem page={page} />
         <PaginationItem aria-hidden="true" className="text-muted">
           ·
         </PaginationItem>
@@ -167,13 +164,7 @@ function CompactPageLinks({
         <PaginationItem aria-hidden="true" className="text-muted">
           ·
         </PaginationItem>
-        <PaginationItem>
-          {page < pageCount ? (
-            <PaginationNext text={next} render={<PageLink page={page + 1} />} />
-          ) : (
-            <PaginationDisabled>{next}</PaginationDisabled>
-          )}
-        </PaginationItem>
+        <NextItem page={page} pageCount={pageCount} />
       </PaginationContent>
     </Pagination>
   );

@@ -1,5 +1,5 @@
 import { nationalities, type Nationality, type Player } from './player';
-import type { PlayerOverviewView } from './playerOverviewSearch';
+import { matchesFilter, type PlayerOverviewView } from './playerOverviewSearch';
 
 export type PlayerOverviewResult = {
   // The players on the effective page.
@@ -37,9 +37,8 @@ export function queryPlayers(
   const matching = players
     .filter(
       (player) =>
-        (view.nationality === 'all' ||
-          player.nationality === view.nationality) &&
-        (view.sex === 'all' || player.sex === view.sex),
+        matchesFilter(view.nationality, player.nationality) &&
+        matchesFilter(view.sex, player.sex),
     )
     .sort(playerComparator(locale, view.sort));
 

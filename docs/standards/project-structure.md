@@ -40,6 +40,7 @@ ricochet-app/
 │   │   │   ├── api/                     # TanStack Query hooks — the only part of a feature
 │   │   │   │                            # allowed to import repositories (query keys, caching)
 │   │   │   ├── components/
+│   │   │   ├── hooks/                    # Feature-local React hooks (not data fetching — that is api/)
 │   │   │   └── store/                    # Feature-local Zustand UI state
 │   │   ├── tournaments/
 │   │   └── auth/
@@ -90,7 +91,7 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 | `src/app/` | Composition root: provider wiring, global layout chrome, app-shell store. No domain logic, no feature components. |
 | `src/domain/` | Pure business logic: domain types and the Zod schemas they are inferred from (e.g. `playerSchema` → `Player`), and scoring/bracket/permission/query rules. Knows nothing about storage: no database column names, no React, no Supabase, no `fetch`. |
 | `src/repositories/` | The Supabase adapter: the client, the generated `database.types.ts`, and one repository per domain module (e.g. `repositories/players/fetchPlayers`). A repository queries Supabase, maps each row to a domain type, and validates it with the domain schema, so it returns domain types, never rows. The only folder allowed to import `@supabase/supabase-js`. |
-| `src/features/` | Feature UI: components, feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `repositories` — it wraps a repository call in TanStack Query hooks (query keys, caching, retries); `components/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
+| `src/features/` | Feature UI: components, feature-local React hooks (`hooks/`), feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `repositories` — it wraps a repository call in TanStack Query hooks (query keys, caching, retries); `components/`, `hooks/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
 | `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. A route may import `domain` schemas and types to validate its path and search params (e.g. `validateSearch`), but the rules themselves stay in `domain`. |
 | `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
 | `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, schema, presentational component, and the composed `LanguageSelect` widget). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it without needing an `app → features` boundary. `LanguageSelect` composes `ui/select` and has no app-shell knowledge (no branding, no nav, no layout grid) — it belongs with the rest of the language-selection capability, not with `app/layout`'s chrome. |
@@ -114,12 +115,12 @@ domain ─────────► domain (its own `shared/` submodule only)
 lib ────────────► (nothing)
 ```
 
-`features/*/api` is a distinct boundary from the rest of `features` — see [ESLint boundaries](#eslint-boundaries-configuration) (`features-api` vs `features`). It is the one seam allowed to import `repositories`; everything else in a feature (`components/`, `store/`) cannot, even though both live under `src/features/`.
+`features/*/api` is a distinct boundary from the rest of `features` — see [ESLint boundaries](#eslint-boundaries-configuration) (`features-api` vs `features`). It is the one seam allowed to import `repositories`; everything else in a feature (`components/`, `hooks/`, `store/`) cannot, even though both live under `src/features/`.
 
 Rules of thumb:
 - **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client, and it never learns how data is stored: no row shapes, no column names.
 - **`repositories` depend on `domain`, never the other way round, and are the only place `@supabase/supabase-js` may be imported.** A repository maps generated row types to domain types and validates them with the domain's Zod schemas, so a renamed column fails typechecking at the query and a value the database types can't narrow fails at parse time (ADR 0012).
-- **`features` cannot import from other `features`, and only `features/*/api` may import `repositories`.** A component or store that needs backend data goes through its own feature's `api/` hook, never around it.
+- **`features` cannot import from other `features`, and only `features/*/api` may import `repositories`.** A component, hook or store that needs backend data goes through its own feature's `api/` hook, never around it.
 - **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `repositories`.
 - **`app` and `routes` do not import each other's non-shared internals in a cycle**: `routes/__root.tsx` imports chrome from `app/layout`, but nothing in `app/` imports from `routes/`. `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
 - **`ui` never imports `domain`, `repositories`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.

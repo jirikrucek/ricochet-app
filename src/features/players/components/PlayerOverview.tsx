@@ -1,43 +1,23 @@
-import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
-import { getRouteApi, useRouter } from '@tanstack/react-router';
-import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
+import { useMemo } from 'react';
+import { getRouteApi } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import type { Player } from '../../../domain/players/player';
 import {
-  formatSurname,
-  sexes,
-  type Nationality,
-  type Player,
-  type Sex,
-} from '../../../domain/players/player';
-import type {
-  PlayerOverviewView,
-  SortDirection,
+  all,
+  type PlayerOverviewView,
 } from '../../../domain/players/playerOverviewSearch';
-import {
-  presentNationalities,
-  queryPlayers,
-} from '../../../domain/players/queryPlayers';
-import { Flag } from '../../../localization/Flag';
+import { queryPlayers } from '../../../domain/players/queryPlayers';
+import { pageBounds } from '../../../lib/pageRange';
 import { Button } from '../../../ui/button';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
 import { usePlayers } from '../api/usePlayers';
-import { FilterSelect, type FilterOption } from './FilterSelect';
+import { NationalityFilter, SexFilter } from './PlayerFilters';
 import { PlayerPagination } from './PlayerPagination';
+import { PlayerTable, PlayerTableSkeleton } from './PlayerTable';
+import { useCanonicalPage } from '../hooks/useCanonicalPage';
+import { usePageChangeOrientation } from '../hooks/usePageChangeOrientation';
 
 const routeApi = getRouteApi('/players/');
-
-// Cells wrap instead of scrolling, so the table fits a 320px viewport.
-const cellClassName = 'whitespace-normal wrap-break-word';
 
 export function PlayerOverview() {
   const { t } = useTranslation();
@@ -88,12 +68,12 @@ function PlayerOverviewContent() {
     return <p className="type-body-md m-0 text-muted">{t('players.empty')}</p>;
   }
 
-  return <PlayerView players={players} />;
+  return <PlayerResults players={players} />;
 }
 
 // The URL is the only view state (ADR 0002): this reads the validated search,
 // derives the rows, and turns every view change into one navigation.
-function PlayerView({ players }: { players: Player[] }) {
+function PlayerResults({ players }: { players: Player[] }) {
   const { t, i18n } = useTranslation();
   const search = routeApi.useSearch();
   const navigate = routeApi.useNavigate();
@@ -111,15 +91,18 @@ function PlayerView({ players }: { players: Player[] }) {
       search: (prev) => ({ ...prev, ...change, page: undefined }),
     });
 
+  // The one place the "Showing X–Y of Z" text is built: the pagination shows
+  // it and the page-change orientation announces it.
+  const summary = t('players.pagination.summary', {
+    ...pageBounds(page, search.pageSize, total),
+    total,
+  });
+
   useCanonicalPage(search.page, page);
   const { tableRef, captionRef, announcement } = usePageChangeOrientation(
     search,
     page,
-    t('players.pagination.summary', {
-      from: (page - 1) * search.pageSize + 1,
-      to: Math.min(page * search.pageSize, total),
-      total,
-    }),
+    summary,
   );
 
   return (
@@ -135,7 +118,7 @@ function PlayerView({ players }: { players: Player[] }) {
       </div>
       {total === 0 ? (
         <NoMatch
-          onClearFilters={() => changeView({ nationality: 'all', sex: 'all' })}
+          onClearFilters={() => changeView({ nationality: all, sex: all })}
         />
       ) : (
         <>
@@ -152,7 +135,7 @@ function PlayerView({ players }: { players: Player[] }) {
             page={page}
             pageCount={pageCount}
             pageSize={search.pageSize}
-            total={total}
+            summary={summary}
             onPageSizeChange={(pageSize) => changeView({ pageSize })}
           />
         </>
@@ -162,61 +145,6 @@ function PlayerView({ players }: { players: Player[] }) {
       </div>
     </div>
   );
-}
-
-// After the visitor changes the page (a page link, Previous/Next, back or
-// forward), scroll to the top of the table, focus its caption, and announce
-// the new summary. A view change also returns to page 1, but it isn't a page
-// change, so it neither moves focus nor announces. Skipped on first render.
-function usePageChangeOrientation(
-  search: PlayerOverviewView,
-  page: number,
-  summary: string,
-) {
-  const tableRef = useRef<HTMLTableElement>(null);
-  const captionRef = useRef<HTMLTableCaptionElement>(null);
-  const [announcement, setAnnouncement] = useState('');
-  const previous = useRef({ search, page });
-
-  useEffect(() => {
-    const before = previous.current;
-    previous.current = { search, page };
-    const viewChanged =
-      before.search.sort !== search.sort ||
-      before.search.nationality !== search.nationality ||
-      before.search.sex !== search.sex ||
-      before.search.pageSize !== search.pageSize;
-    if (before.page === page || viewChanged) return;
-
-    tableRef.current?.scrollIntoView({ block: 'start' });
-    captionRef.current?.focus({ preventScroll: true });
-    setAnnouncement(summary);
-  }, [search, page, summary]);
-
-  return { tableRef, captionRef, announcement };
-}
-
-// A page beyond the last, or an invalid one, renders page 1 (queryPlayers).
-// Once the players are loaded and the page count is known, replace the URL so
-// the address bar matches what is shown, without a new history entry.
-function useCanonicalPage(requestedPage: number, effectivePage: number) {
-  const router = useRouter();
-  const navigate = routeApi.useNavigate();
-
-  // Runs when the validated or effective page changes, which is after the
-  // route has resolved, so the URL read here is the one being shown.
-  useEffect(() => {
-    const rawPage = new URLSearchParams(router.state.location.searchStr).get(
-      'page',
-    );
-    const canonicalPage = effectivePage === 1 ? null : String(effectivePage);
-    if (rawPage !== canonicalPage) {
-      void navigate({
-        search: (prev) => ({ ...prev, page: undefined }),
-        replace: true,
-      });
-    }
-  }, [requestedPage, effectivePage, router, navigate]);
 }
 
 function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {
@@ -231,193 +159,5 @@ function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {
         {t('players.noMatch.clearFilters')}
       </Button>
     </div>
-  );
-}
-
-function SexFilter({
-  value,
-  onChange,
-}: {
-  value: Sex | 'all';
-  onChange: (value: Sex | 'all') => void;
-}) {
-  const { t } = useTranslation();
-  const options: FilterOption<Sex | 'all'>[] = [
-    { value: 'all', label: t('players.filters.all') },
-    ...sexes.map((sex) => ({ value: sex, label: t(`players.sex.${sex}`) })),
-  ];
-
-  return (
-    <FilterSelect
-      id="player-sex-filter"
-      label={t('players.filters.sex')}
-      value={value}
-      options={options}
-      onChange={onChange}
-    />
-  );
-}
-
-function NationalityFilter({
-  players,
-  locale,
-  value,
-  onChange,
-}: {
-  players: Player[];
-  locale: string;
-  value: Nationality | 'all';
-  onChange: (value: Nationality | 'all') => void;
-}) {
-  const { t } = useTranslation();
-
-  const options = useMemo<FilterOption<Nationality | 'all'>[]>(() => {
-    const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
-    const countries = presentNationalities(players)
-      .map((nationality) => ({
-        nationality,
-        name: t(`countries.${nationality}`),
-      }))
-      .sort((a, b) => collator.compare(a.name, b.name));
-
-    return [
-      { value: 'all', label: t('players.filters.all') },
-      ...countries.map(({ nationality, name }) => ({
-        value: nationality,
-        label: (
-          <>
-            <Flag
-              countryCode={nationality}
-              aria-hidden="true"
-              className="size-4 shrink-0"
-            />
-            {name}
-          </>
-        ),
-      })),
-    ];
-  }, [players, locale, t]);
-
-  return (
-    <FilterSelect
-      id="player-nationality-filter"
-      label={t('players.filters.nationality')}
-      value={value}
-      options={options}
-      onChange={onChange}
-    />
-  );
-}
-
-function PlayerTableSkeleton() {
-  const { t } = useTranslation();
-
-  return (
-    <div
-      role="status"
-      aria-label={t('players.loading')}
-      className="flex flex-col gap-md"
-    >
-      {Array.from({ length: 8 }, (_, index) => (
-        <div
-          key={index}
-          aria-hidden="true"
-          className="h-lg animate-pulse rounded-xs bg-surface-strong"
-        />
-      ))}
-    </div>
-  );
-}
-
-function PlayerTable({
-  tableRef,
-  captionRef,
-  rows,
-  sort,
-  onToggleSort,
-}: {
-  tableRef: Ref<HTMLTableElement>;
-  captionRef: Ref<HTMLTableCaptionElement>;
-  rows: Player[];
-  sort: SortDirection;
-  onToggleSort: () => void;
-}) {
-  const { t } = useTranslation();
-  const SortIcon = sort === 'asc' ? ArrowUpIcon : ArrowDownIcon;
-  const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
-
-  return (
-    // scroll-mt keeps the table's top clear of the sticky top nav.
-    <Table ref={tableRef} className="scroll-mt-nav-height table-fixed">
-      <TableCaption ref={captionRef} tabIndex={-1} className="sr-only">
-        {t('players.caption')}
-      </TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead aria-sort={ariaSort} className={cellClassName}>
-            <button
-              type="button"
-              onClick={onToggleSort}
-              className="-mx-xs inline-flex items-center gap-xs rounded-xs px-xs text-left font-medium outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {t('players.columns.surname')}
-              <SortIcon
-                aria-hidden="true"
-                data-sort-indicator={ariaSort}
-                className="size-4 shrink-0"
-              />
-            </button>
-          </TableHead>
-          <TableHead className={cellClassName}>
-            {t('players.columns.firstName')}
-          </TableHead>
-          <TableHead className={`w-24 ${cellClassName}`}>
-            {t('players.columns.nationality')}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((player) => (
-          <TableRow key={player.id}>
-            <TableCell className={cellClassName}>
-              {formatSurname(player)}
-            </TableCell>
-            <TableCell className={cellClassName}>{player.firstName}</TableCell>
-            <TableCell>
-              <NationalityFlag nationality={player.nationality} />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-
-// A flag only, named by the localized country name. Focusable, so the tooltip
-// opens on keyboard focus as well as on hover.
-function NationalityFlag({ nationality }: { nationality: Nationality }) {
-  const { t } = useTranslation();
-  const countryName = t(`countries.${nationality}`);
-
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <span
-            role="img"
-            aria-label={countryName}
-            tabIndex={0}
-            className="inline-flex rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
-        }
-      >
-        <Flag
-          countryCode={nationality}
-          aria-hidden="true"
-          className="size-5 shrink-0"
-        />
-      </TooltipTrigger>
-      <TooltipContent>{countryName}</TooltipContent>
-    </Tooltip>
   );
 }

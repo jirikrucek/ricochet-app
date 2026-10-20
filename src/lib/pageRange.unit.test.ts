@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { pageRange } from './pageRange';
+import { pageBounds, pageRange } from './pageRange';
 
 describe('pageRange', () => {
   it.each([
@@ -30,4 +30,18 @@ describe('pageRange', () => {
   it('shows the page number for a one-page gap at the end', () => {
     expect(pageRange(7, 10)).toEqual([1, 'ellipsis', 6, 7, 8, 9, 10]);
   });
+});
+
+describe('pageBounds', () => {
+  it.each([
+    [1, 25, 100, { from: 1, to: 25 }],
+    [2, 25, 100, { from: 26, to: 50 }],
+    [4, 25, 90, { from: 76, to: 90 }],
+    [1, 10, 4, { from: 1, to: 4 }],
+  ] as const)(
+    'page %i of size %i over %i gives %j',
+    (page, pageSize, total, expected) => {
+      expect(pageBounds(page, pageSize, total)).toEqual(expected);
+    },
+  );
 });

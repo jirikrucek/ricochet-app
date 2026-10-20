@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { playerOverviewSearchSchema } from './playerOverviewSearch';
+import {
+  isSameViewIgnoringPage,
+  matchesFilter,
+  playerOverviewSearchDefaults,
+  playerOverviewSearchSchema,
+} from './playerOverviewSearch';
 
 const parse = (search: Record<string, unknown>) =>
   playerOverviewSearchSchema.parse(search);
@@ -76,5 +81,33 @@ describe('playerOverviewSearchSchema pageSize', () => {
 
   it.each([7, 'abc', 100])('falls back to 25 for %s', (pageSize) => {
     expect(parse({ pageSize }).pageSize).toBe(25);
+  });
+});
+
+describe('matchesFilter', () => {
+  it('matches every value for "all"', () => {
+    expect(matchesFilter('all', 'CZ')).toBe(true);
+  });
+
+  it('matches only the selected value otherwise', () => {
+    expect(matchesFilter('CZ', 'CZ')).toBe(true);
+    expect(matchesFilter('CZ', 'DE')).toBe(false);
+  });
+});
+
+describe('isSameViewIgnoringPage', () => {
+  const base = { ...playerOverviewSearchDefaults };
+
+  it('ignores a different page', () => {
+    expect(isSameViewIgnoringPage(base, { ...base, page: 3 })).toBe(true);
+  });
+
+  it.each([
+    { sort: 'desc' },
+    { nationality: 'CZ' },
+    { sex: 'female' },
+    { pageSize: 50 },
+  ] as const)('sees %j as a different view', (change) => {
+    expect(isSameViewIgnoringPage(base, { ...base, ...change })).toBe(false);
   });
 });

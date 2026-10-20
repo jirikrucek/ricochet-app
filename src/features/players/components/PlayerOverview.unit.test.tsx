@@ -153,3 +153,34 @@ describe('PlayerOverview with filters that match no players', () => {
     ).toBeNull();
   });
 });
+
+describe('PlayerOverview pagination ends', () => {
+  const rows = Array.from({ length: 30 }, (_, index) =>
+    buildPlayer({
+      id: index + 1,
+      surname: `Player${String(index).padStart(2, '0')}`,
+    }),
+  );
+
+  it('shows Previous as a disabled link on the first page', async () => {
+    fetchPlayers.mockResolvedValue(rows);
+
+    renderPlayerOverview('/players?pageSize=10');
+
+    const [previous] = await screen.findAllByText('Previous');
+    expect(previous?.getAttribute('role')).toBe('link');
+    expect(previous?.getAttribute('aria-disabled')).toBe('true');
+    expect(previous?.hasAttribute('href')).toBe(false);
+  });
+
+  it('shows Next as a disabled link on the last page', async () => {
+    fetchPlayers.mockResolvedValue(rows);
+
+    renderPlayerOverview('/players?pageSize=10&page=3');
+
+    const [next] = await screen.findAllByText('Next');
+    expect(next?.getAttribute('role')).toBe('link');
+    expect(next?.getAttribute('aria-disabled')).toBe('true');
+    expect(next?.hasAttribute('href')).toBe(false);
+  });
+});

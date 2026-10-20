@@ -65,13 +65,16 @@ function PaginationLink({
 }
 
 // Previous/Next at either end: a link can't be disabled, so it renders as a
-// non-interactive element marked aria-disabled.
+// non-interactive element with the link role and aria-disabled, which is how
+// assistive technology announces a disabled link (a bare span's aria-disabled
+// is not exposed).
 function PaginationDisabled({
   className,
   ...props
 }: React.ComponentProps<'span'>) {
   return (
     <span
+      role="link"
       aria-disabled="true"
       data-slot="pagination-disabled"
       className={cn(

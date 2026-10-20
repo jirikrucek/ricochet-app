@@ -9,7 +9,9 @@ import {
 } from './playerOverviewSearch';
 import { presentNationalities, queryPlayers } from './queryPlayers';
 
-function view(overrides: Partial<PlayerOverviewView> = {}): PlayerOverviewView {
+function buildView(
+  overrides: Partial<PlayerOverviewView> = {},
+): PlayerOverviewView {
   return { ...playerOverviewSearchDefaults, ...overrides };
 }
 
@@ -27,7 +29,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ surname }),
     );
 
-    expect(surnames(queryPlayers(players, view(), 'en').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'en').rows)).toEqual([
       'Bakker',
       'Nagy',
       'Wagner',
@@ -45,7 +47,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ firstName: 'Anna', surname: 'Bakker' }),
     ];
 
-    expect(surnames(queryPlayers(players, view(), 'en').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'en').rows)).toEqual([
       'Bakker',
       'Novák',
       'de Vries',
@@ -57,7 +59,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ surname }),
     );
 
-    expect(surnames(queryPlayers(players, view(), 'en').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'en').rows)).toEqual([
       'Macbeth',
       'MacDonald',
     ]);
@@ -68,11 +70,11 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ surname }),
     );
 
-    expect(surnames(queryPlayers(players, view(), 'cs').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'cs').rows)).toEqual([
       'Horák',
       'Chládek',
     ]);
-    expect(surnames(queryPlayers(players, view(), 'en').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'en').rows)).toEqual([
       'Chládek',
       'Horák',
     ]);
@@ -84,7 +86,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ firstName: 'Anna', surname: 'Szabó' }),
     ];
 
-    expect(names(queryPlayers(players, view(), 'hu').rows)).toEqual([
+    expect(names(queryPlayers(players, buildView(), 'hu').rows)).toEqual([
       'Anna Szabó',
       'Petra Szabó',
     ]);
@@ -105,7 +107,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ firstName: 'Tomáš', surname: 'Kovář' }),
     ];
 
-    expect(surnames(queryPlayers(players, view(), 'cs').rows)).toEqual([
+    expect(surnames(queryPlayers(players, buildView(), 'cs').rows)).toEqual([
       'Kovář',
       'Kovář jr.',
       'Kovář sr.',
@@ -131,7 +133,7 @@ describe('queryPlayers sorting', () => {
     ];
 
     expect(
-      names(queryPlayers(players, view({ sort: 'desc' }), 'en').rows),
+      names(queryPlayers(players, buildView({ sort: 'desc' }), 'en').rows),
     ).toEqual([
       'Pieter de Vries',
       'Petra Szabó',
@@ -147,7 +149,7 @@ describe('queryPlayers sorting', () => {
       buildPlayer({ surname }),
     );
 
-    queryPlayers(players, view(), 'en');
+    queryPlayers(players, buildView(), 'en');
 
     expect(surnames(players)).toEqual(['Wagner', 'Bakker']);
   });
@@ -163,19 +165,23 @@ describe('queryPlayers nationality filter', () => {
 
   it("lets every player through with 'all'", () => {
     expect(
-      queryPlayers(players, view({ nationality: 'all' }), 'en').rows,
+      queryPlayers(players, buildView({ nationality: 'all' }), 'en').rows,
     ).toHaveLength(4);
   });
 
   it('keeps only players of the chosen nationality', () => {
-    const { rows } = queryPlayers(players, view({ nationality: 'DE' }), 'en');
+    const { rows } = queryPlayers(
+      players,
+      buildView({ nationality: 'DE' }),
+      'en',
+    );
 
     expect(surnames(rows)).toEqual(['Schmidt', 'Wagner']);
   });
 
   it('returns no rows when no player has the nationality', () => {
     expect(
-      queryPlayers(players, view({ nationality: 'GB' }), 'en').rows,
+      queryPlayers(players, buildView({ nationality: 'GB' }), 'en').rows,
     ).toEqual([]);
   });
 });
@@ -208,13 +214,13 @@ describe('queryPlayers sex filter', () => {
   ];
 
   it("lets both sexes through with 'all'", () => {
-    expect(queryPlayers(players, view({ sex: 'all' }), 'en').rows).toHaveLength(
-      4,
-    );
+    expect(
+      queryPlayers(players, buildView({ sex: 'all' }), 'en').rows,
+    ).toHaveLength(4);
   });
 
   it('keeps only players of the chosen sex', () => {
-    const { rows } = queryPlayers(players, view({ sex: 'female' }), 'en');
+    const { rows } = queryPlayers(players, buildView({ sex: 'female' }), 'en');
 
     expect(surnames(rows)).toEqual(['Kowalska', 'Nováková']);
   });
@@ -222,7 +228,7 @@ describe('queryPlayers sex filter', () => {
   it('combines the sex and nationality filters with AND', () => {
     const { rows } = queryPlayers(
       players,
-      view({ nationality: 'PL', sex: 'male' }),
+      buildView({ nationality: 'PL', sex: 'male' }),
       'en',
     );
 
@@ -240,7 +246,11 @@ describe('queryPlayers page slicing', () => {
   );
 
   it('returns the requested page with the total and page count', () => {
-    const result = queryPlayers(players, view({ page: 2, pageSize: 10 }), 'en');
+    const result = queryPlayers(
+      players,
+      buildView({ page: 2, pageSize: 10 }),
+      'en',
+    );
 
     expect(surnames(result.rows)).toEqual(
       Array.from({ length: 10 }, (_, i) => `P${11 + i}`),
@@ -249,7 +259,11 @@ describe('queryPlayers page slicing', () => {
   });
 
   it('returns the remaining players on the last page', () => {
-    const result = queryPlayers(players, view({ page: 2, pageSize: 25 }), 'en');
+    const result = queryPlayers(
+      players,
+      buildView({ page: 2, pageSize: 25 }),
+      'en',
+    );
 
     expect(result.rows).toHaveLength(5);
     expect(result).toMatchObject({ total: 30, page: 2, pageCount: 2 });
@@ -258,7 +272,7 @@ describe('queryPlayers page slicing', () => {
   it('counts and pages only the filtered players', () => {
     const result = queryPlayers(
       players,
-      view({ sex: 'female', pageSize: 10, page: 2 }),
+      buildView({ sex: 'female', pageSize: 10, page: 2 }),
       'en',
     );
 
@@ -267,14 +281,20 @@ describe('queryPlayers page slicing', () => {
   });
 
   it('falls back to page 1 for a page beyond the last', () => {
-    const result = queryPlayers(players, view({ page: 9, pageSize: 10 }), 'en');
+    const result = queryPlayers(
+      players,
+      buildView({ page: 9, pageSize: 10 }),
+      'en',
+    );
 
     expect(result.page).toBe(1);
     expect(surnames(result.rows)[0]).toBe('P01');
   });
 
   it('has one page and no rows when nothing matches', () => {
-    expect(queryPlayers(players, view({ nationality: 'GB' }), 'en')).toEqual({
+    expect(
+      queryPlayers(players, buildView({ nationality: 'GB' }), 'en'),
+    ).toEqual({
       rows: [],
       total: 0,
       page: 1,

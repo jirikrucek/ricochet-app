@@ -23,3 +23,16 @@ export function pageRange(current: number, count: number): PageRangeItem[] {
   });
   return items;
 }
+
+// The 1-based positions of the first and last item on a page, for a summary
+// such as "Showing 26–50 of 100".
+export function pageBounds(
+  page: number,
+  pageSize: number,
+  total: number,
+): { from: number; to: number } {
+  return {
+    from: (page - 1) * pageSize + 1,
+    to: Math.min(page * pageSize, total),
+  };
+}
