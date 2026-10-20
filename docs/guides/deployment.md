@@ -30,7 +30,7 @@ Set these in the Vercel project settings for both Preview and Production. Vite i
 A migration, and the data the app needs in it, are not part of the Vercel deploy. They reach the shared database by hand, so run them in this order. A frontend that is deployed first shows its error state until the table exists and holds rows.
 
 1. Apply the migrations: `npx supabase db push`.
-2. Load the production data. The scripts live in the gitignored `supabase/data/` and are idempotent (`insert … on conflict`, relying on the table's natural key), so running one again is safe. Never run one against a local or CI database (see `docs/standards/testing.md`).
+2. Load the production data. The scripts live in the gitignored `supabase/data/` and are idempotent (`insert … on conflict`, relying on the table's natural key), so running one again is safe. Run each script against the linked project: `npx supabase db query -f ./supabase/data/<script>.sql --linked`. Never run one against a local or CI database (see `docs/standards/testing.md`).
 3. Merge, so Vercel deploys the frontend.
 4. Smoke-check the deployed app: the page lists rows, and `VITE_SENTRY_DSN` is set so a failure would be reported.
 
