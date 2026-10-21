@@ -8,8 +8,8 @@ rules:
     - Must use /glossary skill
     - Must use /c4-diagrams skill 
   proposal:
-    - Must use /grilling skill
     - Must use /glossary skill
+    - Must use /grilling skill    
     - Must organize specs by feature area
     - Must include an **Out of Scope** section
     - Must include a **Traceability** section with a link to a relevant issue in the issue tracker
@@ -24,7 +24,7 @@ rules:
 operations:
   apply:
     guidance:
-      - Must use /implement skill
+      - Must use /tdd skill where possible, at pre-agreed seams
   archive:
     guidance:
       - Must run OpenSpec Sync before archiving

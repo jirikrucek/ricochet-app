@@ -27,6 +27,7 @@
 
 - Must use Conventional Commits when creating commit messages
 - Must use Conventional Branch when creating branches
+- Must use /pr skill when writing a PR body
 
 ### Definition of Done
 
