@@ -4,12 +4,13 @@ rules:
   adr:
     - Must use /glossary skill
     - Must use /architectural-decision-records skill  
+    - Must create or update any standards (docs/standards/) or guides (docs/guides/) related to architectural decisions taken
   design:
     - Must use /glossary skill
     - Must use /c4-diagrams skill 
   proposal:
-    - Must use /grilling skill
     - Must use /glossary skill
+    - Must use /grilling skill    
     - Must organize specs by feature area
     - Must include an **Out of Scope** section
     - Must include a **Traceability** section with a link to a relevant issue in the issue tracker
@@ -24,7 +25,8 @@ rules:
 operations:
   apply:
     guidance:
-      - Must use /implement skill
+      - Must use /tdd skill where possible, at pre-agreed seams
   archive:
     guidance:
-      - Must run OpenSpec Sync before archiving      
+      - Must run OpenSpec Sync before archiving
+      - Must keep *-glossary-reference.md files with the archived change; do not sync them into main specs

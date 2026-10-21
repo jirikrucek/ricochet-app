@@ -1,17 +1,17 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-  "name": "Ubuntu",
+  "name": "ricochet-app",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/base:resolute",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:latest": {},
-    "ghcr.io/devcontainers/features/copilot-cli:latest": {},    
-    "ghcr.io/devcontainers/features/node:latest": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:latest": {},
-    "ghcr.io/devcontainers-extra/features/claude-code:latest": {}    
+    "ghcr.io/devcontainers/features/github-cli:1.1.3": {},
+    "ghcr.io/devcontainers/features/copilot-cli:1.1.3": {},
+    "ghcr.io/devcontainers/features/node:2.1.1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {},
+    "ghcr.io/devcontainers-extra/features/claude-code:2.0.3": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -28,6 +28,12 @@
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
     "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume"
   ],
+
+  // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
+  // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
+  "remoteEnv": {
+    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}"
+  },
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
@@ -55,7 +61,6 @@
         "esbenp.prettier-vscode",
         "Supabase.vscode-supabase-extension",
         "redhat.vscode-yaml",
-        "AbelMak.skills-sh",
         "github.vscode-github-actions"
       ]
     }

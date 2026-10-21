@@ -1,3 +1,5 @@
+# branding Specification
+
 ## Purpose
 
 Shows the official Ricochet brand identity in the app shell (the logo in the top nav bar and the favicon in the browser tab), so users recognise the product on every page.
