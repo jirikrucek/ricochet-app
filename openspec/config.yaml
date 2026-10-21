@@ -27,4 +27,5 @@ operations:
       - Must use /implement skill
   archive:
     guidance:
-      - Must run OpenSpec Sync before archiving      
+      - Must run OpenSpec Sync before archiving
+      - Must keep *-glossary-reference.md files with the archived change; do not sync them into main specs
