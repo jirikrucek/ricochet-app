@@ -1,3 +1,5 @@
+# navigation Specification
+
 ## Purpose
 
 Keeps the top nav bar usable at every viewport width. It shows the full single-row nav on tablets and desktops, and collapses to the logo plus a menu button on phones, so the section links and language selector stay reachable without the page overflowing.

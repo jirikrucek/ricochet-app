@@ -44,6 +44,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 - Run `npm run typecheck` (must pass 0 errors).
 - Run `npm run lint` (must pass 0 errors).
+- Run `npm run spec:validate` (must pass 0 errors).
 - Run `npm run build` (must pass clean).
 - Run `npm run test:all` (must pass 100%).
 - _Self-correction:_ On error, parse stderr, fix code, and retry until clean.
@@ -63,6 +64,7 @@ Output concise status:
 - ADRs: [OK / NOK]
 - Typecheck: [OK / NOK]
 - Lint: [OK / NOK]
+- Spec validation: [OK / NOK]
 - Build: [OK / NOK]
 - Tests & Anti-Ghost Audit: [OK / NOK]
 
