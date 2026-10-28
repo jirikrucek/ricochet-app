@@ -4,9 +4,9 @@ This is a client-only SPA ([ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core
 
 ## Error reporting
 
-Error reporting is wired once in `src/app/observability/` and `src/app/providers/AppProviders.tsx`:
+Error reporting is wired once, in `src/lib/sentry.ts`, `src/app/observability/` and `src/app/providers/AppProviders.tsx`:
 
-- `initSentry(router)` runs once in `main.tsx` before render. It does nothing when `VITE_SENTRY_DSN` is unset, so local dev needs no special-casing. The DSN stays blank in `.env.example` and is set per environment (see [deployment guide](../guides/deployment.md)).
+- `initSentry(router)` (from `src/lib/sentry.ts`) runs once in `main.tsx` before render. It does nothing when `VITE_SENTRY_DSN` is unset, so local dev needs no special-casing. The DSN stays blank in `.env.example` and is set per environment (see [deployment guide](../guides/deployment.md)).
 - `AppErrorBoundary` wraps the app, reports render errors, and shows a translated fallback screen.
 - The shared `QueryClient` reports every failed query and mutation through its `QueryCache`/`MutationCache` `onError`, with the query or mutation key attached.
 
@@ -14,12 +14,12 @@ Rules:
 
 - **Don't add error reporting to a component just so a failure is seen.** A query or mutation failure is already reported; component-level error UI is only for user-facing messaging.
 - **Don't swallow errors.** A `catch` either rethrows or calls `Sentry.captureException`. This holds for any background or retry path: the failure after the last attempt must reach Sentry.
-- **Every query key must identify the data it fetches** (table or RPC name and the row ids involved), because it is the only context the shared `onError` attaches. It is what lets you find the request in Supabase's own logs; there is no custom request-id header.
+- **The first element of every query key is the table or RPC name it reads, followed by any ids or filters** (`['players']`, `['players', id]`). The shared `onError` attaches the key to the Sentry event, so the key is what tells you which Supabase table a failure came from and lets you find the request in Supabase's own logs; there is no custom request-id header.
 - **Session Replay is not enabled.** If it is added, keep the SDK's default text and input masking on.
 
 ## Structured logging
 
-Use `Sentry.logger.*` (exported by `src/app/observability/sentry.ts`) instead of `console.*`. `console.*` must not appear in application code: it isn't structured and isn't captured anywhere.
+Use `Sentry.logger.*` (exported by `src/lib/sentry.ts`) instead of `console.*`. `console.*` is not structured and isn't captured anywhere; ESLint rejects it in `src/`.
 
 - Pick the level deliberately: `trace`, `debug`, `info`, `warn`, `error` or `fatal`.
 - Pass structured `attributes`, not an interpolated string:

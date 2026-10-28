@@ -5,7 +5,7 @@ This project uses a design system defined in DESIGN.md.
 For all UI work:
 - Use the color tokens exactly as specified in DESIGN.md. No custom hex values.
 - Apply the type scale to all text elements
-- Use the spacing scale for margins, padding, and gaps
+- Use the spacing scale for margins, padding, and gaps. Use the named tokens (`p-base`, `gap-sm`), not numeric utilities (`p-4`, `gap-2`) or arbitrary values.
 - Do not introduce new design decisions without a reason
 
 ## Vendored artwork
@@ -15,7 +15,7 @@ The "no custom hex values" rule governs UI styling. Vendored artwork rendered as
 ## Where things live
 
 - The DESIGN.md tokens, the typography primitives and the app-level base styles live in `src/styles/globals.css`, the only stylesheet (the project has one frontend surface).
-- Shadcn UI components live in `src/ui/`; the `cn()` utility is in `src/lib/utils.ts`.
+- Shadcn UI components live in `src/ui/`; the `cn()` utility is in `src/lib/utils.ts`. The rules above apply to them too: after `shadcn add` or an update, replace numeric spacing and `text-xs`/`text-sm` with the nearest token. Where no token matches a size (for example 6px or 10px), round up to the next token.
 - The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`.
 
 ## Token naming convention
@@ -39,4 +39,4 @@ Dark mode is **not currently supported**. Do not add `dark:*` classes or dark-th
 
 ## DESIGN.md
 
-DESIGN.md is the source of the tokens. After changing it, it must pass `npx @google/design.md lint DESIGN.md`, and `src/styles/globals.css` must match it.
+DESIGN.md is the source of the tokens, and `src/styles/globals.css` must match it. DESIGN.md must pass `npm run design:lint` (0 errors). It is part of the Definition of Done and the Verification checks workflow.

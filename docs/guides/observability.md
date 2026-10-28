@@ -29,4 +29,4 @@ Alert rules live in Sentry, not in the repo.
 
 ## Revisit
 
-`tracesSampleRate` is `1.0` in `src/app/observability/sentry.ts`, which is fine at current traffic. Lower it if ingestion volume or cost becomes a concern before considering a second vendor.
+`tracesSampleRate` is `1.0` in `src/lib/sentry.ts`, which is fine at current traffic. Lower it if ingestion volume or cost becomes a concern before considering a second vendor.

@@ -18,7 +18,7 @@ ricochet-app/
 │   ├── app/                     # Composition root: wires the app shell, owns nothing domain-specific
 │   │   ├── providers/              # AppProviders.tsx — QueryClientProvider (with error reporting), RouterProvider
 │   │   ├── layout/                  # Global chrome: TopNav, AppFooter — rendered by routes/__root.tsx
-│   │   └── observability/            # Sentry setup and AppErrorBoundary
+│   │   └── observability/            # AppErrorBoundary
 │   │
 │   ├── domain/                   # Pure business logic. No React. No Supabase. (ADR 0012)
 │   │   ├── players/                  # Player schema and type, overview search params, filtering, sorting, paging
@@ -54,7 +54,7 @@ ricochet-app/
 │   │       ├── useLanguageSelection.ts
 │   │       ├── LanguageOption.tsx
 │   │       └── LanguageSelect.tsx          # imports ui/select — the composed public widget
-│   ├── lib/                        # Generic framework utilities (cn(), pageRange) — no business rules
+│   ├── lib/                        # Generic framework utilities (cn(), pageRange, sentry.ts) — no business rules
 │   ├── styles/                     # Tailwind directives + CSS design tokens (globals.css)
 │   └── assets/                     # Bundler-processed static assets imported by components (brand/, flags/)
 │
@@ -86,16 +86,20 @@ Unit and integration tests stay colocated with the source they test (`*.unit.tes
 
 | Folder | Scope & allowed artifacts |
 | :--- | :--- |
-| `src/app/` | Composition root: provider wiring, global layout chrome, and observability setup (Sentry, error boundary). No domain logic, no feature components. |
+| `src/app/` | Composition root: provider wiring, global layout chrome, and the error boundary. No domain logic, no feature components. |
 | `src/domain/` | Pure business logic: domain types and the Zod schemas they are inferred from (e.g. `playerSchema` → `Player`), and scoring/bracket/permission/query rules. Knows nothing about storage: no database column names, no React, no Supabase, no `fetch`. |
 | `src/repositories/` | The Supabase adapter: the client, the generated `database.types.ts`, and one repository per domain module (e.g. `repositories/players/fetchPlayers`). A repository queries Supabase, maps each row to a domain type, and validates it with the domain schema, so it returns domain types, never rows. The only folder allowed to import `@supabase/supabase-js`. |
 | `src/features/` | Feature UI: components, feature-local React hooks (`hooks/`), feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `repositories` — it wraps a repository call in TanStack Query hooks (query keys, caching, retries); `components/`, `hooks/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
 | `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. A route may import `domain` schemas and types to validate its path and search params (e.g. `validateSearch`), but the rules themselves stay in `domain`. |
 | `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
 | `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, option component, and the composed `LanguageSelect` widget). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it without needing an `app → features` boundary. `LanguageSelect` composes `ui/select` and has no app-shell knowledge (no branding, no nav, no layout grid) — it belongs with the rest of the language-selection capability, not with `app/layout`'s chrome. |
-| `src/lib/` | Small generic helpers (e.g. `cn()`) with no business meaning. If a helper encodes a business rule, it belongs in `domain/` instead. |
+| `src/lib/` | Small generic helpers (e.g. `cn()`, the Sentry client in `sentry.ts`) with no business meaning. If a helper encodes a business rule, it belongs in `domain/` instead. |
 | `src/styles/` | Tailwind theme tokens and global CSS. No JS/TS. |
 | `src/assets/` | Static files imported by components and processed by the bundler (as opposed to `public/`, which is copied verbatim). |
+
+## Imports
+
+Inside `src/`, import a file in the same folder or below it with `./` (`./PlayerTable`, `./locales/en`). Import anything else with the `@/` alias (`@/domain/players/player`). Never use `../`. ESLint enforces this (`no-restricted-imports`).
 
 ## Dependency graph
 
@@ -131,4 +135,5 @@ The dependency graph is enforced by [`eslint-plugin-boundaries`](https://github.
 
 - `features-api` (`src/features/*/api/**`) is a separate element from `features`, so only `api/` can import `repositories`. A feature can import only its own `api/` and files, never another feature's.
 - `@supabase/supabase-js` can be imported only from `src/repositories/`.
+- Parent-relative imports (`../`) and `console.*` are rejected in `src/` by separate ESLint rules; see [Imports](#imports).
 - Files outside every element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained, since nothing imports them.

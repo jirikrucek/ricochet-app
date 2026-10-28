@@ -51,6 +51,10 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run spec:validate
 
+      - name: Design lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run design:lint
+
       - name: Unit tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run test:unit
