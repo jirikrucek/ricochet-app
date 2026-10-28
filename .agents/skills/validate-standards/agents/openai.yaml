@@ -1,0 +1,5 @@
+interface:
+  display_name: "Validate Standards"
+  short_description: "Validate that the standards in docs/standards are sound."
+policy:
+  allow_implicit_invocation: false
