@@ -27,7 +27,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn('flex items-center gap-0.5', className)}
+      className={cn('flex items-center gap-xxs', className)}
       {...props}
     />
   );
@@ -95,7 +95,7 @@ function PaginationPrevious({
   return (
     <PaginationLink
       size="default"
-      className={cn('pl-1.5!', className)}
+      className={cn('pl-sm!', className)}
       {...props}
     >
       <ChevronLeftIcon aria-hidden="true" data-icon="inline-start" />
@@ -112,7 +112,7 @@ function PaginationNext({
   return (
     <PaginationLink
       size="default"
-      className={cn('pr-1.5!', className)}
+      className={cn('pr-sm!', className)}
       {...props}
     >
       <span>{text}</span>
