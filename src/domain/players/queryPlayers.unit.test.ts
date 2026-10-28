@@ -7,7 +7,11 @@ import {
   playerOverviewSearchDefaults,
   type PlayerOverviewView,
 } from './playerOverviewSearch';
-import { presentNationalities, queryPlayers } from './queryPlayers';
+import {
+  nationalityFilterEntries,
+  presentNationalities,
+  queryPlayers,
+} from './queryPlayers';
 
 function buildView(
   overrides: Partial<PlayerOverviewView> = {},
@@ -300,5 +304,44 @@ describe('queryPlayers page slicing', () => {
       page: 1,
       pageCount: 1,
     });
+  });
+});
+
+describe('nationalityFilterEntries', () => {
+  const players = ['NL', 'CZ', 'DE', 'NL'].map((nationality) =>
+    buildPlayer({ nationality: nationality as Player['nationality'] }),
+  );
+
+  it('names each present nationality once, ordered by name', () => {
+    const names = { CZ: 'Czechia', DE: 'Germany', NL: 'Netherlands' };
+
+    const entries = nationalityFilterEntries(
+      players,
+      (nationality) => names[nationality as keyof typeof names],
+      'en',
+    );
+
+    expect(entries).toEqual([
+      { nationality: 'CZ', name: 'Czechia' },
+      { nationality: 'DE', name: 'Germany' },
+      { nationality: 'NL', name: 'Netherlands' },
+    ]);
+  });
+
+  it("orders by the locale's collation, not by code point", () => {
+    // Czech sorts "Ch" after "H"; code point order would put it first.
+    const names = { CZ: 'Chorvatsko', DE: 'Hongkong', NL: 'Andorra' };
+
+    const entries = nationalityFilterEntries(
+      players,
+      (nationality) => names[nationality as keyof typeof names],
+      'cs',
+    );
+
+    expect(entries.map(({ name }) => name)).toEqual([
+      'Andorra',
+      'Hongkong',
+      'Chorvatsko',
+    ]);
   });
 });

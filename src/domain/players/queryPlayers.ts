@@ -1,5 +1,6 @@
+import { matchesFilter } from '@/lib/filter';
 import { nationalities, type Nationality, type Player } from './player';
-import { matchesFilter, type PlayerOverviewView } from './playerOverviewSearch';
+import type { PlayerOverviewView } from './playerOverviewSearch';
 
 export type PlayerOverviewResult = {
   // The players on the effective page.
@@ -61,4 +62,18 @@ export function presentNationalities(
 ): Nationality[] {
   const present = new Set(players.map((player) => player.nationality));
   return nationalities.filter((nationality) => present.has(nationality));
+}
+
+// The nationality filter's entries: each present nationality with its name in
+// the UI language, ordered by that name as the locale sorts it. Accents count,
+// case doesn't.
+export function nationalityFilterEntries(
+  players: readonly Player[],
+  countryName: (nationality: Nationality) => string,
+  locale: string,
+): { nationality: Nationality; name: string }[] {
+  const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
+  return presentNationalities(players)
+    .map((nationality) => ({ nationality, name: countryName(nationality) }))
+    .sort((a, b) => collator.compare(a.name, b.name));
 }

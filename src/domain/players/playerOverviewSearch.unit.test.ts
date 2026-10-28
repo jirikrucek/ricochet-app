@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   isSameViewIgnoringPage,
-  matchesFilter,
   playerOverviewSearchDefaults,
   playerOverviewSearchSchema,
 } from './playerOverviewSearch';
@@ -81,17 +80,6 @@ describe('playerOverviewSearchSchema pageSize', () => {
 
   it.each([7, 'abc', 100])('falls back to 25 for %s', (pageSize) => {
     expect(parse({ pageSize }).pageSize).toBe(25);
-  });
-});
-
-describe('matchesFilter', () => {
-  it('matches every value for "all"', () => {
-    expect(matchesFilter('all', 'CZ')).toBe(true);
-  });
-
-  it('matches only the selected value otherwise', () => {
-    expect(matchesFilter('CZ', 'CZ')).toBe(true);
-    expect(matchesFilter('CZ', 'DE')).toBe(false);
   });
 });
 

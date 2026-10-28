@@ -1,6 +1,6 @@
 # ADR 0012: Repositories Map Supabase Rows to Domain Types
 
-- Status: Accepted
+- Status: Superseded by ADR 0016
 - Created: 2026-10-20
 - Updated: 2026-10-28
 - Supersedes: ADR 0003

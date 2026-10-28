@@ -2,7 +2,10 @@ import { playerSchema, type Player } from '@/domain/players/player';
 import type { PlayerRow } from './playerRow';
 
 // Renames the columns to the domain's fields, then validates against the
-// domain schema. Throws on a row that doesn't fit, so schema drift surfaces as
+// domain schema. `nationalities` mirrors the `nationality` check constraint on
+// public.players (the column is plain text, so the generated types can't
+// narrow it) and `sexes` mirrors the `player_sex` enum: a change to either
+// needs a migration. Throws on a row that doesn't fit, so schema drift surfaces as
 // the query's error state instead of a silently partial list.
 export function toPlayer(row: PlayerRow): Player {
   return playerSchema.parse({

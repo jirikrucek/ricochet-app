@@ -15,7 +15,8 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0009 | [E2E Tests Do Not Use Pixel Snapshots](ADR0009-e2e-tests-do-not-use-pixel-snapshots.md) | Accepted |
 | 0010 | [Render Tables Without a Table Library](ADR0010-render-tables-without-a-table-library.md) | Accepted |
 | 0011 | [Tests Reach Only a Local Supabase with Seed Data](ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md) | Accepted |
-| 0012 | [Repositories Map Supabase Rows to Domain Types](ADR0012-repositories-map-supabase-rows-to-domain-types.md) | Accepted |
+| 0012 | [Repositories Map Supabase Rows to Domain Types](ADR0012-repositories-map-supabase-rows-to-domain-types.md) | Superseded by ADR 0016 |
 | 0013 | [Preview and Production Use Separate Supabase Projects](ADR0013-preview-and-production-use-separate-supabase-projects.md) | Accepted |
 | 0014 | [Report Client Errors and Logs to Sentry](ADR0014-report-client-errors-and-logs-to-sentry.md) | Accepted |
 | 0015 | [Shadcn Components Use Base UI Primitives](ADR0015-shadcn-components-use-base-ui-primitives.md) | Accepted |
+| 0016 | [Repositories Map Supabase Rows to Domain Types; Domain May Use Generic Helpers](ADR0016-repositories-map-rows-and-domain-may-use-generic-helpers.md) | Accepted |

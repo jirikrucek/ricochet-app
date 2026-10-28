@@ -3,11 +3,9 @@ import { getRouteApi } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import type { Player } from '@/domain/players/player';
-import {
-  all,
-  type PlayerOverviewView,
-} from '@/domain/players/playerOverviewSearch';
+import type { PlayerOverviewView } from '@/domain/players/playerOverviewSearch';
 import { queryPlayers } from '@/domain/players/queryPlayers';
+import { all } from '@/lib/filter';
 import { pageBounds } from '@/lib/pageRange';
 import { Button } from '@/ui/button';
 import { usePlayers } from '@/features/players/api/usePlayers';

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { all, orAll } from '@/lib/filter';
 import { nationalitySchema, sexSchema } from './player';
 
 // The player overview's view lives in the URL (ADR 0002). Each field falls
@@ -10,20 +11,6 @@ export type SortDirection = (typeof sortDirections)[number];
 
 export const pageSizes = [10, 25, 50] as const;
 export type PageSize = (typeof pageSizes)[number];
-
-// A filter that is either one value or "all" (no filtering).
-export const all = 'all';
-export type OrAll<TValue> = TValue | typeof all;
-
-export function matchesFilter<TValue>(
-  filter: OrAll<TValue>,
-  value: TValue,
-): boolean {
-  return filter === all || filter === value;
-}
-
-const orAll = <TSchema extends z.ZodType>(schema: TSchema) =>
-  z.union([schema, z.literal(all)]);
 
 export const playerOverviewSearchDefaults = {
   sort: 'asc',

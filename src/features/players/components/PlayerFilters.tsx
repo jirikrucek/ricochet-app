@@ -7,8 +7,8 @@ import {
   type Player,
   type Sex,
 } from '@/domain/players/player';
-import { all, type OrAll } from '@/domain/players/playerOverviewSearch';
-import { presentNationalities } from '@/domain/players/queryPlayers';
+import { all, type OrAll } from '@/lib/filter';
+import { nationalityFilterEntries } from '@/domain/players/queryPlayers';
 import { Flag } from '@/localization/Flag';
 import { FilterSelect, type FilterOption } from './FilterSelect';
 
@@ -50,13 +50,11 @@ export function NationalityFilter({
   const { t } = useTranslation();
 
   const options = useMemo<FilterOption<OrAll<Nationality>>[]>(() => {
-    const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
-    const countries = presentNationalities(players)
-      .map((nationality) => ({
-        nationality,
-        name: t(`countries.${nationality}`),
-      }))
-      .sort((a, b) => collator.compare(a.name, b.name));
+    const countries = nationalityFilterEntries(
+      players,
+      (nationality) => t(`countries.${nationality}`),
+      locale,
+    );
 
     return [
       { value: all, label: t('players.filters.all') },

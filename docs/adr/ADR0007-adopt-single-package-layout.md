@@ -24,7 +24,7 @@ Collapse the repository to a single npm package at the root:
 - Adopt the folder layout and dependency graph defined in [`docs/standards/project-structure-standard.md`](../standards/project-structure-standard.md), which supersedes the folder mapping previously in ADR 0004.
 - Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see `eslint.config.mjs` for the rule set.
 
-This does not change the domain boundaries decided in ADR 0003, now recorded in ADR 0012 (players / tournaments / auth, repository seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
+This does not change the domain boundaries decided in ADR 0003, now recorded in ADR 0016 (players / tournaments / auth, repository seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
 
 ## Alternatives Considered
 

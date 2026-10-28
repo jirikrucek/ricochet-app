@@ -179,7 +179,7 @@ export default tseslint.config(
               from: { element: { type: 'features-api' } },
               // the seam: wraps a repository (which already returns
               // domain types) in TanStack Query hooks for the rest of
-              // the feature (ADR 0012)
+              // the feature (ADR 0016)
               allow: [
                 {
                   to: { element: { types: ['repositories', 'domain', 'lib'] } },
@@ -197,7 +197,7 @@ export default tseslint.config(
             {
               from: { element: { type: 'repositories' } },
               // the adapter: maps Supabase rows to domain types and
-              // validates them with domain schemas (ADR 0012)
+              // validates them with domain schemas (ADR 0016)
               allow: { to: { element: { types: ['domain', 'lib'] } } },
             },
             {
@@ -210,7 +210,9 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'domain' } },
-              allow: { to: { element: { type: 'domain' } } },
+              // generic, framework-free lib helpers only; lib/sentry and
+              // lib/utils are banned for domain below (ADR 0016)
+              allow: { to: { element: { types: ['domain', 'lib'] } } },
             },
             {
               allow: {
@@ -227,7 +229,7 @@ export default tseslint.config(
                 },
               },
               message:
-                'Import Supabase only inside src/repositories (ADR 0012).',
+                'Import Supabase only inside src/repositories (ADR 0016).',
             },
             {
               from: { element: { type: 'repositories' } },
@@ -272,7 +274,7 @@ export default tseslint.config(
         'error',
         {
           name: 'fetch',
-          message: 'The domain does not fetch; repositories do (ADR 0012).',
+          message: 'The domain does not fetch; repositories do (ADR 0016).',
         },
       ],
       'no-restricted-imports': [
@@ -292,6 +294,11 @@ export default tseslint.config(
               ],
               message:
                 'The domain is pure business logic: no React, TanStack or i18next.',
+            },
+            {
+              group: ['@/lib/sentry', '@/lib/utils'],
+              message:
+                'The domain may use only framework-free lib helpers, not Sentry or cn() (ADR 0016).',
             },
           ],
         },
