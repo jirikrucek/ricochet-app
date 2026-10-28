@@ -15,13 +15,21 @@ const sql = `
 
 type TableRow = { table_name: string; rls_enabled: boolean };
 
+// `supabase db query -o json` prints a bare array of rows, but wraps them as
+// `{ boundary, rows, warning }` when it detects an AI agent (AI_AGENT,
+// CLAUDECODE), so accept both shapes.
 function publicTables(): TableRow[] {
   const output = execFileSync(
     'npx',
     ['supabase', 'db', 'query', '--local', '-o', 'json', sql],
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
   );
-  return (JSON.parse(output) as { rows: TableRow[] }).rows;
+  const parsed = JSON.parse(output) as TableRow[] | { rows?: TableRow[] };
+  const rows = Array.isArray(parsed) ? parsed : parsed.rows;
+  if (!Array.isArray(rows)) {
+    throw new Error(`Unexpected supabase db query output: ${output}`);
+  }
+  return rows;
 }
 
 describe('row-level security', () => {
