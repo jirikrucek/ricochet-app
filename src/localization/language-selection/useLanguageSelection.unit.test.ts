@@ -1,32 +1,29 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    i18n: mockI18n,
-  }),
-}));
-
-const mockI18n = {
-  language: 'en',
-  resolvedLanguage: 'en' as string | undefined,
-  changeLanguage: vi.fn(),
-};
-
+import i18n from '@/localization/i18n';
 import { useLanguageSelection } from './useLanguageSelection';
 
 describe('useLanguageSelection', () => {
-  it('resolves the active language as the initial selection', () => {
-    mockI18n.resolvedLanguage = 'de';
+  beforeEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('resolves the active language as the initial selection', async () => {
+    await i18n.changeLanguage('de');
 
     const { result } = renderHook(() => useLanguageSelection());
 
     expect(result.current.selectedLanguage).toBe('de');
   });
 
-  it('falls back to the default language when the active language is unsupported', () => {
-    mockI18n.resolvedLanguage = 'fr';
+  it('falls back to the default language when the active language is unsupported', async () => {
+    await i18n.changeLanguage('fr');
 
     const { result } = renderHook(() => useLanguageSelection());
 
@@ -34,8 +31,6 @@ describe('useLanguageSelection', () => {
   });
 
   it('lists every supported language with its display metadata', () => {
-    mockI18n.resolvedLanguage = 'en';
-
     const { result } = renderHook(() => useLanguageSelection());
 
     expect(result.current.options).toEqual([
@@ -48,66 +43,46 @@ describe('useLanguageSelection', () => {
     ]);
   });
 
-  it('updates the selection and changes the app language when a new option is chosen', () => {
-    mockI18n.resolvedLanguage = 'en';
-    mockI18n.changeLanguage.mockClear();
-    mockI18n.changeLanguage.mockImplementation((language: string) => {
-      mockI18n.language = language;
-      mockI18n.resolvedLanguage = language;
-      return Promise.resolve();
-    });
+  it('updates the selection and changes the app language when a new option is chosen', async () => {
+    const { result } = renderHook(() => useLanguageSelection());
 
-    const { result, rerender } = renderHook(() => useLanguageSelection());
-
-    act(() => {
+    await act(async () => {
       result.current.onSelect('de');
     });
-    rerender();
 
     expect(result.current.selectedLanguage).toBe('de');
-    expect(mockI18n.changeLanguage).toHaveBeenCalledWith('de');
+    expect(i18n.resolvedLanguage).toBe('de');
   });
 
-  it('keeps mounted selectors in sync after changing language on mobile', () => {
-    mockI18n.language = 'en';
-    mockI18n.resolvedLanguage = 'en';
-    mockI18n.changeLanguage.mockReset();
-    mockI18n.changeLanguage.mockImplementation((language: string) => {
-      mockI18n.language = language;
-      mockI18n.resolvedLanguage = language;
-      return Promise.resolve();
-    });
-
-    const { result, rerender } = renderHook(() => ({
+  it('keeps mounted selectors in sync after changing language on mobile', async () => {
+    const { result } = renderHook(() => ({
       desktop: useLanguageSelection(),
       mobile: useLanguageSelection(),
     }));
 
-    act(() => {
+    await act(async () => {
       result.current.mobile.onSelect('de');
     });
-    rerender();
 
     expect(result.current.desktop.selectedLanguage).toBe('de');
     expect(result.current.mobile.selectedLanguage).toBe('de');
 
-    act(() => {
+    await act(async () => {
       result.current.desktop.onSelect('en');
     });
 
-    expect(mockI18n.changeLanguage).toHaveBeenNthCalledWith(2, 'en');
+    expect(result.current.desktop.selectedLanguage).toBe('en');
+    expect(result.current.mobile.selectedLanguage).toBe('en');
   });
 
   it('does not call changeLanguage when selecting the already-active language', () => {
-    mockI18n.resolvedLanguage = 'en';
-    mockI18n.changeLanguage.mockClear();
-
+    const changeLanguage = vi.spyOn(i18n, 'changeLanguage');
     const { result } = renderHook(() => useLanguageSelection());
 
     act(() => {
       result.current.onSelect('en');
     });
 
-    expect(mockI18n.changeLanguage).not.toHaveBeenCalled();
+    expect(changeLanguage).not.toHaveBeenCalled();
   });
 });
