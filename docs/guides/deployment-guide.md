@@ -21,13 +21,13 @@ Client-side routes are rewritten to `index.html` via `vercel.json`, so direct na
 
 ## Environment variables
 
-Set these in the Vercel project settings for both Preview and Production. Vite inlines them at build time, so a change needs a redeploy.
+Set these in the Vercel project settings for both Preview and Production. Preview and Production use separate Sentry projects (ADR 0014), so each environment gets its own DSN. Vite inlines them at build time, so a change needs a redeploy.
 
 | Variable | Required | Value |
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` | Yes | The Supabase project URL. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | The publishable key (`sb_publishable_…`) from the Supabase dashboard, under API keys. The app fails at start-up without it. |
-| `VITE_SENTRY_DSN` | Production only | The Sentry DSN. Leave unset in Preview to disable error reporting there (see `docs/standards/observability-standard.md`). |
+| `VITE_SENTRY_DSN` | Yes | The DSN of the environment's Sentry project. Without it, errors in that environment aren't reported (see `docs/standards/observability-standard.md`). |
 
 ## Releasing a database change
 
@@ -38,7 +38,7 @@ Once per machine, authenticate and link the shared project: `npx supabase login`
 1. Apply the migrations: `npx supabase db push`.
 2. Load the production data. The scripts live in the gitignored `supabase/data/` and are idempotent (`insert … on conflict`, relying on the table's natural key), so running one again is safe. Run each script against the linked project: `npx supabase db query -f ./supabase/data/<script>.sql --linked`. Never run one against a local or CI database (see `docs/standards/testing-standard.md`).
 3. Merge, so Vercel deploys the frontend.
-4. Smoke-check the deployed app: the page lists rows, and `VITE_SENTRY_DSN` is set in Production so a failure would be reported.
+4. Smoke-check the deployed app: the page lists rows, and `VITE_SENTRY_DSN` is set so a failure would be reported.
 
 Adding a value the database restricts needs more than a migration. A new nationality needs a migration that widens the `players_nationality_known` check, a flag in `src/localization/flags.ts`, and a name in each locale file.
 
