@@ -62,11 +62,11 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 #### Phase 1: Standards
 
-- Check code against `docs/standards/` files. Align code to comply with the standards.
+- Check every changed file against each standard whose trigger in the Standards list above matches the change, and fix every violation. Done when every rule of those standards holds for the change.
 
 #### Phase 2: ADRs
 
-- Check code against the accepted ADRs in `docs/adr/`. Align code to comply with the architecture decisions.
+- Check every changed file against the accepted ADRs (see `docs/adr/README.md`) that touch its area, and fix every violation. Done when the change follows each of them. If the change needs to depart from an accepted ADR, stop and ask the user: the departure is a new ADR that supersedes it.
 
 #### Phase 3: Automated Verification
 
