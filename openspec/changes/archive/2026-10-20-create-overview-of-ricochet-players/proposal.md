@@ -36,7 +36,7 @@ The app has a Players section in its nav, but the page behind it only shows a he
   - **Seed data** and **mock data** are fictional.
 
   `AGENTS.md` gets a pointer to it, and the Definition of Done checks tests against it.
-- Update the E2E guide (`docs/guides/e2e-tests-guide.md`). It will say that Docker and a running local Supabase (`supabase start`) are required before integration and E2E tests on macOS, in the dev container, and in CI. It will also cover how the tests get the local URL and publishable key, how to reset to **seed data** (`supabase db reset`), and that CI starts Supabase itself.
+- Update the E2E guide (`docs/guides/testing-guide.md`). It will say that Docker and a running local Supabase (`supabase start`) are required before integration and E2E tests on macOS, in the dev container, and in CI. It will also cover how the tests get the local URL and publishable key, how to reset to **seed data** (`supabase db reset`), and that CI starts Supabase itself.
 
 ## Capabilities
 
@@ -71,7 +71,7 @@ _None._
 - `docs/standards/testing-standard.md`: new standard for test data per test level (**mock data**, **seed data**, interception, no **production data**).
 - `docs/adr/`: a new ADR deciding against TanStack Table for this table: a plain domain query function and Shadcn `table` markup are used instead, with triggers for revisiting the decision.
 - `AGENTS.md`: a "Testing" entry under Standards pointing to `docs/standards/testing-standard.md`.
-- `docs/guides/e2e-tests-guide.md`: the local Supabase prerequisite (Docker, `supabase start`, environment variables, `supabase db reset`) for each environment, and how CI starts Supabase.
+- `docs/guides/testing-guide.md`: the local Supabase prerequisite (Docker, `supabase start`, environment variables, `supabase db reset`) for each environment, and how CI starts Supabase.
 - Production: the product owner applies the migration and runs the **production data** script by hand. Previews share the production database, so both steps run once. The migration only adds a table, so it is safe to apply before merging.
 
 ## Out of Scope
