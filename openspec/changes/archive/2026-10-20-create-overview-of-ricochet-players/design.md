@@ -225,7 +225,7 @@ flowchart LR
 - Read the key from `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
 - The publishable key runs requests as the `anon` role, so the RLS policy (`to anon, authenticated`) and the revoked grants (D2) apply unchanged.
 - Local and CI runs use the CLI's `PUBLISHABLE_KEY` (D8). The installed Supabase CLI (v2.119) already reports it in `supabase status -o json`.
-- Update the wording in `docs/standards/security-standard.md` and `docs/standards/observability-standard.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment.md`.
+- Update the wording in `docs/standards/security-standard.md` and `docs/standards/observability-standard.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment-guide.md`.
 
 *Alternative:* keep the legacy JWT anon key. Rejected: Supabase is phasing out the JWT-based keys. Publishable keys can be rotated on their own without rotating the JWT secret, and the switch is cheapest now, while only one client file reads the key.
 

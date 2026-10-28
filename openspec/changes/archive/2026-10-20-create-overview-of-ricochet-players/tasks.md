@@ -1,7 +1,7 @@
 ## 1. Prefactoring: publishable key
 
 - [x] 1.1 Read the key from `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/client-api/supabaseClient.ts` (keeping the fail-fast error, renamed), `src/vite-env.d.ts`, and `.env.example` (D10)
-- [x] 1.2 Change "anon key" to "publishable key" in `docs/standards/security-standard.md` and `docs/standards/observability-standard.md`, and list the required Vercel variables in `docs/guides/deployment.md`
+- [x] 1.2 Change "anon key" to "publishable key" in `docs/standards/security-standard.md` and `docs/standards/observability-standard.md`, and list the required Vercel variables in `docs/guides/deployment-guide.md`
 - [x] 1.3 Verify: `npm run typecheck`, `npm run build`, and the existing E2E suite pass with a local `.env.local` that sets the new variable
 
 ## 2. Prefactoring: test infrastructure for a local Supabase
@@ -12,7 +12,7 @@
 - [x] 2.4 Pass the helper's values to `vitest.integration.config.ts` through `test.env` and to `playwright.config.ts` through `webServer.env`; verify that a `.env.local` pointing at a non-local URL doesn't reach a test run
 - [x] 2.5 Make component unit tests possible: include `src/**/*.unit.test.tsx` in `vitest.unit.config.ts` and `vitest.config.ts`, using the `jsdom` environment for those files
 - [x] 2.6 Add the `npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime` step before the integration tests in `.github/workflows/verification-checks.yml`, and a `supabase:types` npm script (`supabase gen types typescript --local > src/client-api/database.types.ts`)
-- [x] 2.7 Update `docs/guides/e2e-tests.md`: Docker and `supabase start` are required before integration and E2E tests on macOS, in the dev container, and in CI; how the tests get the local URL and publishable key; `supabase db reset` restores the **seed data**; CI starts Supabase itself
+- [x] 2.7 Update `docs/guides/e2e-tests-guide.md`: Docker and `supabase start` are required before integration and E2E tests on macOS, in the dev container, and in CI; how the tests get the local URL and publishable key; `supabase db reset` restores the **seed data**; CI starts Supabase itself
 - [x] 2.8 Verify: with Supabase stopped, `npm run test:integration` fails fast with the helper's message; with it started, `npm run test:all` passes
 
 ## 3. Prefactoring: shared flags and UI primitives
@@ -105,5 +105,5 @@
 - [x] 15.1 Rename `src/client-api/` to `src/repositories/` (including the `supabase:types` script and the ESLint boundary element), and let `repositories` import `domain`
 - [x] 15.2 Make `playerSchema` in `src/domain/players/player.ts` the only player schema and infer `Player` from it; remove `PlayerRowInput`, `playerRowSchema`, and `toPlayer` from the domain
 - [x] 15.3 Move `toPlayer` to `src/repositories/players/toPlayer.ts` (generated row type in, validated `Player` out) with its unit tests and row mock builders, and replace `fetchPlayerRows()` with `fetchPlayers(): Promise<Player[]>`; `usePlayers()` wraps it in `useQuery`
-- [x] 15.4 Update `docs/standards/project-structure-standard.md`, `docs/standards/testing-standard.md`, `docs/guides/e2e-tests.md`, design D3, and the proposal impact list
+- [x] 15.4 Update `docs/standards/project-structure-standard.md`, `docs/standards/testing-standard.md`, `docs/guides/e2e-tests-guide.md`, design D3, and the proposal impact list
 - [x] 15.5 Record the decision in ADR 0012, superseding ADR 0003, and point the standard, ESLint messages, and design at it

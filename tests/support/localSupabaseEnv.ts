@@ -12,7 +12,7 @@ export type LocalSupabaseEnv = {
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
 const NOT_RUNNING_MESSAGE =
-  'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/e2e-tests.md).';
+  'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/e2e-tests-guide.md).';
 
 function readStatus(): Record<string, unknown> {
   let output: string;

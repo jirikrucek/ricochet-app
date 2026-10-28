@@ -34,12 +34,12 @@
 
 ### Guides
 
-- **issue tracker**: when creating, reading, updating, or triaging an issue or PR, read `docs/guides/issue-tracker.md` first
-- **triage labels**: when applying a triage label, read `docs/guides/triage-labels.md` first
-- **ADRs**: when creating or updating an ADR, read `docs/guides/adrs.md` first
-- **E2E tests**: when running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` first
-- **observability**: when verifying instrumentation or setting up Sentry alerts, read `docs/guides/observability.md` first
-- **deployment**: when touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment.md` first
+- **issue tracker**: when creating, reading, updating, or triaging an issue or PR, read `docs/guides/issue-tracker-guide.md` first
+- **triage labels**: when applying a triage label, read `docs/guides/triage-labels-guide.md` first
+- **ADRs**: when creating or updating an ADR, read `docs/guides/adrs-guide.md` first
+- **E2E tests**: when running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests-guide.md` first
+- **observability**: when verifying instrumentation or setting up Sentry alerts, read `docs/guides/observability-guide.md` first
+- **deployment**: when touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment-guide.md` first
 
 ### Standards
 

@@ -6,7 +6,7 @@ This is a client-only SPA ([ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core
 
 Error reporting is wired once, in `src/lib/sentry.ts`, `src/app/observability/` and `src/app/providers/AppProviders.tsx`:
 
-- `initSentry(router)` (from `src/lib/sentry.ts`) runs once in `main.tsx` before render. It does nothing when `VITE_SENTRY_DSN` is unset, so local dev needs no special-casing. The DSN stays blank in `.env.example` and is set per environment (see [deployment guide](../guides/deployment.md)).
+- `initSentry(router)` (from `src/lib/sentry.ts`) runs once in `main.tsx` before render. It does nothing when `VITE_SENTRY_DSN` is unset, so local dev needs no special-casing. The DSN stays blank in `.env.example` and is set per environment (see [deployment guide](../guides/deployment-guide.md)).
 - `AppErrorBoundary` wraps the app, reports render errors, and shows a translated fallback screen.
 - The shared `QueryClient` reports every failed query and mutation through its `QueryCache`/`MutationCache` `onError`, with the query or mutation key attached.
 
@@ -41,4 +41,4 @@ A custom metric or span attribute must use a bounded label set (route template, 
 
 ## Alerting
 
-Alert on symptoms, not causes (an app-wide error-rate spike, a new unseen error type), never on a single low-severity `Sentry.logger.warn`. Every alert uses one of two severities, page (act now) or ticket (act this week), and links to a short runbook. Setting them up is described in the [observability guide](../guides/observability.md).
+Alert on symptoms, not causes (an app-wide error-rate spike, a new unseen error type), never on a single low-severity `Sentry.logger.warn`. Every alert uses one of two severities, page (act now) or ticket (act this week), and links to a short runbook. Setting them up is described in the [observability guide](../guides/observability-guide.md).
