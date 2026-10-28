@@ -240,6 +240,27 @@ export default tseslint.config(
     },
   },
   {
+    // docs/standards/project-structure.md: import siblings and children with
+    // './', everything else under src/ with '@/'. Use Sentry.logger, not
+    // console (docs/standards/observability.md).
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['..', '../**'],
+              message:
+                "Import files outside this folder with the '@/' alias instead of '../'.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Pixel baselines are OS- and renderer-specific, so e2e tests must not
     // use them (ADR 0009).
     files: ['tests/e2e/**/*.ts'],

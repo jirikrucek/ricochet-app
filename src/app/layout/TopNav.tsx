@@ -2,15 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/brand/ricochet-logo.svg';
-import { LanguageSelect } from '../../localization/language-selection/LanguageSelect';
+import logo from '@/assets/brand/ricochet-logo.svg';
+import { LanguageSelect } from '@/localization/language-selection/LanguageSelect';
 import {
   Sheet,
   SheetClose,
   SheetContent,
   SheetTitle,
   SheetTrigger,
-} from '../../ui/sheet';
+} from '@/ui/sheet';
 
 // A brand name, identical in every UI language, so not a translation key.
 const BRAND_NAME = 'Ricochet';

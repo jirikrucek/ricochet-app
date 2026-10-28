@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchPlayers } from '../../../repositories/players/fetchPlayers';
+import { fetchPlayers } from '@/repositories/players/fetchPlayers';
 
 // The query key names the table, so the shared QueryCache.onError reports a
 // failure with enough context to find it in Supabase's logs

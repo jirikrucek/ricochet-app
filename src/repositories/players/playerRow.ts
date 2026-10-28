@@ -1,4 +1,4 @@
-import type { Database } from '../database.types';
+import type { Database } from '@/repositories/database.types';
 
 // The columns the players repository selects.
 export const playerColumns =

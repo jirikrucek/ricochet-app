@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router';
-import { AppFooter } from '../app/layout/AppFooter';
-import { TopNav } from '../app/layout/TopNav';
+import { AppFooter } from '@/app/layout/AppFooter';
+import { TopNav } from '@/app/layout/TopNav';
 
 function RootLayout() {
   return (

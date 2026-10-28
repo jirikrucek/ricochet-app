@@ -1,4 +1,4 @@
-import { playerSchema, type Player } from '../../domain/players/player';
+import { playerSchema, type Player } from '@/domain/players/player';
 import type { PlayerRow } from './playerRow';
 
 // Renames the columns to the domain's fields, then validates against the

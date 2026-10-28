@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { supabase } from '../supabaseClient';
+import { supabase } from '@/repositories/supabaseClient';
 
 // The abuse case for the players RLS policy and revoked grants
 // (docs/standards/security.md): the browser's publishable key can read

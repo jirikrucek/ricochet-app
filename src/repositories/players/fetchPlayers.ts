@@ -1,8 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import type { Player } from '../../domain/players/player';
-import type { Database } from '../database.types';
-import { supabase } from '../supabaseClient';
+import type { Player } from '@/domain/players/player';
+import type { Database } from '@/repositories/database.types';
+import { supabase } from '@/repositories/supabaseClient';
 import { playerColumns } from './playerRow';
 import { toPlayer } from './toPlayer';
 

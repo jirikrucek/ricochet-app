@@ -6,10 +6,10 @@ import {
   type Nationality,
   type Player,
   type Sex,
-} from '../../../domain/players/player';
-import { all, type OrAll } from '../../../domain/players/playerOverviewSearch';
-import { presentNationalities } from '../../../domain/players/queryPlayers';
-import { Flag } from '../../../localization/Flag';
+} from '@/domain/players/player';
+import { all, type OrAll } from '@/domain/players/playerOverviewSearch';
+import { presentNationalities } from '@/domain/players/queryPlayers';
+import { Flag } from '@/localization/Flag';
 import { FilterSelect, type FilterOption } from './FilterSelect';
 
 export function SexFilter({

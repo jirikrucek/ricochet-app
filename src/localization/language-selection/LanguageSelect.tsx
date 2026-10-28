@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { SupportedLanguage } from '../languages';
+import type { SupportedLanguage } from '@/localization/languages';
 import { LanguageOption } from './LanguageOption';
 import { useLanguageSelection } from './useLanguageSelection';
 import {
@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../ui/select';
+} from '@/ui/select';
 
 type LanguageSelectProps = {
   id?: string;

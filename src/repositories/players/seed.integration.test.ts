@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { supabase } from '../supabaseClient';
+import { supabase } from '@/repositories/supabaseClient';
 
 // E2E expectations (counts, sort orders, page numbers) depend on these facts
 // about supabase/seed.sql, so an edit to the seed fails here first.

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sentry } from './sentry';
+import { Sentry } from '@/lib/sentry';
 
 function ErrorFallback() {
   const { t } = useTranslation();
