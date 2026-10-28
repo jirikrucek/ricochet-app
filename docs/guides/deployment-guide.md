@@ -1,4 +1,4 @@
-# Deployment
+# Deployment Guide
 
 This repository is configured for Vercel deployment from the repo root.
 

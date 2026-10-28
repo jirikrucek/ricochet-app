@@ -1,4 +1,4 @@
-# Observability
+# Observability Standard
 
 This is a client-only SPA ([ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core-stack.md)) — there is no application server to instrument. Observability here means: client errors reach Sentry, logs are structured and queryable, and what gets alerted on are user-facing symptoms, not backend causes.
 

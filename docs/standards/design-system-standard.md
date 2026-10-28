@@ -1,4 +1,4 @@
-# Design System
+# Design System Standard
 
 This project uses a design system defined in DESIGN.md.
 

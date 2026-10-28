@@ -1,4 +1,4 @@
-# Testing
+# Testing Standard
 
 Rules for what data each test level may use and how tests reach a database. The decision and its reasons are in [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md).
 

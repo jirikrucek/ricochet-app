@@ -1,4 +1,4 @@
-# Security
+# Security Standard
 
 This project uses Supabase with the client-side publishable key (`sb_publishable_…`, which runs requests as the `anon` Postgres role) exposed to the browser (see [ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core-stack.md)). Row-Level Security (RLS) is the only access control boundary between that key and the database — there is no server tier in front of it.
 

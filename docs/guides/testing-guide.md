@@ -1,4 +1,4 @@
-# Testing
+# Testing Guide
 
 The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the dev container and in GitHub Actions. It builds the app into `dist-e2e/` and serves it with `vite preview` on `127.0.0.1:4173`. Set `E2E_PORT` to use another port. The run fails fast if the port is already taken. It uses a production build, not `vite dev`, because every test loads the page in a fresh browser context: the dev server serves hundreds of unbundled modules per load, and parallel workers timed those loads out.
 

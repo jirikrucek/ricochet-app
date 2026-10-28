@@ -1,4 +1,4 @@
-# ADRs
+# ADRs Guide
 
 ADRs live in `docs/adr/` and use sequential numbering: `ADR0001-slug.md`, `ADR0002-slug.md`, etc.
 
