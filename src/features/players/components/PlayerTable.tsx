@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/ui/table';
+import { Button } from '@/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 // Cells wrap instead of scrolling, so the table fits a 320px viewport.
@@ -69,10 +70,10 @@ export function PlayerTable({
       <TableHeader>
         <TableRow>
           <TableHead aria-sort={ariaSort} className={cellClassName}>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={onToggleSort}
-              className="-mx-xs inline-flex items-center gap-xs rounded-xs px-xs text-left font-medium outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="-mx-xs h-auto gap-xs! px-xs! text-left hover:bg-transparent hover:text-ink"
             >
               {t('players.columns.surname')}
               <SortIcon
@@ -80,7 +81,7 @@ export function PlayerTable({
                 data-sort-indicator={ariaSort}
                 className="size-4 shrink-0"
               />
-            </button>
+            </Button>
           </TableHead>
           <TableHead className={cellClassName}>
             {t('players.columns.firstName')}

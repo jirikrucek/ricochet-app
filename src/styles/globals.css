@@ -118,6 +118,13 @@
     letter-spacing: -0.18px;
   }
 
+  .type-title-sm {
+    font-size: var(--text-title-sm);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
   .type-body-md {
     font-size: var(--text-body-md);
     font-weight: 400;
@@ -136,6 +143,21 @@
     font-size: var(--text-caption-sm);
     font-weight: 400;
     line-height: 1.23;
+    letter-spacing: 0;
+  }
+
+  /* button-md after button-sm, so a Button can opt up to it with className. */
+  .type-button-sm {
+    font-size: var(--text-button-sm);
+    font-weight: 500;
+    line-height: 1.29;
+    letter-spacing: 0;
+  }
+
+  .type-button-md {
+    font-size: var(--text-button-md);
+    font-weight: 500;
+    line-height: 1.25;
     letter-spacing: 0;
   }
 

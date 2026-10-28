@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sentry } from '@/lib/sentry';
+import { Button } from '@/ui/button';
 
 function ErrorFallback() {
   const { t } = useTranslation();
@@ -9,13 +10,12 @@ function ErrorFallback() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-base px-base text-center">
       <h1 className="type-display-sm">{t('errors.unexpectedTitle')}</h1>
       <p className="type-body-md">{t('errors.unexpectedDescription')}</p>
-      <button
-        type="button"
+      <Button
+        className="h-auto rounded-sm px-base! py-sm type-button-md"
         onClick={() => window.location.reload()}
-        className="rounded-sm bg-primary px-base py-sm text-button-md text-primary-foreground"
       >
         {t('errors.reload')}
-      </button>
+      </Button>
     </div>
   );
 }

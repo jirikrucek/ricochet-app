@@ -155,13 +155,13 @@ function CompactPageLinks({
     >
       <PaginationContent className="w-full justify-between gap-xs">
         <PreviousItem page={page} />
-        <PaginationItem aria-hidden="true" className="text-muted">
+        <PaginationItem aria-hidden="true" className="type-body-md text-muted">
           ·
         </PaginationItem>
         <PaginationItem className="type-body-md text-ink">
           {t('players.pagination.pageOf', { page, count: pageCount })}
         </PaginationItem>
-        <PaginationItem aria-hidden="true" className="text-muted">
+        <PaginationItem aria-hidden="true" className="type-body-md text-muted">
           ·
         </PaginationItem>
         <NextItem page={page} pageCount={pageCount} />

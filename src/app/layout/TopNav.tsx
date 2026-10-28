@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/ui/sheet';
+import { Button } from '@/ui/button';
 
 // A brand name, identical in every UI language, so not a translation key.
 const BRAND_NAME = 'Ricochet';
@@ -24,8 +25,7 @@ function tabletMediaQuery() {
   return `(min-width: ${width})`;
 }
 
-const iconButtonClassName =
-  'inline-flex size-xxl shrink-0 items-center justify-center rounded-full text-ink outline-none transition-colors hover:bg-surface-strong focus-visible:ring-3 focus-visible:ring-ring/50';
+const iconButtonClassName = 'rounded-full text-ink hover:bg-accent';
 
 export function TopNav() {
   const { t } = useTranslation();
@@ -71,13 +71,13 @@ export function TopNav() {
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetTrigger
             aria-label={t('nav.openMenu')}
+            render={<Button variant="ghost" size="icon-xl" />}
             className={`${iconButtonClassName} tablet:hidden`}
           >
             <MenuIcon aria-hidden="true" className="size-lg" />
           </SheetTrigger>
           <SheetContent
             side="right"
-            showCloseButton={false}
             className="max-w-80 gap-lg p-base data-[side=right]:sm:max-w-80"
           >
             <div className="flex items-center justify-between">
@@ -86,6 +86,7 @@ export function TopNav() {
               </SheetTitle>
               <SheetClose
                 aria-label={t('nav.closeMenu')}
+                render={<Button variant="ghost" size="icon-xl" />}
                 className={iconButtonClassName}
               >
                 <XIcon aria-hidden="true" className="size-lg" />

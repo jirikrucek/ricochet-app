@@ -498,6 +498,7 @@ Inter is used at its default metrics across the full type scale — no line-heig
 - **City link grid (homepage footer):** 6-column grid at desktop with each cell housing a city name in `{typography.title-md}` and a category sub-label in `{typography.body-sm}` muted.
 - **Listing detail:** 2-column with photo / amenity body on the left (~64% width) and a sticky reservation card (`{component.reservation-card}`) on the right (~32%).
 - **Footer:** 3-column link list (Support / Hosting / About) at desktop, collapsing to 1-column on mobile.
+- **Form field width:** inline filter fields (for example the select boxes above a table) are 240px wide from tablet up, so a row of them lines up without stretching; on mobile they take the full width.
 
 ### Whitespace Philosophy
 
