@@ -7,12 +7,15 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/ui/button';
+import { buttonVariants } from './button';
 
-function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
+// The label is required: it is user-facing text, so the caller translates it.
+function Pagination({
+  className,
+  ...props
+}: React.ComponentProps<'nav'> & { 'aria-label': string }) {
   return (
     <nav
-      aria-label="pagination"
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
@@ -89,9 +92,9 @@ function PaginationDisabled({
 
 function PaginationPrevious({
   className,
-  text = 'Previous',
+  text,
   ...props
-}: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+}: React.ComponentProps<typeof PaginationLink> & { text: string }) {
   return (
     <PaginationLink
       size="default"
@@ -106,9 +109,9 @@ function PaginationPrevious({
 
 function PaginationNext({
   className,
-  text = 'Next',
+  text,
   ...props
-}: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+}: React.ComponentProps<typeof PaginationLink> & { text: string }) {
   return (
     <PaginationLink
       size="default"

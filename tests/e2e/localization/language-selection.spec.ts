@@ -33,6 +33,21 @@ test('changes the app language from the selector', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('follows the app language in the page title and lang attribute', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(page).toHaveTitle('Ricochet App');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
+  await page.getByRole('combobox', { name: 'Language' }).click();
+  await page.getByRole('option', { name: 'Čeština' }).click();
+
+  await expect(page).toHaveTitle('Aplikace Ricochet');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
+});
+
 test('shows native names regardless of active locale', async ({ page }) => {
   await page.goto('/');
 

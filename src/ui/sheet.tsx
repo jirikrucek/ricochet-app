@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@/lib/utils';
 
-import { Button } from '@/ui/button';
+import { Button } from './button';
 import { XIcon } from 'lucide-react';
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
@@ -38,12 +38,17 @@ function SheetContent({
   className,
   children,
   side = 'right',
-  showCloseButton = true,
+  showCloseButton = false,
+  closeLabel,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: 'top' | 'right' | 'bottom' | 'left';
-  showCloseButton?: boolean;
-}) {
+} &
+  // The close button's label is user-facing text, so the caller translates it.
+  (
+    | { showCloseButton?: false; closeLabel?: never }
+    | { showCloseButton: true; closeLabel: string }
+  )) {
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -69,7 +74,7 @@ function SheetContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{closeLabel}</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>
@@ -101,7 +106,7 @@ function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn('text-title-sm font-medium text-foreground', className)}
+      className={cn('type-title-sm text-foreground', className)}
       {...props}
     />
   );

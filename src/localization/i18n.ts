@@ -5,6 +5,14 @@ import { initReactI18next } from 'react-i18next';
 import { defaultLanguage, supportedLanguages } from './languages';
 import { resources } from './locales/resources';
 
+// The tab title and the page's lang attribute follow the UI language, so the
+// browser and assistive technology use it too. Registered before init, which
+// emits the first languageChanged.
+i18n.on('languageChanged', () => {
+  document.documentElement.lang = i18n.resolvedLanguage ?? defaultLanguage;
+  document.title = i18n.t('app.title');
+});
+
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
