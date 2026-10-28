@@ -16,7 +16,8 @@ Without a DSN, local dev stays silent by design. That is expected, not a bug.
 
 Alert rules live in Sentry, not in the repo.
 
-- Alert on a symptom, for example:
+- Satisfy the Alerting rules in `docs/standards/observability-standard.md`: a symptom, one of two severities, a linked runbook.
+- Example of a symptom (page-worthy) versus a cause:
 
   ```text
   SYMPTOM (page-worthy):                 Not this:
@@ -24,8 +25,8 @@ Alert rules live in Sentry, not in the repo.
   a new, unseen error type appears
   ```
 
-- Use only two severities: page (act now) and ticket (act this week). A third tier trains people to ignore alerts.
-- Link every alert to a short runbook: what it means and the first thing to check.
+- A third severity tier trains people to ignore alerts, so keep to page and ticket.
+- Write the runbook as: what the alert means and the first thing to check.
 
 ## Revisit
 

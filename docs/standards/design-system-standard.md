@@ -15,8 +15,7 @@ The "no custom hex values" rule governs UI styling. Vendored artwork rendered as
 ## Where things live
 
 - The DESIGN.md tokens, the typography primitives and the app-level base styles live in `src/styles/globals.css`, the only stylesheet (the project has one frontend surface).
-- Shadcn UI components live in `src/ui/`; the `cn()` utility is in `src/lib/utils.ts`. The rules above apply to them too: after `shadcn add` or an update, replace numeric spacing and `text-xs`/`text-sm` with the nearest token. Where no token matches a size (for example 6px or 10px), round up to the next token.
-- The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`.
+- The rules above apply to the Shadcn primitives in `src/ui/` too: after `shadcn add` or an update, replace numeric spacing and `text-xs`/`text-sm` with the nearest token. Where no token matches a size (for example 6px or 10px), round up to the next token.
 
 ## Token naming convention
 
@@ -39,4 +38,4 @@ Dark mode is **not currently supported**. Do not add `dark:*` classes or dark-th
 
 ## DESIGN.md
 
-DESIGN.md is the source of the tokens, and `src/styles/globals.css` must match it. DESIGN.md must pass `npm run design:lint` (0 errors). It is part of the Definition of Done and the Verification checks workflow.
+DESIGN.md is the source of the tokens, and `src/styles/globals.css` must match it; a unit test compares them. DESIGN.md must pass `npm run design:lint` (0 errors).

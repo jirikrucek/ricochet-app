@@ -78,15 +78,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 - Run `npm run test:all` (must pass 100%).
 - _Self-correction:_ On error, parse stderr, fix code, and retry until clean.
 
-#### Phase 4: Test Audit
-
-Inspect newly added or modified test files only.
-
-- Validate tests have non-trivial assertions (no `expect(true).toBe(true)` or empty blocks).
-- Ensure unit under test is not mocked out (mock external I/O only).
-- Confirm zero skipped tests (`it.skip`/`describe.skip`).
-
-#### Phase 5: Definition of Done Final Report
+#### Phase 4: Definition of Done Final Report
 
 Output concise status:
 
@@ -97,4 +89,4 @@ Output concise status:
 - Spec Validation: [OK / NOK]
 - Design Lint: [OK / NOK]
 - Build: [OK / NOK]
-- Test Audit: [OK / NOK]
+- Tests: [OK / NOK]

@@ -41,4 +41,4 @@ A custom metric or span attribute must use a bounded label set (route template, 
 
 ## Alerting
 
-Alert on symptoms, not causes (an app-wide error-rate spike, a new unseen error type), never on a single low-severity `Sentry.logger.warn`. Every alert uses one of two severities, page (act now) or ticket (act this week), and links to a short runbook. How to set up and verify them is in the [observability guide](../guides/observability.md).
+Alert on symptoms, not causes (an app-wide error-rate spike, a new unseen error type), never on a single low-severity `Sentry.logger.warn`. Every alert uses one of two severities, page (act now) or ticket (act this week), and links to a short runbook. Setting them up is described in the [observability guide](../guides/observability.md).

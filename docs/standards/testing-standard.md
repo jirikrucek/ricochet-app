@@ -10,7 +10,7 @@ Rules for what data each test level may use and how tests reach a database. The 
 | Integration | `src/**/*.integration.test.ts` | **Seed data** in the local Supabase | Local only |
 | E2E | `tests/e2e/**/*.spec.ts` | **Seed data** in the local Supabase | Local only |
 
-- **Unit tests use mock data only.** They never make network calls or create a Supabase client; a component test mocks the repository function it uses, and a repository test passes in a fake client (the module under test loads `supabaseClient.ts`, so the test stubs the two `VITE_SUPABASE_*` variables first). Mock external I/O (a CLI call, `fetch`), never the unit under test. A component unit test gets a fresh `QueryClient` with `retry: false`.
+- **Unit tests use mock data only.** They never reach the network; a component test mocks the repository function it uses, and a repository test passes in a fake client (loading `supabaseClient.ts` needs the two `VITE_SUPABASE_*` variables, so the test stubs them first). A component unit test gets a fresh `QueryClient` with `retry: false`.
 - **Integration and E2E tests run against the local Supabase** (`supabase start`), loaded with the migrations and `supabase/seed.sql`. They only read the shared seed, so they can run in parallel. A test that needs to prove a write is refused may try it, but must assert that the data is unchanged afterwards.
 - **E2E tests intercept Supabase requests only for states the seed data can't produce**, such as an empty table, a server error, or a specific subset of rows. Everything else goes to the real local API.
 - **Production data is never used by any test.** It is never committed, never copied into the seed or a fixture, and never loaded into a local or CI database. Production data scripts live in the gitignored `supabase/data/`.
@@ -19,8 +19,8 @@ Rules for what data each test level may use and how tests reach a database. The 
 ## Reaching the database
 
 - Every test that reaches a database gets its URL and publishable key from `tests/support/localSupabaseEnv.ts`. It reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`.
-- The test configs pass those values as process environment variables (`test.env` in `vitest.integration.config.ts`, `webServer.env` in `playwright.config.ts`). Process variables take precedence over `.env*` files, so a `.env.local` pointing at a shared project can't reach a test run.
-- Don't hand-write connection settings (URLs, keys) in a test or a config.
+- The Vitest integration project and Playwright (its global setup and the web server wrapper) put those values in the process environment. Process variables take precedence over `.env*` files, so a `.env.local` pointing at a shared project can't reach a test run.
+- A test that reaches a database never hand-writes connection settings (URLs, keys), in the test or in a config.
 
 ## Seed data
 
@@ -35,6 +35,7 @@ Rules for what data each test level may use and how tests reach a database. The 
 
 ## Test quality
 
+- Mock external I/O only (a CLI call, `fetch`), never the unit under test.
 - Every test has a non-trivial assertion. No `expect(true).toBe(true)` and no empty test bodies.
 - No skipped tests (`it.skip`, `describe.skip`, `test.skip`) in committed code.
 - E2E tests assert structure (roles, attributes, sizes), never pixels, because screenshots differ per OS ([ADR 0009](../adr/ADR0009-e2e-tests-do-not-use-pixel-snapshots.md)). ESLint rejects `toHaveScreenshot` and `toMatchSnapshot` in `tests/e2e`.
