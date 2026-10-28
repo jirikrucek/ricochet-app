@@ -2,11 +2,11 @@
 
 - Status: Accepted
 - Created: 2026-08-03
-- Updated: 2026-08-03
+- Updated: 2026-10-28
 
 ## Context
 
-The language selector (`apps/web/src/routes/index.tsx`) showed each language's name translated into the *currently active* UI language (e.g. "English" rendered as "Angličtina" when Czech was active). Users found this confusing when trying to locate their own language.
+The language selector (`apps/web/src/routes/index.tsx`) showed each language's name translated into the *currently active* UI language (e.g. "English" rendered as "Angličtina" when Czech was active). Visitors found this confusing when trying to locate their own language.
 
 ## Decision
 
@@ -21,7 +21,7 @@ Show each language as its native-language name (endonym) plus a country flag ico
 
 Native names are a static, locale-invariant map — not translation resources — since they don't change based on the active UI language.
 
-Flag SVGs are vendored into `apps/web/src/assets/flags/` (MIT-licensed, sourced from the `circle-flags` project) and imported as local assets rather than loaded from a third-party CDN at runtime. Only six flags are needed, so bundling them keeps the selector working offline, avoids taking an availability/privacy dependency on an external host, and sidesteps future CSP tightening. Each SVG is small enough that Vite inlines it as a `data:` URI in the built bundle — no separate network request at all.
+Flag SVGs are vendored into `src/assets/flags/` (MIT-licensed, sourced from the `circle-flags` project) and imported as local assets rather than loaded from a third-party CDN at runtime. Only six flags are needed, so bundling them keeps the selector working offline, avoids taking an availability/privacy dependency on an external host, and sidesteps future CSP tightening. Each SVG is small enough that Vite inlines it as a `data:` URI in the built bundle — no separate network request at all.
 
 English is mapped to the GB flag rather than a generic/placeholder flag (`xx`) or a custom composite GB/US graphic: a real ISO country flag keeps every entry visually consistent with the same component and rendering path, and no combined-flag asset exists in any standard flag-icon set.
 

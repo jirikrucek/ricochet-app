@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-21
-- Updated: 2026-10-19
+- Updated: 2026-10-28
 
 ## Context
 
@@ -44,3 +44,7 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
 - Positive: easier AI-assisted changes due to predictable patterns and localized responsibilities.
 - Negative: requires team discipline to avoid bypassing repositories or mixing state layers.
 - Negative: adds initial architectural setup overhead versus ad hoc feature coding.
+
+## Notes
+
+- ADR 0012 defines the seam between the UI and Supabase and takes precedence over the "FE/BE decoupling" bullets above: features reach data only through repositories that return domain types, with no separate service layer.
