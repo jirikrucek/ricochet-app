@@ -1,0 +1,5 @@
+interface:
+  display_name: "Validate Guides"
+  short_description: "Validate that the guides in docs/guides work as written."
+policy:
+  allow_implicit_invocation: false
