@@ -30,13 +30,13 @@
 - **references** (`docs/references/`): production readiness and non-functional requirements checklists
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
-- **ADRs** (`docs/adr/`): accepted architecture and design decisions (created or updated using /architectural-decision-records skill)
+- **ADRs** (`docs/adr/`): architecture and design decisions, indexed with their status in `docs/adr/README.md`
 
 ### Guides
 
 - **issue tracker**: when creating, reading, updating, or triaging an issue or PR, read `docs/guides/issue-tracker-guide.md` first
 - **triage labels**: when applying a triage label, read `docs/guides/triage-labels-guide.md` first
-- **ADRs**: when creating or updating an ADR, read `docs/guides/adrs-guide.md` first
+- **ADRs**: when deciding whether a decision needs an ADR, or writing, editing, or superseding one, read `docs/guides/adrs-guide.md` first
 - **testings**: when running or debugging tests, read `docs/guides/testing-guide.md` first
 - **observability**: when verifying instrumentation or setting up Sentry alerts, read `docs/guides/observability-guide.md` first
 - **deployment**: when touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment-guide.md` first
@@ -54,7 +54,7 @@
 - Must use Conventional Commits when creating commit messages
 - Must use Conventional Branch when creating branches
 - Must use /pr skill when writing a PR body
-- Must read ADRs in `docs/adr/` that touch the area you're about to work in before exploring the codebase for a task
+- Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task
 
 ### Definition of Done
 
@@ -66,7 +66,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 #### Phase 2: ADRs
 
-- Check code against `docs/adr/` files. Align code to comply with the architecture decisions.
+- Check code against the accepted ADRs in `docs/adr/`. Align code to comply with the architecture decisions.
 
 #### Phase 3: Automated Verification
 
