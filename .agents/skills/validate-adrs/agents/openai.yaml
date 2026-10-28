@@ -1,0 +1,5 @@
+interface:
+  display_name: "Validate ADRs"
+  short_description: "Validate that the ADRs in docs/adr are sound."
+policy:
+  allow_implicit_invocation: false
