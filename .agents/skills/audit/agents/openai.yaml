@@ -1,0 +1,5 @@
+interface:
+  display_name: "Audit"
+  short_description: "Audit the codebase for violations of the standards and accepted ADRs, fix the approved ones, and commit after review."
+policy:
+  allow_implicit_invocation: false
