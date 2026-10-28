@@ -41,7 +41,7 @@ There are only two ways to change an ADR: edit it in place, or supersede it with
 
 When superseding:
 
-- Leave the old ADR's body alone. Change only its `Status` and `Updated` lines.
+- Leave the old ADR's body alone. Change only its `Status` and `Updated` lines. Later, fix only broken links and renamed paths in it, bumping `Updated`.
 - The new ADR must stand on its own. A reader should never need the superseded ADR to know what currently applies.
 - If the old ADR bundled several decisions and only one changes, the old ADR is still fully superseded. Write a new ADR for the changed decision, and move each decision that still holds into its own new ADR.
 
