@@ -68,6 +68,9 @@ export default tseslint.config(
     files: ['src/**/*.{ts,tsx}'],
     plugins: { boundaries },
     settings: {
+      // Required: the default resolver only understands .js/.json, so without
+      // the TypeScript one extensionless imports ('./languages') go
+      // unresolved and every boundaries rule silently stops checking them.
       'import/resolver': {
         typescript: true,
       },

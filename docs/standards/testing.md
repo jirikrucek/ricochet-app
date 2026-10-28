@@ -2,9 +2,6 @@
 
 Rules for what data each test level may use and how tests reach a database. The decision and its reasons are in [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md).
 
-For any change that adds or edits a test:
-- Read this file first.
-
 ## Test levels and their data
 
 | Level | Files | Data | Reaches Supabase |
@@ -13,7 +10,7 @@ For any change that adds or edits a test:
 | Integration | `src/**/*.integration.test.ts` | **Seed data** in the local Supabase | Local only |
 | E2E | `tests/e2e/**/*.spec.ts` | **Seed data** in the local Supabase | Local only |
 
-- **Unit tests use mock data only.** They never import `src/repositories/supabaseClient.ts` or make network calls; a component test mocks the repository function it uses. Mock external I/O (a CLI call, `fetch`), never the unit under test. A component unit test gets a fresh `QueryClient` with `retry: false`.
+- **Unit tests use mock data only.** They never make network calls or create a Supabase client; a component test mocks the repository function it uses, and a repository test passes in a fake client (the module under test loads `supabaseClient.ts`, so the test stubs the two `VITE_SUPABASE_*` variables first). Mock external I/O (a CLI call, `fetch`), never the unit under test. A component unit test gets a fresh `QueryClient` with `retry: false`.
 - **Integration and E2E tests run against the local Supabase** (`supabase start`), loaded with the migrations and `supabase/seed.sql`. They only read the shared seed, so they can run in parallel. A test that needs to prove a write is refused may try it, but must assert that the data is unchanged afterwards.
 - **E2E tests intercept Supabase requests only for states the seed data can't produce**, such as an empty table, a server error, or a specific subset of rows. Everything else goes to the real local API.
 - **Production data is never used by any test.** It is never committed, never copied into the seed or a fixture, and never loaded into a local or CI database. Production data scripts live in the gitignored `supabase/data/`.
@@ -27,7 +24,7 @@ For any change that adds or edits a test:
 
 ## Seed data
 
-- `supabase/seed.sql` holds the fictional rows that integration and E2E expectations depend on. `supabase db reset` restores it.
+- `supabase/seed.sql` holds the fictional rows that integration and E2E expectations depend on.
 - When a test relies on a count or an edge case in the seed, a seed integration test checks it, so a later edit to the seed fails there first.
 - Every new table that tests depend on gets fictional rows in `supabase/seed.sql`.
 

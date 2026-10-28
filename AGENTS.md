@@ -30,7 +30,7 @@
 - **references** (`docs/references/`): production readiness and non-functional requirements checklists
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
-- **ADRs** (`docs/adr/`): accepted architecture and design decisions (created or updated using /architectural-decision-records skill)  
+- **ADRs** (`docs/adr/`): accepted architecture and design decisions (created or updated using /architectural-decision-records skill)
 
 ### Guides
 
@@ -38,6 +38,7 @@
 - **triage labels**: when applying a triage label, read `docs/guides/triage-labels.md` first
 - **ADRs**: when creating or updating an ADR, read `docs/guides/adrs.md` first
 - **E2E tests**: when running or debugging E2E tests (Playwright), read `docs/guides/e2e-tests.md` first
+- **observability**: when verifying instrumentation or setting up Sentry alerts, read `docs/guides/observability.md` first
 - **deployment**: when touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment.md` first
 
 ### Standards
