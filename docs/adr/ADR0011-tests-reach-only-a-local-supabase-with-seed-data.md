@@ -21,7 +21,7 @@ Tests use data according to their level:
 
 Every test that reaches a database gets its URL and publishable key from a single helper (`tests/support/localSupabaseEnv.ts`). The helper reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`. Test configs pass these values through process environment variables, so they take precedence over any `.env*` file. CI starts the local Supabase itself and uses the same helper.
 
-`docs/standards/testing.md` holds the detailed rules. This ADR records the decision and the reasons behind it.
+`docs/standards/testing-standard.md` holds the detailed rules. This ADR records the decision and the reasons behind it.
 
 ## Alternatives Considered
 

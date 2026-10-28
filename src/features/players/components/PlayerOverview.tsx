@@ -31,7 +31,7 @@ export function PlayerOverview() {
 }
 
 // Failures reach Sentry through the shared QueryCache.onError
-// (docs/standards/observability.md), so the states here only inform the
+// (docs/standards/observability-standard.md), so the states here only inform the
 // visitor.
 function PlayerOverviewContent() {
   const { t } = useTranslation();

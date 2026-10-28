@@ -5,7 +5,7 @@ import {
 } from 'vitest/config';
 
 // Unit tests use mock data only and never reach Supabase
-// (docs/standards/testing.md). Component tests (.tsx) need a DOM.
+// (docs/standards/testing-standard.md). Component tests (.tsx) need a DOM.
 export const unitProjects: TestProjectInlineConfiguration[] = [
   {
     extends: true,

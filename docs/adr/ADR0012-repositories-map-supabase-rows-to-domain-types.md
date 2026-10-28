@@ -27,7 +27,7 @@ Repositories map Supabase rows to domain types and validate them with domain sch
 - `domain` owns the domain types and the Zod schemas they are inferred from (`playerSchema` → `Player`), plus the business rules. It knows nothing about storage: no row shapes, no column names. It imports nothing else from `src/`.
 - `repositories` may import `domain` and `lib`. `domain` may not import `repositories`.
 - Each feature's `api/` subfolder (its TanStack Query hooks) is the only part of a feature allowed to import `repositories`. It owns query keys, caching, and retries. Components and stores never import `repositories` or `@supabase/supabase-js`.
-- `eslint-plugin-boundaries` enforces these rules (`docs/standards/project-structure.md`).
+- `eslint-plugin-boundaries` enforces these rules (`docs/standards/project-structure-standard.md`).
 
 ## Alternatives Considered
 
@@ -42,7 +42,7 @@ Repositories map Supabase rows to domain types and validate them with domain sch
 - Positive: a renamed column fails typechecking at the query that selects it. A value the generated types can't narrow, such as a `text` nationality, fails at parse time and surfaces as the query's error state, not as a partial list.
 - Positive: any feature's `api/` can reuse a repository, so a domain type is mapped in one place.
 - Negative: `repositories` now depend on `domain`. Replacing Supabase means rewriting the mappers together with the queries.
-- Negative: a feature's `api/` hook can be a thin `useQuery` wrapper around one repository call. It still earns its place by owning the query key, which the shared `QueryCache.onError` uses to correlate failures (`docs/standards/observability.md`).
+- Negative: a feature's `api/` hook can be a thin `useQuery` wrapper around one repository call. It still earns its place by owning the query key, which the shared `QueryCache.onError` uses to correlate failures (`docs/standards/observability-standard.md`).
 - Follow-up: a write path, such as for tournaments, follows the same rule in reverse: the repository takes a domain type and maps it to an insert or update row.
 
 ## Notes

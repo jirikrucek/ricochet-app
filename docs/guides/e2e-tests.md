@@ -2,7 +2,7 @@
 
 The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the dev container and in GitHub Actions. It builds the app into `dist-e2e/` and serves it with `vite preview` on `127.0.0.1:4173`. Set `E2E_PORT` to use another port. The run fails fast if the port is already taken. It uses a production build, not `vite dev`, because every test loads the page in a fresh browser context: the dev server serves hundreds of unbundled modules per load, and parallel workers timed those loads out.
 
-Which data each test level may use is set by `docs/standards/testing.md` (see [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)).
+Which data each test level may use is set by `docs/standards/testing-standard.md` (see [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)).
 
 ## Local Supabase
 

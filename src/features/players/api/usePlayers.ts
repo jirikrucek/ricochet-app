@@ -4,7 +4,7 @@ import { fetchPlayers } from '@/repositories/players/fetchPlayers';
 
 // The query key names the table, so the shared QueryCache.onError reports a
 // failure with enough context to find it in Supabase's logs
-// (docs/standards/observability.md).
+// (docs/standards/observability-standard.md).
 export const playersQueryKey = ['players'] as const;
 
 // The players change only when someone loads them by hand, so a visit within

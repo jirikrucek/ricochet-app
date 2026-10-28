@@ -27,7 +27,7 @@ import { buildPlayer } from '@/domain/players/playerMocks';
 import i18n from '@/localization/i18n';
 import { PlayerOverview } from './PlayerOverview';
 
-// Mock data only (docs/standards/testing.md): the players repository is the
+// Mock data only (docs/standards/testing-standard.md): the players repository is the
 // one piece of external I/O, so it is the only thing mocked.
 const fetchPlayers = vi.fn<() => Promise<Player[]>>();
 

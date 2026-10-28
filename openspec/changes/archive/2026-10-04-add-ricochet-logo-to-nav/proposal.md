@@ -36,7 +36,7 @@ _None._
 - `src/assets/brand/ricochet-logo.svg`: new vendored logo SVG. No new runtime dependency.
 - `public/favicon.svg` (new `public/` directory) and `index.html`: the logo-mark favicon and its `<link>`.
 - `src/styles/globals.css`: a named `tablet` (744px) breakpoint token matching DESIGN.md.
-- `docs/standards/design-system.md`: note that vendored brand and flag artwork may keep its own colours.
+- `docs/standards/design-system-standard.md`: note that vendored brand and flag artwork may keep its own colours.
 - `docs/adr/ADR0008-vendored-brand-artwork-keeps-its-own-colours.md`: new ADR recording that exception.
 - Tests: Playwright E2E checks for the logo and its accessible name at desktop and phone viewports, and for the hamburger sheet's navigation and language selection. Existing e2e tests that use the language selector at desktop width are unaffected. Existing e2e assertions on the page heading "Ricochet App" are unaffected.
 

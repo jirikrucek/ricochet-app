@@ -43,11 +43,11 @@
 
 ### Standards
 
-- **project structure**: when adding, moving, or renaming files, read `docs/standards/project-structure.md` first
-- **design system**: when creating or modifying UI (components, pages, layouts, styles), read `docs/standards/design-system.md` first
-- **testing**: when adding or editing a test (unit, integration, or E2E), or test configuration, read `docs/standards/testing.md` first
-- **security**: when adding or editing a Supabase migration (tables, RLS policies), read `docs/standards/security.md` first
-- **observability**: when adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability.md` first
+- **project structure**: when adding, moving, or renaming files, read `docs/standards/project-structure-standard.md` first
+- **design system**: when creating or modifying UI (components, pages, layouts, styles), read `docs/standards/design-system-standard.md` first
+- **testing**: when adding or editing a test (unit, integration, or E2E), or test configuration, read `docs/standards/testing-standard.md` first
+- **security**: when adding or editing a Supabase migration (tables, RLS policies), read `docs/standards/security-standard.md` first
+- **observability**: when adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability-standard.md` first
 
 ## General Rules
 

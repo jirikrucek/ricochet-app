@@ -8,7 +8,7 @@ import {
 } from './overview';
 
 // The seed can't produce these states, so these tests intercept the players
-// request (docs/standards/testing.md).
+// request (docs/standards/testing-standard.md).
 const PLAYERS_API = '**/rest/v1/players*';
 
 // TanStack Query retries a failed query 3 times with backoff (about 7 s)

@@ -240,9 +240,9 @@ export default tseslint.config(
     },
   },
   {
-    // docs/standards/project-structure.md: import siblings and children with
+    // docs/standards/project-structure-standard.md: import siblings and children with
     // './', everything else under src/ with '@/'. Use Sentry.logger, not
-    // console (docs/standards/observability.md).
+    // console (docs/standards/observability-standard.md).
     files: ['src/**/*.{ts,tsx}'],
     rules: {
       'no-console': 'error',

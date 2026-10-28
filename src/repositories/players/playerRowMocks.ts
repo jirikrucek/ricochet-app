@@ -1,7 +1,7 @@
 import type { PlayerRow } from './playerRow';
 
 // Mock rows for unit tests of the players repository's mapping
-// (docs/standards/testing.md). Fictional people only.
+// (docs/standards/testing-standard.md). Fictional people only.
 
 let nextId = 1;
 

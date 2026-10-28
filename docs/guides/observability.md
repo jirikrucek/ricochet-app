@@ -1,6 +1,6 @@
 # Observability
 
-How to verify instrumentation and set up alerts. The rules they must satisfy are in `docs/standards/observability.md`.
+How to verify instrumentation and set up alerts. The rules they must satisfy are in `docs/standards/observability-standard.md`.
 
 ## Verify instrumentation
 

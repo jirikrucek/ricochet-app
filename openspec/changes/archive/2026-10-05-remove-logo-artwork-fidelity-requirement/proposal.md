@@ -28,7 +28,7 @@ None.
 
 - Changing the logo asset (`src/assets/brand/ricochet-logo.svg`) or the favicon.
 - Editing the archived change `2026-10-04-add-ricochet-logo-to-nav`, which stays as a historical record.
-- ADR 0008 and `docs/standards/design-system.md`: they describe why vendored artwork keeps its own colours, which is unaffected.
+- ADR 0008 and `docs/standards/design-system-standard.md`: they describe why vendored artwork keeps its own colours, which is unaffected.
 - The other branding requirements (home link, accessible name, sharpness, fit, favicon).
 
 ## Traceability

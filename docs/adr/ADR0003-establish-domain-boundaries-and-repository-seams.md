@@ -47,4 +47,4 @@ Centralized repository/service interfaces per domain were chosen for long-term m
 
 ## Notes
 
-- The concrete folder mapping for these domain modules (`src/domain/*`, `src/client-api/*`) and how the boundary is enforced by lint rules are defined in ADR 0007 and `docs/standards/project-structure.md`, superseding the mapping originally in ADR 0004.
+- The concrete folder mapping for these domain modules (`src/domain/*`, `src/client-api/*`) and how the boundary is enforced by lint rules are defined in ADR 0007 and `docs/standards/project-structure-standard.md`, superseding the mapping originally in ADR 0004.

@@ -27,7 +27,7 @@ The app has a Players section in its nav, but the page behind it only shows a he
   - Page states: loading, an error with Retry (reported per the observability standard), "No players yet" when the table is empty, and "No players match the selected filters" with a Clear filters action.
 - Add translations for all new UI text, country names, and sex labels in all six supported languages.
 - Run tests against a local Supabase: CI starts Supabase in Docker, applies migrations and **seed data**, and passes its URL and publishable key to integration and E2E tests. Locally, `supabase start` becomes a prerequisite for `npm run test:all`.
-- Add a testing standard (`docs/standards/testing.md`) that sets the data rules for every test level:
+- Add a testing standard (`docs/standards/testing-standard.md`) that sets the data rules for every test level:
   - Unit tests use **mock data** only and never reach Supabase.
   - Integration and E2E tests run against the local Supabase with **seed data**.
   - E2E tests intercept Supabase requests only for states the **seed data** can't produce, such as an empty table or a server error.
@@ -65,12 +65,12 @@ _None._
   - Integration tests run the repository and hook against the local Supabase **seed data**.
   - Playwright E2E tests cover listing, sorting, filtering, pagination, and URL state against the **seed data**. Only the "No players yet" and error scenarios intercept `/rest/v1/players` to return an empty list or a 500.
 - `.github/workflows/verification-checks.yml`: a step that starts local Supabase before the integration and E2E tests, which read its URL and publishable key through the same helper as on a developer machine (adds roughly 1–3 minutes).
-- `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, `.env.example`: the app switches from the legacy anon key to the publishable key (`VITE_SUPABASE_PUBLISHABLE_KEY`). The product owner sets it in Vercel before the merge. `docs/standards/security.md`, `docs/standards/observability.md`, and `docs/guides/deployment.md` are updated to match.
-- `docs/standards/project-structure.md` and `eslint.config.mjs`: `routes` may import `domain`, so a route can validate its search params with a domain schema (already updated).
+- `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, `.env.example`: the app switches from the legacy anon key to the publishable key (`VITE_SUPABASE_PUBLISHABLE_KEY`). The product owner sets it in Vercel before the merge. `docs/standards/security-standard.md`, `docs/standards/observability-standard.md`, and `docs/guides/deployment.md` are updated to match.
+- `docs/standards/project-structure-standard.md` and `eslint.config.mjs`: `routes` may import `domain`, so a route can validate its search params with a domain schema (already updated).
 - `docs/adr/ADR0002-adopt-type-safe-frontend-architecture.md`: the line prescribing TanStack Table was removed, with a dated note (already updated).
-- `docs/standards/testing.md`: new standard for test data per test level (**mock data**, **seed data**, interception, no **production data**).
+- `docs/standards/testing-standard.md`: new standard for test data per test level (**mock data**, **seed data**, interception, no **production data**).
 - `docs/adr/`: a new ADR deciding against TanStack Table for this table: a plain domain query function and Shadcn `table` markup are used instead, with triggers for revisiting the decision.
-- `AGENTS.md`: a "Testing" entry under Standards pointing to `docs/standards/testing.md`.
+- `AGENTS.md`: a "Testing" entry under Standards pointing to `docs/standards/testing-standard.md`.
 - `docs/guides/e2e-tests.md`: the local Supabase prerequisite (Docker, `supabase start`, environment variables, `supabase db reset`) for each environment, and how CI starts Supabase.
 - Production: the product owner applies the migration and runs the **production data** script by hand. Previews share the production database, so both steps run once. The migration only adds a table, so it is safe to apply before merging.
 

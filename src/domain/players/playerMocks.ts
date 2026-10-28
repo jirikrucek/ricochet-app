@@ -1,6 +1,6 @@
 import type { Player } from './player';
 
-// Mock data builders for unit tests (docs/standards/testing.md). Fictional
+// Mock data builders for unit tests (docs/standards/testing-standard.md). Fictional
 // people only.
 
 let nextId = 1;
