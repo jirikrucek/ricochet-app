@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 
 // The only way a test reaches a database (docs/standards/testing-standard.md, ADR 0011).
 // Reads the running local Supabase from the CLI instead of from .env* files,
-// so a developer's .env.local pointing at the shared project can't leak in.
+// so a developer's .env.local pointing at a hosted project can't leak in.
 
 export type LocalSupabaseEnv = {
   VITE_SUPABASE_URL: string;

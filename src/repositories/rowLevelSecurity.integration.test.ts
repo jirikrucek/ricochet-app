@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 // publishable key (docs/standards/security-standard.md), so every table in
 // `public` must have it enabled. The publishable key can't read the catalog,
 // so this asks the local database through the Supabase CLI. `--local` keeps
-// it off the shared project (ADR 0011).
+// it off the hosted projects (ADR 0011).
 const sql = `
   select c.relname as table_name, c.relrowsecurity as rls_enabled
   from pg_class c

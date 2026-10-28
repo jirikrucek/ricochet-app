@@ -31,7 +31,7 @@ Every test that reaches a database gets its URL and publishable key from a singl
 
 ## Consequences
 
-- Positive: tests can't reach **production data**, even when a developer's `.env.local` points at the shared project.
+- Positive: tests can't reach **production data**, even when a developer's `.env.local` points at a hosted project.
 - Positive: one setup works in all three environments, and `supabase db reset` restores a known state.
 - Positive: RLS policies and migrations are tested against a real Postgres.
 - Negative: Docker and a running `supabase start` are now required for `npm run test:all`, and CI takes about 1–3 minutes longer.
