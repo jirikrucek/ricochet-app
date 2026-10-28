@@ -4,30 +4,14 @@ How to verify instrumentation and set up alerts. The rules they must satisfy are
 
 ## Verify instrumentation
 
-Before calling instrumentation done for a change:
+Before calling instrumentation done for a change, run the app with `npm run dev` and a real DSN in `.env.local` (`VITE_SENTRY_DSN`). Make each temporary edit below, check the result, then revert it.
 
-1. Set `VITE_SENTRY_DSN` to a real DSN in `.env.local`, throw a test error locally, and confirm it lands in Sentry with the expected `extra` context (the query or mutation key).
-2. Force a render error and confirm the error boundary fallback renders and is translated. Trigger it, don't just review the code.
+1. **Failed query.** Make a `queryFn` throw, for example `queryFn: () => { throw new Error('sentry test'); }` in `src/features/players/api/usePlayers.ts`. Open the page and confirm the error lands in Sentry with `extra.queryKey` set. For a mutation, check `extra.mutationKey`.
+2. **Render error.** Throw during render, for example `throw new Error('render test')` at the top of `PlayerOverview` in `src/features/players/components/PlayerOverview.tsx`. Confirm `AppErrorBoundary` shows the fallback screen in the selected language and the error lands in Sentry.
 3. Spot-check that no secrets or tokens appear in anything you logged.
 
 Without a DSN, local dev stays silent by design. That is expected, not a bug.
 
 ## Set up an alert
 
-Alert rules live in Sentry, not in the repo.
-
-- Satisfy the Alerting rules in `docs/standards/observability-standard.md`: a symptom, one of two severities, a linked runbook.
-- Example of a symptom (page-worthy) versus a cause:
-
-  ```text
-  SYMPTOM (page-worthy):                 Not this:
-  error rate spike across the app        a single low-severity Sentry.logger.warn call
-  a new, unseen error type appears
-  ```
-
-- A third severity tier trains people to ignore alerts, so keep to page and ticket.
-- Write the runbook as: what the alert means and the first thing to check.
-
-## Revisit
-
-`tracesSampleRate` is `1.0` in `src/lib/sentry.ts`, which is fine at current traffic. Lower it if ingestion volume or cost becomes a concern before considering a second vendor.
+Alert rules live in Sentry, not in the repo. Satisfy the Alerting rules in `docs/standards/observability-standard.md`. Write the runbook as: what the alert means and the first thing to check.
