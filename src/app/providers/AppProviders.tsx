@@ -6,9 +6,9 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
-import { router } from '../../router';
-import { AppErrorBoundary } from '../observability/AppErrorBoundary';
-import { Sentry } from '../observability/sentry';
+import { router } from '@/router';
+import { AppErrorBoundary } from '@/app/observability/AppErrorBoundary';
+import { Sentry } from '@/lib/sentry';
 
 const ReactQueryDevtools = lazy(() =>
   import('@tanstack/react-query-devtools').then((module) => ({

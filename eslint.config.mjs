@@ -6,6 +6,12 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
+const parentImportsPattern = {
+  group: ['..', '../**'],
+  message:
+    "Import files outside this folder with the '@/' alias instead of '../'.",
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -68,6 +74,9 @@ export default tseslint.config(
     files: ['src/**/*.{ts,tsx}'],
     plugins: { boundaries },
     settings: {
+      // Required: the default resolver only understands .js/.json, so without
+      // the TypeScript one extensionless imports ('./languages') go
+      // unresolved and every boundaries rule silently stops checking them.
       'import/resolver': {
         typescript: true,
       },
@@ -230,6 +239,59 @@ export default tseslint.config(
                   },
                 },
               },
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // docs/standards/project-structure-standard.md: import siblings and children with
+    // './', everything else under src/ with '@/'. Use Sentry.logger, not
+    // console (docs/standards/observability-standard.md).
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [parentImportsPattern],
+        },
+      ],
+    },
+  },
+  {
+    // docs/standards/project-structure-standard.md: the domain is pure business
+    // logic, so no UI, data-fetching or localization libraries (Supabase is
+    // already blocked everywhere but src/repositories by the boundaries policy).
+    // This replaces the src-wide no-restricted-imports above for these files,
+    // so it repeats the '../' pattern.
+    files: ['src/domain/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'fetch',
+          message: 'The domain does not fetch; repositories do (ADR 0012).',
+        },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            parentImportsPattern,
+            {
+              group: [
+                'react',
+                'react/*',
+                'react-dom',
+                'react-dom/*',
+                '@tanstack/*',
+                'i18next',
+                'react-i18next',
+              ],
+              message:
+                'The domain is pure business logic: no React, TanStack or i18next.',
             },
           ],
         },

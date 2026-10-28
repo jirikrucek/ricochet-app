@@ -18,20 +18,20 @@ import {
 } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Player } from '../../../domain/players/player';
+import type { Player } from '@/domain/players/player';
 import {
   playerOverviewSearchDefaults,
   playerOverviewSearchSchema,
-} from '../../../domain/players/playerOverviewSearch';
-import { buildPlayer } from '../../../domain/players/playerMocks';
-import i18n from '../../../localization/i18n';
+} from '@/domain/players/playerOverviewSearch';
+import { buildPlayer } from '@/domain/players/playerMocks';
+import i18n from '@/localization/i18n';
 import { PlayerOverview } from './PlayerOverview';
 
-// Mock data only (docs/standards/testing.md): the players repository is the
+// Mock data only (docs/standards/testing-standard.md): the players repository is the
 // one piece of external I/O, so it is the only thing mocked.
 const fetchPlayers = vi.fn<() => Promise<Player[]>>();
 
-vi.mock('../../../repositories/players/fetchPlayers', () => ({
+vi.mock('@/repositories/players/fetchPlayers', () => ({
   fetchPlayers: () => fetchPlayers(),
 }));
 

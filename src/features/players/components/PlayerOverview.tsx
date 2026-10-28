@@ -2,20 +2,20 @@ import { useMemo } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import type { Player } from '../../../domain/players/player';
+import type { Player } from '@/domain/players/player';
 import {
   all,
   type PlayerOverviewView,
-} from '../../../domain/players/playerOverviewSearch';
-import { queryPlayers } from '../../../domain/players/queryPlayers';
-import { pageBounds } from '../../../lib/pageRange';
-import { Button } from '../../../ui/button';
-import { usePlayers } from '../api/usePlayers';
+} from '@/domain/players/playerOverviewSearch';
+import { queryPlayers } from '@/domain/players/queryPlayers';
+import { pageBounds } from '@/lib/pageRange';
+import { Button } from '@/ui/button';
+import { usePlayers } from '@/features/players/api/usePlayers';
 import { NationalityFilter, SexFilter } from './PlayerFilters';
 import { PlayerPagination } from './PlayerPagination';
 import { PlayerTable, PlayerTableSkeleton } from './PlayerTable';
-import { useCanonicalPage } from '../hooks/useCanonicalPage';
-import { usePageChangeOrientation } from '../hooks/usePageChangeOrientation';
+import { useCanonicalPage } from '@/features/players/hooks/useCanonicalPage';
+import { usePageChangeOrientation } from '@/features/players/hooks/usePageChangeOrientation';
 
 const routeApi = getRouteApi('/players/');
 
@@ -31,7 +31,7 @@ export function PlayerOverview() {
 }
 
 // Failures reach Sentry through the shared QueryCache.onError
-// (docs/standards/observability.md), so the states here only inform the
+// (docs/standards/observability-standard.md), so the states here only inform the
 // visitor.
 function PlayerOverviewContent() {
   const { t } = useTranslation();

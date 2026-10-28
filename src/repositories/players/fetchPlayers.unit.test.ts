@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Database } from '../database.types';
+import type { Database } from '@/repositories/database.types';
 import { buildPlayerRow } from './playerRowMocks';
 import type { PlayerRow } from './playerRow';
 

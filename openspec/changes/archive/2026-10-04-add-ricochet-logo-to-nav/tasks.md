@@ -23,7 +23,7 @@ Each slice is a complete, demoable path. Work it test-first: write the listed E2
 - [x] 2.4 Commit the result as `src/assets/brand/ricochet-logo.svg`.
 - [x] 2.5 Record the colour exception (design D3):
   - Add `docs/adr/ADR0008-vendored-brand-artwork-keeps-its-own-colours.md`, citing ADR 0006's flags as precedent.
-  - Add a "Vendored artwork" note to `docs/standards/design-system.md`.
+  - Add a "Vendored artwork" note to `docs/standards/design-system-standard.md`.
 - [x] 2.6 Update `src/app/layout/TopNav.tsx` (design D2, D4):
   - Remove the placeholder `<svg>` and the "Ricochet" text.
   - Render `<img src={logo} alt="" aria-hidden="true" className="h-xl w-auto shrink-0">` inside the home `Link`.

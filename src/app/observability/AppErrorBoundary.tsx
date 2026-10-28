@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sentry } from './sentry';
+import { Sentry } from '@/lib/sentry';
 
 function ErrorFallback() {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ function ErrorFallback() {
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="rounded-sm bg-primary px-base py-2 text-button-md text-primary-foreground"
+        className="rounded-sm bg-primary px-base py-sm text-button-md text-primary-foreground"
       >
         {t('errors.reload')}
       </button>

@@ -46,7 +46,7 @@ export function rowFor(page: Page, surname: string, firstName: string) {
 }
 
 // Connection to the local Supabase, set by playwright.config.ts from
-// tests/support/localSupabaseEnv.ts (docs/standards/testing.md).
+// tests/support/localSupabaseEnv.ts (docs/standards/testing-standard.md).
 export function localSupabase() {
   const url = process.env.VITE_SUPABASE_URL;
   const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;

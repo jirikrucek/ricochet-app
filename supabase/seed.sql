@@ -1,4 +1,4 @@
--- Seed data: 100 fictional players for local runs and CI (docs/standards/testing.md).
+-- Seed data: 100 fictional players for local runs and CI (docs/standards/testing-standard.md).
 -- Never put production data here. E2E expectations depend on these rows, and
 -- src/repositories/players/seed.integration.test.ts checks the agreed facts:
 -- 100 players, 40 female, 24 CZ, 4 HU, no female GB, all six nationalities,

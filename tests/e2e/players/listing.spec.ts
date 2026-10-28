@@ -55,7 +55,7 @@ test.describe('Player overview lists every player in a table', () => {
 
   test('Table kept on a phone with an unbroken long name', async ({ page }) => {
     // The seed has no names this long, so intercept the players request
-    // (docs/standards/testing.md).
+    // (docs/standards/testing-standard.md).
     await page.route('**/rest/v1/players*', (route) =>
       route.fulfill({
         status: 200,

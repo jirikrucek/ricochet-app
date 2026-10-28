@@ -1,11 +1,6 @@
 # Custom ADR Template
 
-Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guides/adrs.md`.
-
-## File
-
-- Location: `docs/adr/ADRNNNN-kebab-case-slug.md`. Scan `docs/adr/` for the highest number and increment by one (4 digits).
-- Create an ADR only when the decision is hard to reverse, surprising without context, and a real trade-off (see `docs/guides/adrs.md`).
+Project-specific style. Matches the existing ADRs in `docs/adr/`. Naming, numbering, writing and changing rules are in `docs/guides/adrs-guide.md`.
 
 ## Template
 
@@ -39,10 +34,7 @@ Project-specific style. Matches the existing ADRs in `docs/adr/` and `docs/guide
 
 ```
 
-## Rules
+## Sections
 
-- One decision per ADR.
-- `Alternatives Considered`, `Consequences` and `Notes` are optional; include them only when they add value. Context and Decision are required.
-- Never rewrite an accepted ADR to change the decision. Add a new ADR and mark the old one `Superseded by ADR NNNN`.
-- Use terms from the glossary.
-- If the decision contradicts an existing ADR, say so explicitly.
+- Context and Decision are required.
+- `Alternatives Considered`, `Consequences` and `Notes` are optional; include them only when they add value.

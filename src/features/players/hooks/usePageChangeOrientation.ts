@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   isSameViewIgnoringPage,
   type PlayerOverviewView,
-} from '../../../domain/players/playerOverviewSearch';
+} from '@/domain/players/playerOverviewSearch';
 
 // After the visitor changes the page (a page link, Previous/Next, back or
 // forward), scroll to the top of the table, focus its caption, and announce

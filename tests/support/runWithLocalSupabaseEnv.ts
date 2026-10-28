@@ -4,7 +4,7 @@ import { localSupabaseEnv } from './localSupabaseEnv.ts';
 
 // Runs the command given as arguments with the local Supabase connection in
 // its environment: Playwright's web server builds the app, which must reach
-// only the local Supabase (docs/standards/testing.md). Resolving it here
+// only the local Supabase (docs/standards/testing-standard.md). Resolving it here
 // instead of in playwright.config.ts keeps loading that config (--list, every
 // worker) from needing Supabase.
 const [command, ...args] = process.argv.slice(2);

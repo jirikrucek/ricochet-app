@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-10-19
-- Updated: 2026-10-19
+- Updated: 2026-10-28
 
 ## Context
 
@@ -21,7 +21,7 @@ Tests use data according to their level:
 
 Every test that reaches a database gets its URL and publishable key from a single helper (`tests/support/localSupabaseEnv.ts`). The helper reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`. Test configs pass these values through process environment variables, so they take precedence over any `.env*` file. CI starts the local Supabase itself and uses the same helper.
 
-`docs/standards/testing.md` holds the detailed rules. This ADR records the decision and the reasons behind it.
+`docs/standards/testing-standard.md` holds the detailed rules. This ADR records the decision and the reasons behind it.
 
 ## Alternatives Considered
 
@@ -31,7 +31,7 @@ Every test that reaches a database gets its URL and publishable key from a singl
 
 ## Consequences
 
-- Positive: tests can't reach **production data**, even when a developer's `.env.local` points at the shared project.
+- Positive: tests can't reach **production data**, even when a developer's `.env.local` points at a hosted project.
 - Positive: one setup works in all three environments, and `supabase db reset` restores a known state.
 - Positive: RLS policies and migrations are tested against a real Postgres.
 - Negative: Docker and a running `supabase start` are now required for `npm run test:all`, and CI takes about 1–3 minutes longer.

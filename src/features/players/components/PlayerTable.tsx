@@ -6,9 +6,9 @@ import {
   formatSurname,
   type Nationality,
   type Player,
-} from '../../../domain/players/player';
-import type { SortDirection } from '../../../domain/players/playerOverviewSearch';
-import { Flag } from '../../../localization/Flag';
+} from '@/domain/players/player';
+import type { SortDirection } from '@/domain/players/playerOverviewSearch';
+import { Flag } from '@/localization/Flag';
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/tooltip';
+} from '@/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 // Cells wrap instead of scrolling, so the table fits a 320px viewport.
 const cellClassName = 'whitespace-normal wrap-break-word';

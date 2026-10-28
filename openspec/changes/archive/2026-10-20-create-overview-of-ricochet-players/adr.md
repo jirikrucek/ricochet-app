@@ -11,7 +11,7 @@ On 2026-10-20, during implementation, D3 changed: repositories now map Supabase 
 
 These design decisions were reviewed and did not get an ADR:
 
-- D1/D2, the `players` schema and the select-only RLS policy with revoked write grants. These are specific to this table. The RLS rule is already in `docs/standards/security.md`.
+- D1/D2, the `players` schema and the select-only RLS policy with revoked write grants. These are specific to this table. The RLS rule is already in `docs/standards/security-standard.md`.
 - D3, fetching all **players** once. This is tactical and easy to reverse. The design records when to revisit it.
 - D5–D7, the page-range helper, URL view state, and UI composition. URL state is already covered by ADR 0002. The rest are implementation details.
 - D9, how the seed and **production data** files are handled. This is covered by ADR 0011 and the new testing standard.

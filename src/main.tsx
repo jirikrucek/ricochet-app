@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { AppProviders } from './app/providers/AppProviders';
-import { initSentry } from './app/observability/sentry';
+import { initSentry } from '@/lib/sentry';
 import { router } from './router';
 import i18n from './localization/i18n';
 import './styles/globals.css';

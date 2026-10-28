@@ -114,7 +114,6 @@ typography:
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: 0.32px
-    textTransform: uppercase
   button-md:
     fontFamily: "'Inter', system-ui, sans-serif"
     fontSize: 16px

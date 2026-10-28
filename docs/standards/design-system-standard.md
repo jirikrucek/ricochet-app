@@ -1,26 +1,21 @@
-# Design System
+# Design System Standard
 
 This project uses a design system defined in DESIGN.md.
 
 For all UI work:
-- Read DESIGN.md before generating any component or style
-- Use the color tokens exactly as specified. No custom hex values.
+- Use the color tokens exactly as specified in DESIGN.md. No custom hex values.
 - Apply the type scale to all text elements
-- Use the spacing scale for margins, padding, and gaps
+- Use the spacing scale for margins, padding, and gaps. Use the named tokens (`p-base`, `gap-sm`), not numeric utilities (`p-4`, `gap-2`) or arbitrary values.
 - Do not introduce new design decisions without a reason
 
 ## Vendored artwork
 
 The "no custom hex values" rule governs UI styling. Vendored artwork rendered as an image keeps its intrinsic colours inside the asset file: the brand logo (`src/assets/brand/`), the favicon (`public/favicon.svg`) and the flag SVGs (`src/assets/flags/`). Don't map those fills to tokens, and don't reuse their hex values in component styles. See [ADR 0008](../adr/ADR0008-vendored-brand-artwork-keeps-its-own-colours.md).
 
-## Setup status
+## Where things live
 
-Tailwind CSS v4 and Shadcn UI are **installed and configured**:
-- Tailwind v4 is wired via `@tailwindcss/vite` in `vite.config.ts`
-- DESIGN.md tokens and typography primitives live in `src/styles/globals.css`
-- `src/styles/globals.css` owns both the Tailwind theme tokens and the app-level base styles because the project only has one frontend surface
-- The path alias `@/*` → `src/*` is set in `tsconfig.json` and `vite.config.ts`
-- Shadcn UI components live in `src/ui/`; the `cn()` utility is at `src/lib/utils.ts`
+- The DESIGN.md tokens, the typography primitives and the app-level base styles live in `src/styles/globals.css`, the only stylesheet (the project has one frontend surface).
+- The rules above apply to the Shadcn primitives in `src/ui/` too: after `shadcn add` or an update, replace numeric spacing and `text-xs`/`text-sm` with the nearest token. Where no token matches a size (for example 6px or 10px), round up to the next token.
 
 ## Token naming convention
 
@@ -35,21 +30,12 @@ Prefer Tailwind classes backed by the theme tokens. Inline `style={{ ... }}` is 
 
 ## Typography primitives
 
-Reusable typography classes are defined in `src/styles/globals.css`:
-
-- `type-display-xl`
-- `type-display-sm`
-- `type-body-md`
-- `type-caption`
-- `type-caption-sm`
-- `type-nav-link`
-
-Use them instead of repeating font size, weight, line-height, and tracking in component files.
+Reusable `type-*` classes (for example `type-body-md`, `type-caption`) are defined in `src/styles/globals.css`. Use them instead of repeating font size, weight, line-height, and tracking in component files. Add a new primitive there when a text style repeats; don't define it in a component.
 
 ## Dark mode
 
 Dark mode is **not currently supported**. Do not add `dark:*` classes or dark-theme token overrides until the product explicitly adopts a dark theme.
 
-## Validation
+## DESIGN.md
 
-Always validate the DESIGN.md file for structural correctness using `npx @google/design.md lint DESIGN.md` after making changes to it.
+DESIGN.md is the source of the tokens, and `src/styles/globals.css` must match it; a unit test compares them. DESIGN.md must pass `npm run design:lint` (0 errors).

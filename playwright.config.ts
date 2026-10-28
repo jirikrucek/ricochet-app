@@ -11,7 +11,7 @@ process.env.PLAYWRIGHT_BROWSERS_PATH ??= path.resolve(
 const port = Number(process.env.E2E_PORT ?? 4173);
 const baseURL = `http://127.0.0.1:${port}`;
 
-// E2E tests reach only the local Supabase (docs/standards/testing.md). The
+// E2E tests reach only the local Supabase (docs/standards/testing-standard.md). The
 // global setup and the web server wrapper find it, so loading this config
 // never needs it.
 export default defineConfig({

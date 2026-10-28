@@ -1,4 +1,4 @@
-import { Flag } from '../Flag';
+import { Flag } from '@/localization/Flag';
 
 type LanguageOptionProps = {
   nativeName: string;

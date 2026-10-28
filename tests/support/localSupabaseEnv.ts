@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
 
-// The only way a test reaches a database (docs/standards/testing.md, ADR 0011).
+// The only way a test reaches a database (docs/standards/testing-standard.md, ADR 0011).
 // Reads the running local Supabase from the CLI instead of from .env* files,
-// so a developer's .env.local pointing at the shared project can't leak in.
+// so a developer's .env.local pointing at a hosted project can't leak in.
 
 export type LocalSupabaseEnv = {
   VITE_SUPABASE_URL: string;
@@ -12,7 +12,7 @@ export type LocalSupabaseEnv = {
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
 const NOT_RUNNING_MESSAGE =
-  'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/e2e-tests.md).';
+  'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/testing-guide.md).';
 
 function readStatus(): Record<string, unknown> {
   let output: string;

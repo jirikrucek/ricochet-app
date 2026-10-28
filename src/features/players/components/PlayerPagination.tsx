@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import {
   pageSizes,
   type PageSize,
-} from '../../../domain/players/playerOverviewSearch';
-import { pageRange } from '../../../lib/pageRange';
+} from '@/domain/players/playerOverviewSearch';
+import { pageRange } from '@/lib/pageRange';
 import {
   Pagination,
   PaginationContent,
@@ -16,7 +16,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '../../../ui/pagination';
+} from '@/ui/pagination';
 import { FilterSelect } from './FilterSelect';
 
 type PlayerPaginationProps = {

@@ -6,7 +6,7 @@ import {
   resolveSupportedLanguage,
   supportedLanguages,
   type SupportedLanguage,
-} from '../languages';
+} from '@/localization/languages';
 
 export type LanguageOption = {
   value: SupportedLanguage;

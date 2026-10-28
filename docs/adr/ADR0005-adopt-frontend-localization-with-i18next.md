@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-22
-- Updated: 2026-08-10
+- Updated: 2026-10-28
 
 ## Context
 
@@ -12,7 +12,7 @@ Ricochet App must support multiple UI languages with English as default, while k
 
 Adopt `i18next` with `react-i18next` and browser language detection for frontend localization.
 
-- Use one locale file per supported language under `apps/web/src/localization/locales`.
+- Use one locale file per supported language under `src/localization/locales`.
 - Keep English (`en`) as the fallback language.
 - Support these language codes:
   - `en` (English)
@@ -22,9 +22,9 @@ Adopt `i18next` with `react-i18next` and browser language detection for frontend
   - `nl` (Dutch)
   - `hu` (Hungarian)
 - Store translation resources in a dedicated localization module:
-  - `apps/web/src/localization/i18n.ts`
-  - `apps/web/src/localization/resources.ts`
-  - `apps/web/src/localization/languages.ts`
+  - `src/localization/i18n.ts`
+  - `src/localization/locales/resources.ts`
+  - `src/localization/languages.ts`
 - Require user-facing text to be referenced by translation key (`t(...)`) instead of hardcoded strings.
 
 ## Alternatives Considered
@@ -43,4 +43,3 @@ Adopt `i18next` with `react-i18next` and browser language detection for frontend
 ## Notes
 
 - This ADR extends ADR 0002 by defining how user-facing text is managed in the frontend architecture.
-- Paths above use the `apps/web/src/...` prefix from the monorepo layout in place at the time (ADR 0004). Since ADR 0007, the same modules live at `src/localization/...` at the repository root — see `docs/standards/project-structure.md`. The decision itself (i18next, one locale file per language, translation-key discipline) is unchanged.

@@ -1,5 +1,5 @@
 -- Players listed on the player overview. Public and read-only: every visitor
--- can select, nobody can write through the API (docs/standards/security.md).
+-- can select, nobody can write through the API (docs/standards/security-standard.md).
 -- Rows are loaded by hand (production data) or by supabase/seed.sql (local, CI).
 
 create type public.player_sex as enum ('male', 'female');

@@ -1,0 +1,105 @@
+# Project Structure Standard
+
+This project is a single npm package (see [ADR 0007](../adr/ADR0007-adopt-single-package-layout.md)). There is one `package.json`, one `src/`, at the repository root — no `apps/*` or `packages/*` workspaces.
+
+Place every file in the folder its scope below allows, and respect the dependency graph. The graph is enforced by `eslint-plugin-boundaries` (see [Enforcement](#enforcement)) — a violation fails `npm run lint`.
+
+## Folder layout
+
+```text
+ricochet-app/
+├── public/                    # Static assets served as-is (favicon) — not imported by code
+├── src/
+│   ├── app/                     # Composition root: wires the app shell, owns nothing domain-specific
+│   │   ├── providers/              # QueryClientProvider (with error reporting), RouterProvider
+│   │   ├── layout/                  # Global chrome: TopNav, AppFooter — rendered by routes/__root.tsx
+│   │   └── observability/            # AppErrorBoundary
+│   ├── domain/                   # Pure business logic. No React. No Supabase. (ADR 0012)
+│   │   ├── players/                  # One folder per domain module
+│   │   └── shared/                    # Cross-domain primitives
+│   ├── repositories/             # Supabase adapter: queries, row → domain mapping. (ADR 0012)
+│   │   └── players/                    # One folder per domain module
+│   ├── features/                 # Feature UI slices, one subfolder per domain module
+│   │   └── players/
+│   │       ├── api/                     # TanStack Query hooks — the only part of a feature allowed to import repositories
+│   │       ├── components/
+│   │       └── hooks/                    # Feature-local React hooks (not data fetching — that is api/)
+│   ├── routes/                    # TanStack Router file-based routes + loaders
+│   ├── ui/                        # Shadcn UI primitives — domain-agnostic
+│   ├── localization/               # i18next setup, locale files, and the language-selection UI
+│   │   ├── locales/
+│   │   └── language-selection/
+│   ├── lib/                        # Generic framework utilities (cn(), pageRange, sentry.ts) — no business rules
+│   ├── styles/                     # Tailwind directives + CSS design tokens (globals.css)
+│   └── assets/                     # Bundler-processed static assets imported by components (brand/, flags/)
+│
+├── supabase/                  # Local Supabase: config.toml, migrations/, seed.sql
+├── tests/
+│   ├── e2e/                       # Playwright specs
+│   └── support/                    # Test tooling: local Supabase env helpers for Vitest and Playwright
+├── docs/
+└── openspec/
+```
+
+`src/` also holds the entry point (`main.tsx`), the router instance (`router.tsx`), the generated route tree (`routeTree.gen.ts`, gitignored — do not hand-edit) and `vite-env.d.ts`. Config files (ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root.
+
+A folder for a domain module (for example `tournaments`, `auth`) is created in each layer when the module gets its first code — not before.
+
+Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`), matching current convention. Only Playwright e2e specs live under a separate `tests/e2e/` folder.
+
+## Folder responsibilities
+
+| Folder | Scope & allowed artifacts |
+| :--- | :--- |
+| `src/app/` | Composition root: provider wiring, global layout chrome, and the error boundary. No domain logic, no feature components. |
+| `src/domain/` | Pure business logic: domain types and the Zod schemas they are inferred from (e.g. `playerSchema` → `Player`), and scoring/bracket/permission/query rules. Knows nothing about storage: no database column names, no React, no Supabase, no `fetch`. |
+| `src/repositories/` | The Supabase adapter: the client, the generated `database.types.ts`, and one repository per domain module (e.g. `repositories/players/fetchPlayers`). A repository queries Supabase, maps each row to a domain type, and validates it with the domain schema, so it returns domain types, never rows. The only folder allowed to import `@supabase/supabase-js`. |
+| `src/features/` | Feature UI: components, feature-local React hooks (`hooks/`), feature-local Zustand stores (`store/`), and TanStack Query hooks (`api/`). One subfolder per domain module. `api/` is the *only* part of a feature allowed to import `repositories` — it wraps a repository call in TanStack Query hooks (query keys, caching, retries); `components/`, `hooks/` and `store/` only ever see domain types. A feature belongs here when it's a self-contained UI slice composed into one specific place — not merely because it lacks a business domain. App-wide infrastructure concerns (like language selection) belong in their own top-level folder instead; see `src/localization/`. |
+| `src/routes/` | TanStack Router route definitions and loaders. Routes compose features and ui; they hold no business logic themselves. A route may import `domain` schemas and types to validate its path and search params (e.g. `validateSearch`), but the rules themselves stay in `domain`. |
+| `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
+| `src/localization/` | i18next bootstrap, language metadata, locale resource files, and the language-selection UI (`language-selection/`: hook, option component, and the composed `LanguageSelect` widget). Owning this here — rather than in `features/` — is what lets both `routes/` and `app/layout/TopNav` depend on it without needing an `app → features` boundary. `LanguageSelect` composes `ui/select` and has no app-shell knowledge (no branding, no nav, no layout grid) — it belongs with the rest of the language-selection capability, not with `app/layout`'s chrome. |
+| `src/lib/` | Small generic helpers (e.g. `cn()`, the Sentry client in `sentry.ts`) with no business meaning. If a helper encodes a business rule, it belongs in `domain/` instead. |
+| `src/styles/` | Tailwind theme tokens and global CSS. No JS/TS. |
+| `src/assets/` | Static files imported by components and processed by the bundler (as opposed to `public/`, which is copied verbatim). |
+
+## Imports
+
+Inside `src/`, import a file in the same folder or below it with `./` (`./PlayerTable`, `./locales/en`). Import anything else with the `@/` alias (`@/domain/players/player`). Never use `../`. ESLint enforces this (`no-restricted-imports`).
+
+## Dependency graph
+
+Layers are ordered leaf-to-root. An arrow means "is allowed to import from":
+
+```text
+app ────────────► ui, localization, lib
+routes ─────────► app, features, domain, lib
+features ───────► domain, ui, localization, lib, features/*/api (own feature only)
+features/*/api ─► repositories, domain, lib                     (own feature only)
+repositories ───► domain, lib
+ui ─────────────► lib
+localization ───► ui, lib
+domain ─────────► domain
+lib ────────────► (nothing)
+```
+
+`features/*/api` is a distinct boundary from the rest of `features` — see [Enforcement](#enforcement). It is the one seam allowed to import `repositories`; everything else in a feature (`components/`, `hooks/`, `store/`) cannot, even though both live under `src/features/`.
+
+Rules of thumb:
+- **`domain` has zero dependencies on the rest of `src/`.** It must be usable from a plain Node script or a future non-React client, and it never learns how data is stored: no row shapes, no column names.
+- **`repositories` depend on `domain`, never the other way round, and are the only place `@supabase/supabase-js` may be imported.** A repository maps generated row types to domain types and validates them with the domain's Zod schemas, so a renamed column fails typechecking at the query and a value the database types can't narrow fails at parse time (ADR 0012).
+- **`features` cannot import from other `features`, and only `features/*/api` may import `repositories`.** A component, hook or store that needs backend data goes through its own feature's `api/` hook, never around it.
+- **`routes` keep composition thin and do not import `ui` or `localization` directly.** A route may compose `app` shell and feature modules, but the shared widget and language-selection layers stay behind their own boundaries. A route may import `domain` (for example a Zod search-param schema for `validateSearch`), but never `repositories`.
+- **`app` never imports `routes`.** `routes/__root.tsx` imports chrome from `app/layout`; `app/providers` wires `router.tsx` (which reads the generated route tree), not `src/routes/` directly.
+- **`ui` never imports `domain`, `repositories`, `features`, or `routes`.** If a component needs domain knowledge, it belongs in `features`, not `ui`.
+- **`localization → ui` is one-directional.** `localization` composes `ui` primitives (e.g. `language-selection/LanguageSelect.tsx` uses `ui/select`) to build its own reusable widgets; `ui` still never imports back from `localization` — no cycle.
+- **`app` does not import `domain` or `repositories`.** Widening that is a deliberate change to the boundary policy, made together with this section.
+
+## Enforcement
+
+The dependency graph is enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) through the `boundaries/dependencies` policy in `eslint.config.mjs`, which is the source of truth for what is allowed. Change the graph and the policy together. Don't copy the policy into this file.
+
+- `features-api` (`src/features/*/api/**`) is a separate element from `features`, so only `api/` can import `repositories`. A feature can import only its own `api/` and files, never another feature's.
+- `@supabase/supabase-js` can be imported only from `src/repositories/`.
+- Parent-relative imports (`../`) and `console.*` are rejected in `src/` by separate ESLint rules; see [Imports](#imports).
+- `src/domain/` rejects imports of React, TanStack, i18next and calls to `fetch` through an ESLint override.
+- Files outside every element (`src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/vite-env.d.ts`) are unconstrained, since nothing imports them.

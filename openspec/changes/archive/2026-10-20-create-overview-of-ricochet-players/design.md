@@ -4,9 +4,9 @@ The `/players` route (`src/routes/players/index.tsx`) renders only a heading. No
 
 Constraints that shape the design:
 
-- **Layering** (ADR 0012, which supersedes ADR 0003; ADR 0007; `docs/standards/project-structure.md`). `repositories` (formerly `client-api`) query Supabase, map rows to domain types, and validate them with domain schemas. `domain` holds the types, schemas, and rules, knows nothing about storage, and imports nothing else from `src/`. Only `features/players/api/` may import `repositories`. `routes` may import `app`, `features`, `domain`, and `lib`. The `domain` import was allowed in this change, so a route can validate its search params with a domain schema; `routes` still can't import `ui`, `localization`, or `repositories`.
-- **Security** (`docs/standards/security.md`). The browser holds the Supabase key, and RLS is the only access boundary. The app uses the publishable key (`sb_publishable_…`), which runs requests as the `anon` Postgres role, the same as the legacy anon key it replaces (D10).
-- **Observability** (`docs/standards/observability.md`). The shared `QueryCache.onError` already sends every failed query to Sentry with its query key.
+- **Layering** (ADR 0012, which supersedes ADR 0003; ADR 0007; `docs/standards/project-structure-standard.md`). `repositories` (formerly `client-api`) query Supabase, map rows to domain types, and validate them with domain schemas. `domain` holds the types, schemas, and rules, knows nothing about storage, and imports nothing else from `src/`. Only `features/players/api/` may import `repositories`. `routes` may import `app`, `features`, `domain`, and `lib`. The `domain` import was allowed in this change, so a route can validate its search params with a domain schema; `routes` still can't import `ui`, `localization`, or `repositories`.
+- **Security** (`docs/standards/security-standard.md`). The browser holds the Supabase key, and RLS is the only access boundary. The app uses the publishable key (`sb_publishable_…`), which runs requests as the `anon` Postgres role, the same as the legacy anon key it replaces (D10).
+- **Observability** (`docs/standards/observability-standard.md`). The shared `QueryCache.onError` already sends every failed query to Sentry with its query key.
 - **Data separation.** **Production data** (84 real **players**) lives only in the shared preview/production database, loaded by hand. **Seed data** (100 fictional **players**) serves local runs and CI. **Mock data** is only for unit tests.
 - **UI.** Shadcn (`base-nova` style on Base UI), DESIGN.md tokens, a single `tablet` breakpoint at 744px, no dark mode. The existing six flags in `src/assets/flags/` are vendored artwork (ADR 0006, ADR 0008).
 - **E2E.** The tests compare structure, not pixels (ADR 0009). They run the same on macOS, in the dev container, and in CI.
@@ -205,7 +205,7 @@ flowchart LR
 ```
 
 - `tests/support/localSupabaseEnv.ts` runs `supabase status -o json`. It returns `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the CLI's `API_URL` and `PUBLISHABLE_KEY` fields. It fails fast with a clear message when Supabase isn't running, and it refuses any URL whose host isn't `127.0.0.1` or `localhost`.
-- The new testing standard (`docs/standards/testing.md`) makes this guard a rule: every test that reaches a database gets its connection from this helper and runs against a localhost Supabase only. Hand-written connection settings in tests are not allowed.
+- The new testing standard (`docs/standards/testing-standard.md`) makes this guard a rule: every test that reaches a database gets its connection from this helper and runs against a localhost Supabase only. Hand-written connection settings in tests are not allowed.
 - `vitest.integration.config.ts` passes those values through `test.env`. `playwright.config.ts` passes them through `webServer.env`, and Vite gives `process.env` precedence over `.env*` files. A developer's `.env.local` pointing at the shared project can therefore never leak into a test run.
 - CI adds one step before the integration tests: `npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime`. The excluded services aren't needed, which cuts start-up time. The tests read the env through the same helper, so no secrets or `$GITHUB_ENV` plumbing are needed.
 - `supabase db reset` reapplies migrations and `seed.sql`. Integration and E2E tests only read players (RLS forbids anything else), so the shared seed is never mutated and the tests can stay `fullyParallel`.
@@ -225,7 +225,7 @@ flowchart LR
 - Read the key from `VITE_SUPABASE_PUBLISHABLE_KEY` in `src/repositories/supabaseClient.ts`, `src/vite-env.d.ts`, and `.env.example`. `createClient(url, publishableKey)` is unchanged otherwise, because supabase-js accepts both kinds of key in the same parameter.
 - The publishable key runs requests as the `anon` role, so the RLS policy (`to anon, authenticated`) and the revoked grants (D2) apply unchanged.
 - Local and CI runs use the CLI's `PUBLISHABLE_KEY` (D8). The installed Supabase CLI (v2.119) already reports it in `supabase status -o json`.
-- Update the wording in `docs/standards/security.md` and `docs/standards/observability.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment.md`.
+- Update the wording in `docs/standards/security-standard.md` and `docs/standards/observability-standard.md` from "anon key" to "publishable key", and list the required Vercel variables in `docs/guides/deployment-guide.md`.
 
 *Alternative:* keep the legacy JWT anon key. Rejected: Supabase is phasing out the JWT-based keys. Publishable keys can be rotated on their own without rotating the JWT secret, and the switch is cheapest now, while only one client file reads the key.
 
@@ -253,6 +253,6 @@ flowchart LR
 None. Resolved on 2026-10-19:
 
 - ADR 0002's TanStack Table line was removed in place (with a dated note), so the new table-library ADR stands alone and supersedes nothing.
-- `routes → domain` is now allowed: `docs/standards/project-structure.md` and `eslint.config.mjs` were updated.
+- `routes → domain` is now allowed: `docs/standards/project-structure-standard.md` and `eslint.config.mjs` were updated.
 - The localhost guard is a rule of the new testing standard (D8).
 - The app switches to the publishable key (D10).
