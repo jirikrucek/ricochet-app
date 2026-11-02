@@ -12,6 +12,155 @@ const parentImportsPattern = {
     "Import files outside this folder with the '@/' alias instead of '../'.",
 };
 
+const uiAndDataPackagesPatterns = {
+  group: [
+    'react',
+    'react/*',
+    'react-dom',
+    'react-dom/*',
+    '@tanstack/*',
+    'i18next',
+    'react-i18next',
+  ],
+};
+
+// A layer of the same feature as the importing file. Other features match no
+// policy, so they stay disallowed.
+const ownFeature = (...types) =>
+  types.map((type) => ({
+    to: {
+      element: {
+        type,
+        captured: { feature: '{{from.captured.feature}}' },
+      },
+    },
+  }));
+
+const layers = (...types) => ({ to: { element: { types } } });
+
+// One file of a layer, for the few layers that are open only in part.
+const fileOf = (type, path) => ({ to: { element: { type }, file: { path } } });
+
+const layerPolicy = (type, ...allow) => ({
+  from: { element: { type } },
+  allow,
+});
+
+const languagesFile = fileOf('locales', 'src/locales/languages.ts');
+
+const boundaryPolicies = [
+  layerPolicy('routes', layers('app', 'feature-components', 'feature-types')),
+  layerPolicy(
+    'app',
+    layers(
+      'feature-components',
+      'components',
+      'hooks',
+      'store',
+      'types',
+      'utils',
+      'ui',
+      'lib',
+      'config',
+    ),
+  ),
+  layerPolicy(
+    'feature-components',
+    ...ownFeature(
+      'feature-hooks',
+      'feature-store',
+      'feature-types',
+      'feature-utils',
+    ),
+    layers('components', 'hooks', 'store', 'types', 'utils', 'ui', 'config'),
+    languagesFile,
+  ),
+  layerPolicy(
+    'feature-hooks',
+    ...ownFeature(
+      'feature-api',
+      'feature-store',
+      'feature-types',
+      'feature-utils',
+    ),
+    layers('api', 'hooks', 'store', 'types', 'utils', 'config'),
+    fileOf('lib', 'src/lib/sentry.ts'),
+    languagesFile,
+  ),
+  layerPolicy(
+    'feature-api',
+    ...ownFeature('feature-types', 'feature-utils'),
+    layers('api', 'types', 'utils', 'db'),
+  ),
+  layerPolicy(
+    'feature-store',
+    ...ownFeature('feature-types', 'feature-utils'),
+    layers('types', 'utils'),
+  ),
+  layerPolicy(
+    'feature-utils',
+    ...ownFeature('feature-types'),
+    layers('types', 'utils'),
+  ),
+  layerPolicy('feature-types', layers('types')),
+  layerPolicy(
+    'components',
+    layers('ui', 'hooks', 'store', 'types', 'utils', 'config'),
+    languagesFile,
+  ),
+  layerPolicy(
+    'hooks',
+    layers('api', 'store', 'types', 'utils', 'config'),
+    fileOf('lib', 'src/lib/sentry.ts'),
+    languagesFile,
+  ),
+  layerPolicy('api', layers('db', 'types', 'utils')),
+  layerPolicy('store', layers('types', 'utils')),
+  layerPolicy('utils', layers('types')),
+  layerPolicy('ui', layers('utils')),
+  layerPolicy('lib', layers('config', 'locales')),
+  {
+    allow: {
+      to: { module: { origin: ['external', 'core'] } },
+    },
+  },
+  {
+    disallow: {
+      to: {
+        module: {
+          origin: ['external', 'core'],
+          source: '@supabase/supabase-js',
+        },
+      },
+    },
+    message: 'Import Supabase only inside src/db and the api folders.',
+  },
+  ...['db', 'api', 'feature-api'].map((type) => ({
+    from: { element: { type } },
+    allow: {
+      to: {
+        module: {
+          origin: ['external', 'core'],
+          source: '@supabase/supabase-js',
+        },
+      },
+    },
+  })),
+];
+
+const dependencyRule = (policies) => [
+  'error',
+  {
+    default: 'disallow',
+    // also check module dependencies (external packages), not just
+    // local elements, so the Supabase policy can be expressed here instead of
+    // in the separate (now deprecated) 'external' rule
+    checkAllOrigins: true,
+    message: '{{from.type}} is not allowed to import {{to.type}}',
+    policies,
+  },
+];
+
 export default tseslint.config(
   {
     ignores: [
@@ -82,167 +231,60 @@ export default tseslint.config(
       },
       'boundaries/include': ['src/**/*'],
       // 'partialMatch: false' matches both flat files (src/ui/select.tsx) and
-      // nested ones (src/localization/locales/en.ts) — the plugin's default
-      // matching only matches files nested one level under a matched
-      // subfolder, so it silently fails to classify flat top-level files.
+      // nested ones (src/locales/en.ts) — the plugin's default matching only
+      // matches files nested one level under a matched subfolder, so it
+      // silently fails to classify flat top-level files. Assets have no element:
+      // an unclassified import is not checked, so every layer can use them.
       'boundaries/elements': [
-        { type: 'app', pattern: 'src/app/**', partialMatch: false },
-        { type: 'domain', pattern: 'src/domain/**', partialMatch: false },
-        {
-          type: 'repositories',
-          pattern: 'src/repositories/**',
-          partialMatch: false,
-        },
-        // More specific than 'features' below — must be declared first,
-        // since the matcher takes the first element pattern that matches
-        // a file. This is the only part of a feature allowed to import
-        // repositories.
-        {
-          type: 'features-api',
-          pattern: 'src/features/*/api/**',
-          partialMatch: false,
-          capture: ['feature'],
-        },
-        {
-          type: 'features',
-          pattern: 'src/features/*/**',
-          partialMatch: false,
-          capture: ['feature'],
-        },
         { type: 'routes', pattern: 'src/routes/**', partialMatch: false },
+        { type: 'app', pattern: 'src/app/**', partialMatch: false },
+        ...['api', 'components', 'hooks', 'store', 'types', 'utils'].flatMap(
+          (layer) => [
+            {
+              type: `feature-${layer}`,
+              pattern: `src/features/*/${layer}/**`,
+              partialMatch: false,
+              capture: ['feature'],
+            },
+            { type: layer, pattern: `src/${layer}/**`, partialMatch: false },
+          ],
+        ),
         { type: 'ui', pattern: 'src/ui/**', partialMatch: false },
-        {
-          type: 'localization',
-          pattern: 'src/localization/**',
-          partialMatch: false,
-        },
+        { type: 'db', pattern: 'src/db/**', partialMatch: false },
         { type: 'lib', pattern: 'src/lib/**', partialMatch: false },
+        { type: 'locales', pattern: 'src/locales/**', partialMatch: false },
+        { type: 'config', pattern: 'src/config/**', partialMatch: false },
+        // No policy allows it: only src/main.tsx, which is outside every
+        // element, imports the global stylesheet.
+        { type: 'styles', pattern: 'src/styles/**', partialMatch: false },
       ],
     },
     rules: {
-      'boundaries/dependencies': [
-        'error',
-        {
-          default: 'disallow',
-          // also check module dependencies (external packages), not just
-          // local elements, so the Supabase policy below can be expressed
-          // here instead of in the separate (now deprecated) 'external' rule
-          checkAllOrigins: true,
-          message: '{{from.type}} is not allowed to import {{to.type}}',
-          policies: [
-            {
-              from: { element: { type: 'app' } },
-              // add 'domain', 'repositories' here once an auth session store lands
-              allow: {
-                to: { element: { types: ['ui', 'localization', 'lib'] } },
-              },
-            },
-            {
-              from: { element: { type: 'routes' } },
-              allow: {
-                to: {
-                  element: {
-                    types: ['app', 'features', 'domain', 'lib'],
-                  },
-                },
-              },
-            },
-            {
-              from: { element: { type: 'features' } },
-              allow: [
-                {
-                  to: {
-                    element: {
-                      types: ['domain', 'ui', 'localization', 'lib'],
-                    },
-                  },
-                },
-                {
-                  to: {
-                    element: {
-                      type: 'features',
-                      captured: { feature: '{{from.captured.feature}}' },
-                    },
-                  },
-                },
-                {
-                  to: {
-                    element: {
-                      type: 'features-api',
-                      captured: { feature: '{{from.captured.feature}}' },
-                    },
-                  },
-                },
-              ],
-            },
-            {
-              from: { element: { type: 'features-api' } },
-              // the seam: wraps a repository (which already returns
-              // domain types) in TanStack Query hooks for the rest of
-              // the feature (ADR 0012)
-              allow: [
-                {
-                  to: { element: { types: ['repositories', 'domain', 'lib'] } },
-                },
-                {
-                  to: {
-                    element: {
-                      type: 'features-api',
-                      captured: { feature: '{{from.captured.feature}}' },
-                    },
-                  },
-                },
-              ],
-            },
-            {
-              from: { element: { type: 'repositories' } },
-              // the adapter: maps Supabase rows to domain types and
-              // validates them with domain schemas (ADR 0012)
-              allow: { to: { element: { types: ['domain', 'lib'] } } },
-            },
-            {
-              from: { element: { type: 'ui' } },
-              allow: { to: { element: { type: 'lib' } } },
-            },
-            {
-              from: { element: { type: 'localization' } },
-              allow: { to: { element: { types: ['ui', 'lib'] } } },
-            },
-            {
-              from: { element: { type: 'domain' } },
-              allow: { to: { element: { type: 'domain' } } },
-            },
-            {
-              allow: {
-                to: { module: { origin: ['external', 'core'] } },
-              },
-            },
-            {
-              disallow: {
-                to: {
-                  module: {
-                    origin: ['external', 'core'],
-                    source: '@supabase/supabase-js',
-                  },
-                },
-              },
-              message:
-                'Import Supabase only inside src/repositories (ADR 0012).',
-            },
-            {
-              from: { element: { type: 'repositories' } },
-              allow: {
-                to: {
-                  module: {
-                    origin: ['external', 'core'],
-                    source: '@supabase/supabase-js',
-                  },
-                },
-              },
-            },
-          ],
-        },
-      ],
+      'boundaries/dependencies': dependencyRule(boundaryPolicies),
+      'boundaries/no-unknown-files': 'error',
+    },
+  },
+  {
+    // Entry files and generated code sit directly under src/, outside every layer.
+    files: [
+      'src/main.tsx',
+      'src/router.tsx',
+      'src/routeTree.gen.ts',
+      'src/vite-env.d.ts',
+    ],
+    rules: { 'boundaries/no-unknown-files': 'off' },
+  },
+  {
+    // Component tests render with the configured i18n instance. Components
+    // themselves use useTranslation, which re-renders on a language change.
+    files: ['src/**/*.test.{ts,tsx}'],
+    rules: {
+      'boundaries/dependencies': dependencyRule([
+        ...boundaryPolicies,
+        ...['feature-components', 'components'].map((type) =>
+          layerPolicy(type, fileOf('lib', 'src/lib/i18n.ts')),
+        ),
+      ]),
     },
   },
   {
@@ -261,18 +303,44 @@ export default tseslint.config(
     },
   },
   {
-    // docs/standards/project-structure-standard.md: the domain is pure business
-    // logic, so no UI, data-fetching or localization libraries (Supabase is
-    // already blocked everywhere but src/repositories by the boundaries policy).
+    // docs/standards/project-structure-standard.md: the api folders talk to the
+    // backend and know nothing about React or query caching, which hooks own.
     // This replaces the src-wide no-restricted-imports above for these files,
     // so it repeats the '../' pattern.
-    files: ['src/domain/**/*.{ts,tsx}'],
+    files: ['src/api/**/*.{ts,tsx}', 'src/features/*/api/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            parentImportsPattern,
+            {
+              ...uiAndDataPackagesPatterns,
+              message:
+                'api talks to the backend: no React, TanStack or i18next. Hooks wrap it.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // docs/standards/project-structure-standard.md: types and utils are pure,
+    // so no UI, data-fetching or localization libraries, and no fetch.
+    // This replaces the src-wide no-restricted-imports above for these files,
+    // so it repeats the '../' pattern.
+    files: [
+      'src/types/**/*.{ts,tsx}',
+      'src/utils/**/*.{ts,tsx}',
+      'src/features/*/types/**/*.{ts,tsx}',
+      'src/features/*/utils/**/*.{ts,tsx}',
+    ],
     rules: {
       'no-restricted-globals': [
         'error',
         {
           name: 'fetch',
-          message: 'The domain does not fetch; repositories do (ADR 0012).',
+          message: 'types and utils do not fetch; the api folders do.',
         },
       ],
       'no-restricted-imports': [
@@ -281,17 +349,9 @@ export default tseslint.config(
           patterns: [
             parentImportsPattern,
             {
-              group: [
-                'react',
-                'react/*',
-                'react-dom',
-                'react-dom/*',
-                '@tanstack/*',
-                'i18next',
-                'react-i18next',
-              ],
+              ...uiAndDataPackagesPatterns,
               message:
-                'The domain is pure business logic: no React, TanStack or i18next.',
+                'types and utils are pure: no React, TanStack or i18next.',
             },
           ],
         },
