@@ -47,7 +47,7 @@ Release in this order:
 3. Merge, so Vercel deploys the frontend.
 4. Smoke-check the deployed app: the page lists rows, and `VITE_SENTRY_DSN` is set so a failure would be reported.
 
-Adding a value the database restricts needs more than a migration. A new nationality needs a migration that widens the `players_nationality_known` check, a flag in `src/localization/flags.ts`, and a name in each locale file.
+Adding a value the database restricts needs more than a migration. A new nationality needs a migration that widens the `players_nationality_known` check, a flag in `src/shared/ui/flags.ts`, and a name in each locale file.
 
 ### Rolling back
 

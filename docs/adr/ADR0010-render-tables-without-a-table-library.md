@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-10-19
-- Updated: 2026-10-19
+- Updated: 2026-11-03
 
 ## Context
 
@@ -10,9 +10,9 @@ The **player overview** (issue #58) is the first table in the app. It has three 
 
 ## Decision
 
-Render tables with Shadcn `table` markup (`src/ui/table`) and no table library. Filtering, sorting, and page slicing are a single pure query function in the owning domain module, for example `queryPlayers(players, view, locale)` in `src/domain/players/`. It returns the visible rows plus the total, the effective page, and the page count. The feature component calls it and renders the result. View state (sort, filters, page, page size) lives in route search params, as ADR 0002 requires.
+Render tables with Shadcn `table` markup (`src/ui/table`) and no table library. Filtering, sorting, and page slicing are a single pure query function in the owning **module**'s `domain/`, for example `queryPlayers(players, view, locale)` in `src/modules/players/domain/utils/`. It returns the visible rows plus the total, the effective page, and the page count. The **feature** calls it and passes the result to its `ui/` components. View state (sort, filters, page, page size) lives in route search params, as ADR 0002 requires.
 
-Generic helpers that carry no business meaning, such as the page-link range, go in `src/lib/` so other tables can reuse them.
+Generic helpers that carry no business meaning, such as the page-link range, go in the **module**'s `ui/`, and move to `src/shared/ui/` when another **module**'s table needs them.
 
 Revisit this decision when any of these appears:
 
@@ -20,7 +20,7 @@ Revisit this decision when any of these appears:
 - multi-column sorting,
 - column visibility, resizing, or reordering,
 - row selection,
-- several complex tables, so that the hand-written logic starts repeating across features.
+- several complex tables, so that the hand-written logic starts repeating across **modules**.
 
 ## Alternatives Considered
 
@@ -31,5 +31,5 @@ Revisit this decision when any of these appears:
 
 - Positive: every table rule is a pure function, covered by unit tests with **mock data** and no React.
 - Positive: no extra dependency, and no second state model to sync with the URL.
-- Negative: features such as column visibility, row selection, or multi-sort would have to be built by hand. Any of them is a trigger to revisit this ADR rather than to extend the hand-written code.
+- Negative: capabilities such as column visibility, row selection, or multi-sort would have to be built by hand. Any of them is a trigger to revisit this ADR rather than to extend the hand-written code.
 - Follow-up: when a revisit trigger appears, record the outcome in a new ADR that supersedes this one.

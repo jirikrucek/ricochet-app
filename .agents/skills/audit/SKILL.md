@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 The user has asked you to **audit** the codebase. A **violation** is code, config, test or migration that breaks a rule in `docs/standards/` or a decision in an accepted ADR. The documents are the rules here; the code is what gets audited. A rule that turns out to be wrong is not a violation: it's a finding for `/validate-standards` or `/validate-adrs`, and you report it in a separate list.
 
-The default scope is the whole codebase: every file `git ls-files` lists, except generated files (those the toolchain writes, such as `src/repositories/database.types.ts`). If the user names a standard, an ADR or an area, audit only that scope.
+The default scope is the whole codebase: every file `git ls-files` lists, except generated files (those the toolchain writes, such as `src/db/supabase.types.ts`). If the user names a standard, an ADR or an area, audit only that scope.
 
 ## Steps
 

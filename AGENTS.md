@@ -7,7 +7,6 @@
 - **localization**: i18next + react-i18next
 - **routing**: TanStack Router (type-safe, file-based)
 - **server state**: TanStack Query
-- **client ui state**: Zustand
 - **form state management and validation**: React Hook Form + Zod
 - **design system and styling**: Shadcn UI + Tailwind CSS + CSS design tokens
 - **backend platform**: Supabase (PostgreSQL, Auth, Realtime, RLS)
