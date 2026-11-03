@@ -70,16 +70,40 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      player_nationalities: {
+        Row: {
+          nationality: string;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      players_sorted: {
+        Args: { ui_language: string };
+        Returns: Database['public']['CompositeTypes']['player_sorted'][];
+        SetofOptions: {
+          from: '*';
+          to: 'player_sorted';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
     };
     Enums: {
       player_sex: 'male' | 'female';
     };
     CompositeTypes: {
-      [_ in never]: never;
+      player_sorted: {
+        id: number | null;
+        first_name: string | null;
+        surname_prefix: string | null;
+        surname: string | null;
+        surname_suffix: string | null;
+        nationality: string | null;
+        sex: Database['public']['Enums']['player_sex'] | null;
+        sort_position: number | null;
+      };
     };
   };
 };

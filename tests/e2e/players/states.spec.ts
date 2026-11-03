@@ -2,14 +2,16 @@ import { expect, test, type Page, type Request } from '@playwright/test';
 
 import {
   DESKTOP,
+  NATIONALITIES_API,
+  PLAYERS_API,
   expectPlayersListed,
+  fulfillPlayers,
   openOverview,
   playersTable,
 } from './overview';
 
-// The seed can't produce these states, so these tests intercept the players
-// request (docs/standards/testing-standard.md).
-const PLAYERS_API = '**/rest/v1/players*';
+// The seed can't produce these states, so these tests intercept the requests
+// behind the overview (docs/standards/testing-standard.md).
 
 // TanStack Query retries a failed query 3 times with backoff (about 7 s)
 // before showing the error state.
@@ -71,7 +73,9 @@ test.describe('Player overview shows loading, error, and empty states', () => {
       .poll(() =>
         envelopes.some((request) => {
           const body = request.postData() ?? '';
-          return body.includes('"type":"event"') && body.includes('"players"');
+          return (
+            body.includes('"type":"event"') && body.includes('"players_sorted"')
+          );
         }),
       )
       .toBe(true);
@@ -93,7 +97,8 @@ test.describe('Player overview shows loading, error, and empty states', () => {
   });
 
   test('No players exist', async ({ page }) => {
-    await page.route(PLAYERS_API, (route) =>
+    await page.route(PLAYERS_API, (route) => fulfillPlayers(route, []));
+    await page.route(NATIONALITIES_API, (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',

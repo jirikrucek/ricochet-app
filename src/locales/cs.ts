@@ -37,7 +37,6 @@ const cs = {
       label: 'Stránkování',
       previous: 'Předchozí',
       next: 'Další',
-      pageSize: 'Hráčů na stránku',
       summary: 'Zobrazeno {{from}}–{{to}} z {{total}}',
       pageOf: 'Strana {{page}} z {{count}}',
     },

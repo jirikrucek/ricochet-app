@@ -14,7 +14,6 @@ describe('isSameViewIgnoringPage', () => {
     { sort: 'desc' },
     { nationality: 'CZ' },
     { sex: 'female' },
-    { pageSize: 50 },
   ] as const)('sees %j as a different view', (change) => {
     expect(isSameViewIgnoringPage(base, { ...base, ...change })).toBe(false);
   });

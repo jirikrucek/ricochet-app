@@ -37,7 +37,6 @@ const nl = {
       label: 'Paginering',
       previous: 'Vorige',
       next: 'Volgende',
-      pageSize: 'Spelers per pagina',
       summary: '{{from}}–{{to}} van {{total}}',
       pageOf: 'Pagina {{page}} van {{count}}',
     },

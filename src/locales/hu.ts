@@ -37,7 +37,6 @@ const hu = {
       label: 'Lapozás',
       previous: 'Előző',
       next: 'Következő',
-      pageSize: 'Játékos oldalanként',
       summary: '{{from}}–{{to}} / {{total}}',
       pageOf: '{{page}}. oldal / {{count}}',
     },

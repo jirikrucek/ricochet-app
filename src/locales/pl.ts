@@ -37,7 +37,6 @@ const pl = {
       label: 'Paginacja',
       previous: 'Poprzednia',
       next: 'Następna',
-      pageSize: 'Graczy na stronę',
       summary: 'Wyświetlono {{from}}–{{to}} z {{total}}',
       pageOf: 'Strona {{page}} z {{count}}',
     },

@@ -13,7 +13,7 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0007 | [Adopt Single-Package Layout](ADR0007-adopt-single-package-layout.md) | Accepted |
 | 0008 | [Vendored Brand Artwork Keeps Its Own Colours](ADR0008-vendored-brand-artwork-keeps-its-own-colours.md) | Accepted |
 | 0009 | [E2E Tests Do Not Use Pixel Snapshots](ADR0009-e2e-tests-do-not-use-pixel-snapshots.md) | Accepted |
-| 0010 | [Render Tables Without a Table Library](ADR0010-render-tables-without-a-table-library.md) | Accepted |
+| 0010 | [Render Tables Without a Table Library](ADR0010-render-tables-without-a-table-library.md) | Superseded by ADR 0019 and ADR 0020 |
 | 0011 | [Tests Reach Only a Local Supabase with Seed Data](ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md) | Accepted |
 | 0012 | [Repositories Map Supabase Rows to Domain Types](ADR0012-repositories-map-supabase-rows-to-domain-types.md) | Superseded by ADR 0016, ADR 0017 and ADR 0018 |
 | 0013 | [Preview and Production Use Separate Supabase Projects](ADR0013-preview-and-production-use-separate-supabase-projects.md) | Accepted |
@@ -22,3 +22,5 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0016 | [Modules Own Their Code by Default](ADR0016-modules-own-their-code-by-default.md) | Accepted |
 | 0017 | [Data Access Maps Backend Rows to Domain Types](ADR0017-data-access-maps-backend-rows-to-domain-types.md) | Accepted |
 | 0018 | [Trusted Business Rules Live in the Backend](ADR0018-trusted-business-rules-live-in-the-backend.md) | Accepted |
+| 0019 | [Render Tables Without a Table Library](ADR0019-render-tables-without-a-table-library.md) | Accepted |
+| 0020 | [Lists Are Filtered, Sorted and Paged in the Backend](ADR0020-lists-are-filtered-sorted-and-paged-in-the-backend.md) | Accepted |

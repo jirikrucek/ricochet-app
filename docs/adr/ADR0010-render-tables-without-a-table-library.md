@@ -1,6 +1,6 @@
 # ADR 0010: Render Tables Without a Table Library
 
-- Status: Accepted
+- Status: Superseded by ADR 0019 and ADR 0020
 - Created: 2026-10-19
 - Updated: 2026-11-03
 

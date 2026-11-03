@@ -37,7 +37,6 @@ const de = {
       label: 'Seitennavigation',
       previous: 'Zurück',
       next: 'Weiter',
-      pageSize: 'Spieler pro Seite',
       summary: '{{from}}–{{to}} von {{total}}',
       pageOf: 'Seite {{page}} von {{count}}',
     },

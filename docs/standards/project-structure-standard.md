@@ -11,6 +11,7 @@ This standard uses the terms domain, module, feature and shared code as defined 
 - **Backend first.** Rules that must be trusted (permissions, integrity, scoring, brackets, ranking points) live in Supabase: RLS, constraints, Postgres functions and views, or Edge Functions. Client code can be read and changed by the user, so client checks only give quick feedback ([ADR 0018](../adr/ADR0018-trusted-business-rules-live-in-the-backend.md)).
 - **Module first.** Code starts in its module. It moves to `src/shared/` only when a second module, or `app`, needs it ([ADR 0016](../adr/ADR0016-modules-own-their-code-by-default.md)).
 - **One term, many representations.** A glossary term means the same in every module, but each module defines its own type with the data it needs. If a module adds real meaning to a term, that meaning gets its own glossary term.
+- **Lists page in the backend.** Filtering, sorting and paging a list happen in Supabase, and the browser receives one page and the total. The page size is one constant for the whole app (`itemsPerPage` in `src/config/pagination.ts`), never view state ([ADR 0020](../adr/ADR0020-lists-are-filtered-sorted-and-paged-in-the-backend.md)).
 - **Thin routes.** A route maps a URL to a feature and validates its search params. The logic belongs to the feature.
 - **Folders on demand.** A folder is created with its first file. The layout below lists folders that don't exist yet because their rules are already defined.
 
@@ -76,14 +77,14 @@ A module's layers and their counterparts in `src/shared/` hold the same kind of 
 | `ui/` | Components, their prop types, and form schemas. Components get data through props and call no backend code. Hooks that serve only these components go here too. |
 | `data-access/` | TanStack Query hooks with their query keys and cache settings. This is what features use to reach the backend. |
 | `data-access/api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-data-access-maps-backend-rows-to-domain-types.md)). Only `data-access/` hooks call it. No React, TanStack or i18next. |
-| `domain/` | The module's representation of glossary terms: domain types, the Zod schemas they are inferred from, those schemas' constants (e.g. `playerSchema` → `Player`, `nationalities`), and pure helpers (e.g. `formatSurname`, `queryPlayers`). Knows nothing about storage: no column names. Pure: no React, TanStack, i18next or `fetch`. Trusted rules don't belong here; see Backend first. |
+| `domain/` | The module's representation of glossary terms: domain types, the Zod schemas they are inferred from, those schemas' constants (e.g. `playerSchema` → `Player`, `nationalities`), and pure helpers (e.g. `formatSurname`). Knows nothing about storage: no column names. Pure: no React, TanStack, i18next or `fetch`. Trusted rules don't belong here; see Backend first. |
 | `src/routes/` | Route definitions and search param validation. Routes import the screen from a feature and its search schema from a module's `domain/`. |
 | `src/app/` | The app shell: provider wiring, global layout chrome, and the error boundary. It composes features but owns none of their logic. |
 | `src/shared/` | `ui/`, `data-access/` and `domain/`, for code two or more modules use, or a module and `app`. Nothing else goes here. |
 | `src/ui/` | Shadcn primitives and `cn`. Domain-agnostic — must work with any product, not just Ricochet. |
 | `src/db/` | The Supabase client, the generated `supabase.types.ts`, and the row-level security test. Only the `data-access/api/` folders import it. |
 | `src/lib/` | Third-party tools configured once at startup (e.g. `sentry.ts`, `i18n.ts`, `queryClient.ts`). A configured REST client belongs in `data-access/api/` instead. |
-| `src/config/` | Static app settings with no better owner. |
+| `src/config/` | Static app settings with no better owner, such as the page size every list uses. |
 | `src/locales/` | One translation file per language, `resources.ts`, and `languages.ts` (supported languages and their metadata). |
 | `src/styles/` | Tailwind theme tokens and global CSS. No JS/TS other than the test that checks the tokens. Components use tokens through Tailwind classes. |
 | `src/assets/` | Static files imported by code and processed by the bundler (as opposed to `public/`, which is copied verbatim). |
@@ -130,7 +131,7 @@ Rules of thumb:
 
 - **Modules never import other modules, and features never import other features.** Code that a second module needs moves to `src/shared/`, and code that a second feature needs moves to the module's `ui/`, `data-access/` or `domain/`. Only `routes` and `app` work across modules.
 - **Only features reach a module's `data-access`.** A `ui` component that needs backend data gets it through props, or the code that needs it becomes a feature. `routes` go through a feature, and `app` can also use `shared/data-access`.
-- **Only `data-access` hooks reach `data-access/api`.** A feature calls `usePlayers`, never `fetchPlayers`, because the hook owns the query key and cache settings.
+- **Only `data-access` hooks reach `data-access/api`.** A feature calls `usePlayersPage`, never `fetchPlayersPage`, because the hook owns the query key and cache settings.
 - **Only `db` and the `data-access/api` folders import `@supabase/supabase-js`.** Supabase Auth, Realtime and Storage calls follow the same path as queries.
 - **`domain` and `data-access/api` don't use React.** They also don't use TanStack or i18next. `domain` doesn't call `fetch` either.
 - **Components get translations from `useTranslation`, not from `lib/i18n`.** Calling `i18n.t()` directly doesn't re-render a component when the language changes. Likewise, use `useQueryClient`, not `lib/queryClient`.

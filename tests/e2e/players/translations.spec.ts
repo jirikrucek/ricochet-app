@@ -14,7 +14,6 @@ const languages = [
     pagination: 'Pagination',
     previous: 'Previous',
     next: 'Next',
-    pageSize: 'Players per page',
     summary: 'Showing 26–50 of 100',
   },
   {
@@ -26,7 +25,6 @@ const languages = [
     pagination: 'Stránkování',
     previous: 'Předchozí',
     next: 'Další',
-    pageSize: 'Hráčů na stránku',
     summary: 'Zobrazeno 26–50 z 100',
   },
   {
@@ -38,7 +36,6 @@ const languages = [
     pagination: 'Seitennavigation',
     previous: 'Zurück',
     next: 'Weiter',
-    pageSize: 'Spieler pro Seite',
     summary: '26–50 von 100',
   },
   {
@@ -50,7 +47,6 @@ const languages = [
     pagination: 'Paginacja',
     previous: 'Poprzednia',
     next: 'Następna',
-    pageSize: 'Graczy na stronę',
     summary: 'Wyświetlono 26–50 z 100',
   },
   {
@@ -62,7 +58,6 @@ const languages = [
     pagination: 'Paginering',
     previous: 'Vorige',
     next: 'Volgende',
-    pageSize: 'Spelers per pagina',
     summary: '26–50 van 100',
   },
   {
@@ -74,7 +69,6 @@ const languages = [
     pagination: 'Lapozás',
     previous: 'Előző',
     next: 'Következő',
-    pageSize: 'Játékos oldalanként',
     summary: '26–50 / 100',
   },
 ];
@@ -100,9 +94,6 @@ test.describe('Player overview is translated into every supported UI language', 
           page.getByRole('combobox', { name: label, exact: true }),
         ).toBeVisible();
       }
-      await expect(
-        page.getByRole('combobox', { name: expected.pageSize, exact: true }),
-      ).toBeVisible();
       await expect(
         page.getByRole('paragraph').filter({ hasText: expected.summary }),
       ).toHaveText(expected.summary);

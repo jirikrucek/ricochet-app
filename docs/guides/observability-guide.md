@@ -6,7 +6,7 @@ How to verify instrumentation and set up alerts. The rules they must satisfy are
 
 Before calling instrumentation done for a change, run the app with `npm run dev` and a real DSN in `.env.local` (`VITE_SENTRY_DSN`). Make each temporary edit below, check the result, then revert it.
 
-1. **Failed query.** Make a `queryFn` throw, for example `queryFn: () => { throw new Error('sentry test'); }` in `src/modules/players/data-access/usePlayers.ts`. Open the page and confirm the error lands in Sentry with `extra.queryKey` set. For a mutation, check `extra.mutationKey`.
+1. **Failed query.** Make a `queryFn` throw, for example `queryFn: () => { throw new Error('sentry test'); }` in `src/modules/players/data-access/usePlayersPage.ts`. Open the page and confirm the error lands in Sentry with `extra.queryKey` set. For a mutation, check `extra.mutationKey`.
 2. **Render error.** Throw during render, for example `throw new Error('render test')` at the top of `PlayerOverview` in `src/modules/players/features/player-overview/PlayerOverview.tsx`. Confirm `AppErrorBoundary` shows the fallback screen in the selected language and the error lands in Sentry.
 3. Spot-check that no secrets or tokens appear in anything you logged.
 

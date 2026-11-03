@@ -18,22 +18,50 @@ import {
 } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Player } from '@/modules/players/domain/types/player';
+import type {
+  Nationality,
+  Player,
+} from '@/modules/players/domain/types/player';
+import type { PlayerOverviewPage } from '@/modules/players/domain/types/playerOverviewPage';
 import {
   playerOverviewSearchDefaults,
   playerOverviewSearchSchema,
+  type PlayerOverviewView,
 } from '@/modules/players/domain/types/playerOverviewSearch';
 import { buildPlayer } from '@/modules/players/domain/types/playerMocks';
 import i18n from '@/lib/i18n';
 import { PlayerOverview } from './PlayerOverview';
 
-// Mock data only (docs/standards/testing-standard.md): fetchPlayers is the
-// one piece of external I/O, so it is the only thing mocked.
-const fetchPlayers = vi.fn<() => Promise<Player[]>>();
+// Mock data only (docs/standards/testing-standard.md): the two data-access/api
+// calls are the only external I/O, so they are the only things mocked.
+const fetchPlayersPage =
+  vi.fn<
+    (view: PlayerOverviewView, language: string) => Promise<PlayerOverviewPage>
+  >();
+const fetchPlayerNationalities = vi.fn<() => Promise<Nationality[]>>();
 
-vi.mock('@/modules/players/data-access/api/fetchPlayers', () => ({
-  fetchPlayers: () => fetchPlayers(),
+vi.mock('@/modules/players/data-access/api/fetchPlayersPage', () => ({
+  fetchPlayersPage: (view: PlayerOverviewView, language: string) =>
+    fetchPlayersPage(view, language),
 }));
+vi.mock('@/modules/players/data-access/api/fetchPlayerNationalities', () => ({
+  fetchPlayerNationalities: () => fetchPlayerNationalities(),
+}));
+
+function pageOf(
+  rows: Player[],
+  overrides: Partial<PlayerOverviewPage> = {},
+): PlayerOverviewPage {
+  return { rows, total: rows.length, page: 1, pageCount: 1, ...overrides };
+}
+
+const emptyPage = pageOf([]);
+
+function deferred<TValue>() {
+  let resolve: (value: TValue) => void = () => {};
+  const promise = new Promise<TValue>((r) => (resolve = r));
+  return { promise, resolve };
+}
 
 function renderPlayerOverview(path = '/players') {
   const queryClient = new QueryClient({
@@ -62,10 +90,13 @@ function renderPlayerOverview(path = '/players') {
 }
 
 beforeEach(async () => {
-  fetchPlayers.mockReset();
-  // jsdom doesn't implement it; the router calls it to reset scroll on every
-  // navigation.
+  fetchPlayersPage.mockReset();
+  fetchPlayerNationalities.mockReset();
+  fetchPlayerNationalities.mockResolvedValue(['CZ', 'GB']);
+  // jsdom doesn't implement these; the router calls the first to reset scroll
+  // on every navigation, and the page change orientation the second.
   vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+  Element.prototype.scrollIntoView = vi.fn();
   await i18n.changeLanguage('en');
 });
 
@@ -75,7 +106,7 @@ afterEach(() => {
 
 describe('PlayerOverview states', () => {
   it('shows a loading skeleton instead of the table while players are fetched', async () => {
-    fetchPlayers.mockReturnValue(new Promise(() => {}));
+    fetchPlayersPage.mockReturnValue(new Promise(() => {}));
 
     renderPlayerOverview();
 
@@ -86,11 +117,11 @@ describe('PlayerOverview states', () => {
   });
 
   it('shows an error message whose Retry fetches the players again', async () => {
-    fetchPlayers
+    fetchPlayersPage
       .mockRejectedValueOnce(new Error('network down'))
-      .mockResolvedValueOnce([
-        buildPlayer({ firstName: 'Jana', surname: 'Nováková' }),
-      ]);
+      .mockResolvedValueOnce(
+        pageOf([buildPlayer({ firstName: 'Jana', surname: 'Nováková' })]),
+      );
 
     renderPlayerOverview();
 
@@ -103,19 +134,92 @@ describe('PlayerOverview states', () => {
     });
 
     expect(await screen.findByRole('cell', { name: 'Nováková' })).toBeTruthy();
-    expect(fetchPlayers).toHaveBeenCalledTimes(2);
+    expect(fetchPlayersPage).toHaveBeenCalledTimes(2);
+    expect(fetchPlayerNationalities).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('shows "No players yet" without table or pagination for an empty list', async () => {
-    fetchPlayers.mockResolvedValue([]);
+  it('shows the same error when only the nationalities fail, and retries them', async () => {
+    fetchPlayersPage.mockResolvedValue(
+      pageOf([buildPlayer({ surname: 'Nováková' })]),
+    );
+    fetchPlayerNationalities
+      .mockRejectedValueOnce(new Error('network down'))
+      .mockResolvedValueOnce(['CZ']);
 
     renderPlayerOverview();
 
-    expect(await screen.findByText('No players yet')).toBeTruthy();
-    expect(screen.queryByRole('table')).toBeNull();
-    expect(screen.queryByRole('navigation')).toBeNull();
-    expect(screen.queryByText(/Showing/)).toBeNull();
+    const alert = await screen.findByRole('alert');
+    await act(async () => {
+      fireEvent.click(within(alert).getByRole('button', { name: 'Retry' }));
+    });
+
+    expect(await screen.findByRole('cell', { name: 'Nováková' })).toBeTruthy();
+    expect(fetchPlayerNationalities).toHaveBeenCalledTimes(2);
+    expect(fetchPlayersPage).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['/players', '/players?sex=female'])(
+    'shows "No players yet" without table or pagination at %s when no players exist',
+    async (path) => {
+      fetchPlayersPage.mockResolvedValue(emptyPage);
+      fetchPlayerNationalities.mockResolvedValue([]);
+
+      renderPlayerOverview(path);
+
+      expect(await screen.findByText('No players yet')).toBeTruthy();
+      expect(screen.queryByRole('table')).toBeNull();
+      expect(screen.queryByRole('navigation')).toBeNull();
+      expect(screen.queryByText(/Showing/)).toBeNull();
+      expect(
+        screen.queryByText('No players match the selected filters'),
+      ).toBeNull();
+    },
+  );
+});
+
+describe('PlayerOverview requests', () => {
+  it('asks the backend for the view in the URL, in the UI language', async () => {
+    fetchPlayersPage.mockResolvedValue(pageOf([buildPlayer()]));
+    await i18n.changeLanguage('cs');
+
+    renderPlayerOverview('/players?nationality=CZ&sex=female&sort=desc');
+    await screen.findByRole('table');
+
+    expect(fetchPlayersPage).toHaveBeenCalledWith(
+      { nationality: 'CZ', sex: 'female', sort: 'desc', page: 1 },
+      'cs',
+    );
+  });
+
+  it('asks again in the new order when the UI language changes', async () => {
+    fetchPlayersPage.mockResolvedValue(pageOf([buildPlayer()]));
+
+    renderPlayerOverview();
+    await screen.findByRole('table');
+    await act(async () => {
+      await i18n.changeLanguage('cs');
+    });
+
+    await vi.waitFor(() =>
+      expect(fetchPlayersPage).toHaveBeenLastCalledWith(
+        expect.objectContaining({ page: 1 }),
+        'cs',
+      ),
+    );
+    expect(screen.getByRole('table')).toBeTruthy();
+  });
+
+  it('offers no way to choose the page size', async () => {
+    fetchPlayersPage.mockResolvedValue(
+      pageOf([buildPlayer()], { total: 60, pageCount: 3 }),
+    );
+
+    renderPlayerOverview();
+    await screen.findByRole('table');
+
+    expect(screen.queryByLabelText('Players per page')).toBeNull();
+    expect(screen.getAllByRole('combobox')).toHaveLength(2);
   });
 });
 
@@ -125,9 +229,13 @@ describe('PlayerOverview with filters that match no players', () => {
     buildPlayer({ surname: 'Nováková', nationality: 'CZ', sex: 'female' }),
   ];
 
-  it('shows the no-match message with Clear filters instead of the table', async () => {
-    fetchPlayers.mockResolvedValue(rows);
+  beforeEach(() => {
+    fetchPlayersPage.mockImplementation((view) =>
+      Promise.resolve(view.nationality === 'GB' ? emptyPage : pageOf(rows)),
+    );
+  });
 
+  it('shows the no-match message with Clear filters instead of the table', async () => {
     renderPlayerOverview('/players?nationality=GB&sex=female');
 
     expect(
@@ -138,7 +246,6 @@ describe('PlayerOverview with filters that match no players', () => {
   });
 
   it('Clear filters resets nationality and sex and keeps the sort', async () => {
-    fetchPlayers.mockResolvedValue(rows);
     const { router } = renderPlayerOverview(
       '/players?nationality=GB&sex=female&sort=desc',
     );
@@ -158,17 +265,20 @@ describe('PlayerOverview with filters that match no players', () => {
 });
 
 describe('PlayerOverview pagination ends', () => {
-  const rows = Array.from({ length: 30 }, (_, index) =>
-    buildPlayer({
-      id: index + 1,
-      surname: `Player${String(index).padStart(2, '0')}`,
-    }),
-  );
+  beforeEach(() => {
+    fetchPlayersPage.mockImplementation((view) =>
+      Promise.resolve(
+        pageOf([buildPlayer()], {
+          total: 60,
+          page: view.page,
+          pageCount: 3,
+        }),
+      ),
+    );
+  });
 
   it('shows Previous as a disabled link on the first page', async () => {
-    fetchPlayers.mockResolvedValue(rows);
-
-    renderPlayerOverview('/players?pageSize=10');
+    renderPlayerOverview('/players');
 
     const [previous] = await screen.findAllByText('Previous');
     expect(previous?.getAttribute('role')).toBe('link');
@@ -177,9 +287,7 @@ describe('PlayerOverview pagination ends', () => {
   });
 
   it('shows Next as a disabled link on the last page', async () => {
-    fetchPlayers.mockResolvedValue(rows);
-
-    renderPlayerOverview('/players?pageSize=10&page=3');
+    renderPlayerOverview('/players?page=3');
 
     const [next] = await screen.findAllByText('Next');
     expect(next?.getAttribute('role')).toBe('link');
@@ -189,23 +297,108 @@ describe('PlayerOverview pagination ends', () => {
 });
 
 describe('PlayerOverview canonical page', () => {
-  const rows = Array.from({ length: 30 }, (_, index) =>
-    buildPlayer({
-      id: index + 1,
-      surname: `Player${String(index).padStart(2, '0')}`,
-    }),
-  );
-
   it('keeps the page when the URL spells a valid page differently', async () => {
-    fetchPlayers.mockResolvedValue(rows);
-
-    const { router } = renderPlayerOverview('/players?pageSize=10&page=2.0');
-
-    await screen.findByText('Player10');
-    await vi.waitFor(() =>
-      expect(router.state.location.search).toEqual({ pageSize: 10, page: 2 }),
+    fetchPlayersPage.mockImplementation((view) =>
+      Promise.resolve(
+        pageOf([buildPlayer({ surname: `Page${view.page}` })], {
+          total: 60,
+          page: view.page,
+          pageCount: 3,
+        }),
+      ),
     );
-    expect(screen.getByText('Player10')).toBeTruthy();
-    expect(screen.queryByText('Player00')).toBeNull();
+
+    const { router } = renderPlayerOverview('/players?page=2.0');
+
+    await screen.findByText('Page2');
+    await vi.waitFor(() =>
+      expect(router.state.location.search).toEqual({ page: 2 }),
+    );
+    expect(screen.getByText('Page2')).toBeTruthy();
+    expect(screen.queryByText('Page1')).toBeNull();
+  });
+
+  it('removes a page beyond the last from the URL', async () => {
+    // The API call answers an out-of-range page with page 1.
+    fetchPlayersPage.mockImplementation(() =>
+      Promise.resolve(
+        pageOf([buildPlayer({ surname: 'FirstPage' })], {
+          total: 60,
+          page: 1,
+          pageCount: 3,
+        }),
+      ),
+    );
+
+    const { router } = renderPlayerOverview('/players?page=9');
+
+    await screen.findByText('FirstPage');
+    await vi.waitFor(() => expect(router.state.location.search).toEqual({}));
+  });
+});
+
+describe('PlayerOverview while another page loads', () => {
+  const firstPage = pageOf([buildPlayer({ surname: 'FirstPage' })], {
+    total: 60,
+    pageCount: 3,
+  });
+  const secondPage = pageOf([buildPlayer({ surname: 'SecondPage' })], {
+    total: 60,
+    page: 2,
+    pageCount: 3,
+  });
+
+  async function openFirstPageThenHoldNext() {
+    const held = deferred<PlayerOverviewPage>();
+    fetchPlayersPage.mockResolvedValueOnce(firstPage);
+    fetchPlayersPage.mockReturnValueOnce(held.promise);
+    const rendered = renderPlayerOverview();
+    await screen.findByText('FirstPage');
+    return { held, ...rendered };
+  }
+
+  it('keeps the previous rows and the requested URL instead of a skeleton', async () => {
+    const { router } = await openFirstPageThenHoldNext();
+
+    await act(() => router.navigate({ to: '/players', search: { page: 2 } }));
+
+    expect(screen.getByText('FirstPage')).toBeTruthy();
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(router.state.location.search).toEqual({ page: 2 });
+  });
+
+  it('orients the visitor only once the new page has arrived', async () => {
+    const { held, router } = await openFirstPageThenHoldNext();
+    const liveRegion = document.querySelector('[aria-live="polite"]');
+
+    await act(() => router.navigate({ to: '/players', search: { page: 2 } }));
+    expect(liveRegion?.textContent).toBe('');
+
+    await act(async () => held.resolve(secondPage));
+
+    await screen.findByText('SecondPage');
+    expect(liveRegion?.textContent).toBe('Showing 26–50 of 60');
+    expect(document.activeElement?.tagName).toBe('CAPTION');
+  });
+
+  it('does not treat a filter change as a page change', async () => {
+    fetchPlayersPage.mockResolvedValueOnce(secondPage);
+    const held = deferred<PlayerOverviewPage>();
+    fetchPlayersPage.mockReturnValueOnce(held.promise);
+    const { router } = renderPlayerOverview('/players?page=2');
+    await screen.findByText('SecondPage');
+
+    await act(() =>
+      router.navigate({ to: '/players', search: { sex: 'female' } }),
+    );
+    await act(async () =>
+      held.resolve(pageOf([buildPlayer({ surname: 'Filtered' })])),
+    );
+
+    await screen.findByText('Filtered');
+    expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe(
+      '',
+    );
+    expect(document.activeElement?.tagName).not.toBe('CAPTION');
   });
 });

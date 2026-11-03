@@ -5,7 +5,6 @@ import {
   PHONE,
   expectNoHorizontalOverflow,
   openOverview,
-  pageSizeSelect,
   pagination,
   paginationText,
   playersTable,
@@ -28,12 +27,8 @@ test.describe('Pagination compacts below 744px', () => {
     ).toHaveCount(0);
 
     const summaryBox = (await summary(page).boundingBox())!;
-    const selectBox = (await pageSizeSelect(page).boundingBox())!;
     const navBox = (await pagination(page).boundingBox())!;
-    expect(selectBox.y).toBeGreaterThanOrEqual(
-      summaryBox.y + summaryBox.height,
-    );
-    expect(navBox.y).toBeGreaterThanOrEqual(selectBox.y + selectBox.height);
+    expect(navBox.y).toBeGreaterThanOrEqual(summaryBox.y + summaryBox.height);
     await expectNoHorizontalOverflow(page);
   });
 });

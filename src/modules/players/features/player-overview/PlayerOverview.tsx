@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import type { Player } from '@/modules/players/domain/types/player';
+import { itemsPerPage } from '@/config/pagination';
+import type { Nationality } from '@/modules/players/domain/types/player';
+import type { PlayerOverviewPage } from '@/modules/players/domain/types/playerOverviewPage';
 import {
   all,
   type PlayerOverviewView,
 } from '@/modules/players/domain/types/playerOverviewSearch';
-import { queryPlayers } from '@/modules/players/domain/utils/queryPlayers';
 import { pageBounds } from '@/modules/players/ui/pageRange';
 import { Button } from '@/ui/button';
-import { usePlayers } from '@/modules/players/data-access/usePlayers';
+import { usePlayerNationalities } from '@/modules/players/data-access/usePlayerNationalities';
+import { usePlayersPage } from '@/modules/players/data-access/usePlayersPage';
 import {
   NationalityFilter,
   SexFilter,
@@ -40,20 +41,17 @@ export function PlayerOverview() {
 // (docs/standards/observability-standard.md), so the states here only inform the
 // visitor.
 function PlayerOverviewContent() {
-  const { t } = useTranslation();
-  const {
-    data: players,
-    isPending,
-    isError,
-    isFetching,
-    refetch,
-  } = usePlayers();
+  const { t, i18n } = useTranslation();
+  const search = routeApi.useSearch();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
+  const nationalities = usePlayerNationalities();
+  const playersPage = usePlayersPage(search, locale);
 
-  if (isPending) {
+  if (nationalities.isPending || playersPage.isPending) {
     return <PlayerTableSkeleton />;
   }
 
-  if (isError) {
+  if (nationalities.isError || playersPage.isError) {
     return (
       <div role="alert" className="flex flex-col items-start gap-base">
         <p className="type-body-md m-0 text-ink">
@@ -61,8 +59,11 @@ function PlayerOverviewContent() {
         </p>
         <Button
           variant="outline"
-          disabled={isFetching}
-          onClick={() => void refetch()}
+          disabled={nationalities.isFetching || playersPage.isFetching}
+          onClick={() => {
+            if (nationalities.isError) void nationalities.refetch();
+            if (playersPage.isError) void playersPage.refetch();
+          }}
         >
           {t('players.error.retry')}
         </Button>
@@ -70,25 +71,40 @@ function PlayerOverviewContent() {
     );
   }
 
-  if (players.length === 0) {
+  // Every player has a nationality, so none means no players at all, whatever
+  // the filters say.
+  if (nationalities.data.length === 0) {
     return <p className="type-body-md m-0 text-muted">{t('players.empty')}</p>;
   }
 
-  return <PlayerResults players={players} />;
+  return (
+    <PlayerResults
+      nationalities={nationalities.data}
+      playersPage={playersPage.data}
+      isShowingPreviousPage={playersPage.isPlaceholderData}
+      locale={locale}
+    />
+  );
 }
 
-// The URL is the only view state (ADR 0002): this reads the validated search,
-// derives the rows, and turns every view change into one navigation.
-function PlayerResults({ players }: { players: Player[] }) {
-  const { t, i18n } = useTranslation();
+// The URL is the only view state (ADR 0002): this reads the validated search and
+// turns every view change into one navigation. The rows come from the backend,
+// and until those of a new view arrive, the previous ones stay on screen.
+function PlayerResults({
+  nationalities,
+  playersPage,
+  isShowingPreviousPage,
+  locale,
+}: {
+  nationalities: Nationality[];
+  playersPage: PlayerOverviewPage;
+  isShowingPreviousPage: boolean;
+  locale: string;
+}) {
+  const { t } = useTranslation();
   const search = routeApi.useSearch();
   const navigate = routeApi.useNavigate();
-  const locale = i18n.resolvedLanguage ?? i18n.language;
-
-  const { rows, total, page, pageCount } = useMemo(
-    () => queryPlayers(players, search, locale),
-    [players, search, locale],
-  );
+  const { rows, total, page, pageCount } = playersPage;
 
   // Every view change returns to page 1 in the same navigation, so each
   // change is one history entry.
@@ -100,22 +116,25 @@ function PlayerResults({ players }: { players: Player[] }) {
   // The one place the "Showing X–Y of Z" text is built: the pagination shows
   // it and the page-change orientation announces it.
   const summary = t('players.pagination.summary', {
-    ...pageBounds(page, search.pageSize, total),
+    ...pageBounds(page, itemsPerPage, total),
     total,
   });
 
-  useCanonicalPage(search.page, page);
+  // The page on screen says nothing yet about the page in the URL while it is
+  // only the previous view's.
+  useCanonicalPage(search.page, isShowingPreviousPage ? search.page : page);
   const { tableRef, captionRef, announcement } = usePageChangeOrientation(
     search,
     page,
     summary,
+    isShowingPreviousPage,
   );
 
   return (
-    <div className="flex flex-col gap-lg">
+    <div className="flex flex-col gap-lg" aria-busy={isShowingPreviousPage}>
       <div className="flex flex-col gap-base tablet:flex-row">
         <NationalityFilter
-          players={players}
+          nationalities={nationalities}
           locale={locale}
           value={search.nationality}
           onChange={(nationality) => changeView({ nationality })}
@@ -140,9 +159,7 @@ function PlayerResults({ players }: { players: Player[] }) {
           <PlayerPagination
             page={page}
             pageCount={pageCount}
-            pageSize={search.pageSize}
             summary={summary}
-            onPageSizeChange={(pageSize) => changeView({ pageSize })}
           />
         </>
       )}

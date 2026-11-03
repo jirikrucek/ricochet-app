@@ -37,7 +37,6 @@ const en = {
       label: 'Pagination',
       previous: 'Previous',
       next: 'Next',
-      pageSize: 'Players per page',
       summary: 'Showing {{from}}–{{to}} of {{total}}',
       pageOf: 'Page {{page}} of {{count}}',
     },

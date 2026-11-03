@@ -42,4 +42,4 @@ The test is whether a wrong result would matter if a **visitor** tampered with i
 
 ## Notes
 
-- Client-side filtering, sorting and paging in `queryPlayers` (ADR 0010) stays for now, because it only affects what a **visitor** sees. Moving it to the server is a separate issue.
+- Filtering, sorting and paging only affect what a **visitor** sees, so this ADR doesn't require them in the backend. They moved there for a different reason: the cost of loading a whole list (ADR 0020).

@@ -3,9 +3,9 @@ import { getRouteApi, useRouter } from '@tanstack/react-router';
 
 const routeApi = getRouteApi('/players/');
 
-// A page beyond the last, or an invalid one, renders page 1 (queryPlayers).
-// Once the players are loaded and the page count is known, replace the URL so
-// the address bar matches what is shown, without a new history entry.
+// A page beyond the last, or an invalid one, shows page 1 (fetchPlayersPage). Once
+// the backend has answered, replace the URL so the address bar matches what is
+// shown, without a new history entry.
 export function useCanonicalPage(requestedPage: number, effectivePage: number) {
   const router = useRouter();
   const navigate = routeApi.useNavigate();

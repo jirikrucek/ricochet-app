@@ -4,14 +4,12 @@ import { useTranslation } from 'react-i18next';
 import {
   sexes,
   type Nationality,
-  type Player,
   type Sex,
 } from '@/modules/players/domain/types/player';
 import {
   all,
   type OrAll,
 } from '@/modules/players/domain/types/playerOverviewSearch';
-import { presentNationalities } from '@/modules/players/domain/utils/queryPlayers';
 import { Flag } from '@/shared/ui/Flag';
 import { FilterSelect, type FilterOption } from './FilterSelect';
 
@@ -40,12 +38,12 @@ export function SexFilter({
 }
 
 export function NationalityFilter({
-  players,
+  nationalities,
   locale,
   value,
   onChange,
 }: {
-  players: Player[];
+  nationalities: Nationality[];
   locale: string;
   value: OrAll<Nationality>;
   onChange: (value: OrAll<Nationality>) => void;
@@ -54,7 +52,7 @@ export function NationalityFilter({
 
   const options = useMemo<FilterOption<OrAll<Nationality>>[]>(() => {
     const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
-    const countries = presentNationalities(players)
+    const countries = nationalities
       .map((nationality) => ({
         nationality,
         name: t(`countries.${nationality}`),
@@ -77,7 +75,7 @@ export function NationalityFilter({
         ),
       })),
     ];
-  }, [players, locale, t]);
+  }, [nationalities, locale, t]);
 
   return (
     <FilterSelect
