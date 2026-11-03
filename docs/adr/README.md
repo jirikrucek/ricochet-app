@@ -19,6 +19,6 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0013 | [Preview and Production Use Separate Supabase Projects](ADR0013-preview-and-production-use-separate-supabase-projects.md) | Accepted |
 | 0014 | [Report Client Errors and Logs to Sentry](ADR0014-report-client-errors-and-logs-to-sentry.md) | Accepted |
 | 0015 | [Shadcn Components Use Base UI Primitives](ADR0015-shadcn-components-use-base-ui-primitives.md) | Accepted |
-| 0016 | [Features Own Their Code by Default](ADR0016-features-own-their-code-by-default.md) | Accepted |
-| 0017 | [API Folders Map Backend Rows to Domain Types](ADR0017-api-folders-map-backend-rows-to-domain-types.md) | Accepted |
+| 0016 | [Modules Own Their Code by Default](ADR0016-modules-own-their-code-by-default.md) | Accepted |
+| 0017 | [Data Access Maps Backend Rows to Domain Types](ADR0017-data-access-maps-backend-rows-to-domain-types.md) | Accepted |
 | 0018 | [Trusted Business Rules Live in the Backend](ADR0018-trusted-business-rules-live-in-the-backend.md) | Accepted |

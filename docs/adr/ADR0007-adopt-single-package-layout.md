@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-08-10
-- Updated: 2026-11-02
+- Updated: 2026-11-03
 - Supersedes: ADR 0004
 
 ## Context
@@ -20,11 +20,11 @@ ADR 0004 considered and rejected a single-package layout at the time, on the gro
 Collapse the repository to a single npm package at the root:
 
 - Remove the `apps/*` / `packages/*` npm workspaces. One `package.json`, one `tsconfig.json`, one `src/` at the repo root.
-- Fold `packages/shared`'s intended purpose (shared contracts) into `src/types/`.
+- Fold `packages/shared`'s intended purpose (shared contracts) into `src/shared/domain/`.
 - Adopt the folder layout and import rules defined in [`docs/standards/project-structure-standard.md`](../standards/project-structure-standard.md), which supersedes the folder mapping previously in ADR 0004.
 - Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see `eslint.config.mjs` for the rule set.
 
-This does not change the boundaries decided in ADR 0003, now recorded in ADR 0016 (players / tournaments / auth) and ADR 0017 (the seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
+This does not change the boundaries decided in ADR 0003, now recorded in ADR 0016 (module boundaries) and ADR 0017 (the seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
 
 ## Alternatives Considered
 

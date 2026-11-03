@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-11-02
-- Updated: 2026-11-02
+- Updated: 2026-11-03
 - Supersedes: ADR 0012
 
 ## Context
@@ -33,8 +33,8 @@ The test is whether a wrong result would matter if a **visitor** tampered with i
 
 ## Consequences
 
-- Positive: results stay correct whatever a browser sends, and every feature reads the same result.
-- Positive: `src/` stays free of scoring and bracket logic, so the client's `utils/` holds only small presentation and view helpers.
+- Positive: results stay correct whatever a browser sends, and every **module** reads the same result.
+- Positive: `src/` stays free of scoring and bracket logic, so the `domain/` folders hold only **domain types** and small presentation and view helpers.
 - Negative: SQL logic is harder to refactor than TypeScript, and every rule change needs a migration.
 - Negative: each trusted result needs a backend round trip, so screens that need instant feedback, such as live scoring, may need a client-side preview.
 - Negative: more logic in Postgres ties the app more closely to Supabase.

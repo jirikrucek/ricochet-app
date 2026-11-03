@@ -9,7 +9,7 @@ This standard uses the terms domain, module, feature and shared code as defined 
 ## Principles
 
 - **Backend first.** Rules that must be trusted (permissions, integrity, scoring, brackets, ranking points) live in Supabase: RLS, constraints, Postgres functions and views, or Edge Functions. Client code can be read and changed by the user, so client checks only give quick feedback ([ADR 0018](../adr/ADR0018-trusted-business-rules-live-in-the-backend.md)).
-- **Module first.** Code starts in its module. It moves to `src/shared/` only when a second module, or `app`, needs it ([ADR 0016](../adr/ADR0016-features-own-their-code-by-default.md)).
+- **Module first.** Code starts in its module. It moves to `src/shared/` only when a second module, or `app`, needs it ([ADR 0016](../adr/ADR0016-modules-own-their-code-by-default.md)).
 - **One term, many representations.** A glossary term means the same in every module, but each module defines its own type with the data it needs. If a module adds real meaning to a term, that meaning gets its own glossary term.
 - **Thin routes.** A route maps a URL to a feature and validates its search params. The logic belongs to the feature.
 - **Folders on demand.** A folder is created with its first file. The layout below lists folders that don't exist yet because their rules are already defined.
@@ -75,7 +75,7 @@ A module's layers and their counterparts in `src/shared/` hold the same kind of 
 | `features/<feature>/` | The orchestration of one use case: the component a route renders, and the hooks that handle its URL, focus and other flow. It connects `ui/`, `data-access/` and `domain/`, and is the only layer that reaches its module's `data-access/`. |
 | `ui/` | Components, their prop types, and form schemas. Components get data through props and call no backend code. Hooks that serve only these components go here too. |
 | `data-access/` | TanStack Query hooks with their query keys and cache settings. This is what features use to reach the backend. |
-| `data-access/api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-api-folders-map-backend-rows-to-domain-types.md)). Only `data-access/` hooks call it. No React, TanStack or i18next. |
+| `data-access/api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-data-access-maps-backend-rows-to-domain-types.md)). Only `data-access/` hooks call it. No React, TanStack or i18next. |
 | `domain/` | The module's representation of glossary terms: domain types, the Zod schemas they are inferred from, those schemas' constants (e.g. `playerSchema` → `Player`, `nationalities`), and pure helpers (e.g. `formatSurname`, `queryPlayers`). Knows nothing about storage: no column names. Pure: no React, TanStack, i18next or `fetch`. Trusted rules don't belong here; see Backend first. |
 | `src/routes/` | Route definitions and search param validation. Routes import the screen from a feature and its search schema from a module's `domain/`. |
 | `src/app/` | The app shell: provider wiring, global layout chrome, and the error boundary. It composes features but owns none of their logic. |
