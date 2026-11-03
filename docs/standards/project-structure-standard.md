@@ -4,13 +4,14 @@ This project is a single npm package (see [ADR 0007](../adr/ADR0007-adopt-single
 
 Place every file in the folder its scope below allows, and respect the import rules. They are enforced by `eslint-plugin-boundaries` (see [Enforcement](#enforcement)) — a violation fails `npm run lint`.
 
+This standard uses the terms domain, module, feature and shared code as defined in [`glossary/technical.md`](../../glossary/technical.md).
+
 ## Principles
 
 - **Backend first.** Rules that must be trusted (permissions, integrity, scoring, brackets, ranking points) live in Supabase: RLS, constraints, Postgres functions and views, or Edge Functions. Client code can be read and changed by the user, so client checks only give quick feedback ([ADR 0018](../adr/ADR0018-trusted-business-rules-live-in-the-backend.md)).
-- **Feature first.** Code starts in its feature. It moves to the matching global folder in `src/` only when a second feature needs it ([ADR 0016](../adr/ADR0016-features-own-their-code-by-default.md)).
-- **A feature is a business area, not a screen.** A player overview and a player detail both belong in `features/players/`. Make a separate feature when the code has its own data and rules, and rarely changes alongside the rest.
-- **Features do not share types by default.** Two features that show the same entity each define the type they need, for example `Player` and `TournamentParticipant`, and each has its own query and mapper.
-- **Thin routes.** A route maps a URL to a screen and validates its search params. The screen's logic belongs to its feature.
+- **Module first.** Code starts in its module. It moves to `src/shared/` only when a second module, or `app`, needs it ([ADR 0016](../adr/ADR0016-features-own-their-code-by-default.md)).
+- **One term, many representations.** A glossary term means the same in every module, but each module defines its own type with the data it needs. If a module adds real meaning to a term, that meaning gets its own glossary term.
+- **Thin routes.** A route maps a URL to a feature and validates its search params. The logic belongs to the feature.
 - **Folders on demand.** A folder is created with its first file. The layout below lists folders that don't exist yet because their rules are already defined.
 
 ## Folder layout
@@ -28,26 +29,21 @@ ricochet-app/
 │   ├── app/                    # App shell, built once
 │   │   ├── AppProviders.tsx
 │   │   ├── AppErrorBoundary.tsx
-│   │   └── layout/             # Global chrome: TopNav, AppFooter
-│   ├── features/
-│   │   └── <feature>/
-│   │       ├── api/            # Backend calls, row types, mappers
-│   │       ├── components/     # UI components
-│   │       ├── hooks/          # TanStack Query hooks and other React hooks
-│   │       ├── store/          # Zustand stores
-│   │       ├── types/          # Domain types and the schemas they are inferred from
-│   │       └── utils/          # Pure helpers
-│   │
-│   │   # Global counterparts, for code used by two or more features
-│   ├── api/
-│   ├── components/
-│   ├── hooks/
-│   ├── store/
-│   ├── types/
-│   ├── utils/
-│   │
-│   │   # Global only
-│   ├── ui/                     # Shadcn primitives
+│   │   └── layout/             # Global chrome: TopNav, AppFooter, language selector
+│   ├── modules/
+│   │   └── <module>/
+│   │       ├── features/
+│   │       │   └── <feature>/  # Orchestration of one use case and its hooks
+│   │       ├── ui/             # Components that get their data through props
+│   │       ├── data-access/    # Query hooks
+│   │       │   └── api/        # Backend calls, row types, mappers
+│   │       └── domain/         # Domain types, their schemas, pure helpers
+│   ├── shared/                 # Used by two or more modules, or by a module and app
+│   │   ├── ui/
+│   │   ├── data-access/
+│   │   │   └── api/
+│   │   └── domain/
+│   ├── ui/                     # Shadcn primitives and cn
 │   ├── db/                     # Supabase client, generated database types, RLS test
 │   ├── lib/                    # Third-party setup: Sentry, i18next, QueryClient
 │   ├── config/                 # Static settings
@@ -59,6 +55,7 @@ ricochet-app/
 ├── tests/
 │   ├── e2e/                    # Playwright specs
 │   └── support/                # Test tooling: local Supabase env helpers for Vitest and Playwright
+├── glossary/                   # Domain and technical terms
 ├── docs/
 └── openspec/
 ```
@@ -67,84 +64,86 @@ Config files (ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `ve
 
 Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`). Only Playwright e2e specs live under a separate `tests/e2e/` folder.
 
+Any layer can have subfolders to organize its code, such as `domain/types/` or `domain/utils/`. They carry no import rules of their own: lint checks the layer as a whole. Add them when a folder grows, not before. The exception is `data-access/api/`, which is a layer of its own.
+
 ## Folder responsibilities
 
-Feature folders and their global counterparts hold the same kind of code. They differ only in how many features use it.
+A module's layers and their counterparts in `src/shared/` hold the same kind of code. They differ only in how many modules use it.
 
 | Folder | Scope & allowed artifacts |
 | :--- | :--- |
-| `api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-api-folders-map-backend-rows-to-domain-types.md)). No React, TanStack or i18next. |
-| `components/` | UI components, their prop types, and form schemas. Global `components/` can know about the app and its domain, which is what separates it from `ui/`. |
-| `hooks/` | TanStack Query hooks, including their query keys and cache settings, and other React hooks. The only layer that can reach `api/`. Wrap pure logic from `utils/` rather than writing it inline, so it can be tested without React. |
-| `store/` | Zustand stores for shared client UI state. Server data belongs to TanStack Query, and shareable view state belongs to the URL. |
-| `types/` | Domain types, the Zod schemas they are inferred from, and those schemas' constants (e.g. `playerSchema` → `Player`, `nationalities`). Knows nothing about storage: no column names. Pure: no React, TanStack, i18next or `fetch`. |
-| `utils/` | Pure helpers for presentation and view logic (e.g. `formatSurname`, `queryPlayers`, `cn`). Same purity rules as `types/`. |
-| `src/routes/` | Route definitions and search param validation. Routes import the screen from a feature's `components/` and its search schema from a feature's `types/`. |
+| `features/<feature>/` | The orchestration of one use case: the component a route renders, and the hooks that handle its URL, focus and other flow. It connects `ui/`, `data-access/` and `domain/`, and is the only layer that reaches its module's `data-access/`. |
+| `ui/` | Components, their prop types, and form schemas. Components get data through props and call no backend code. Hooks that serve only these components go here too. |
+| `data-access/` | TanStack Query hooks with their query keys and cache settings. This is what features use to reach the backend. |
+| `data-access/api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-api-folders-map-backend-rows-to-domain-types.md)). Only `data-access/` hooks call it. No React, TanStack or i18next. |
+| `domain/` | The module's representation of glossary terms: domain types, the Zod schemas they are inferred from, those schemas' constants (e.g. `playerSchema` → `Player`, `nationalities`), and pure helpers (e.g. `formatSurname`, `queryPlayers`). Knows nothing about storage: no column names. Pure: no React, TanStack, i18next or `fetch`. Trusted rules don't belong here; see Backend first. |
+| `src/routes/` | Route definitions and search param validation. Routes import the screen from a feature and its search schema from a module's `domain/`. |
 | `src/app/` | The app shell: provider wiring, global layout chrome, and the error boundary. It composes features but owns none of their logic. |
-| `src/ui/` | Shadcn primitives. Domain-agnostic — must work with any product, not just Ricochet. |
-| `src/db/` | The Supabase client, the generated `database.types.ts`, and the row-level security test. Only the `api/` folders import it. |
-| `src/lib/` | Third-party tools configured once at startup (e.g. `sentry.ts`, `i18n.ts`, `queryClient.ts`). A configured REST client belongs in `api/` instead. |
+| `src/shared/` | `ui/`, `data-access/` and `domain/`, for code two or more modules use, or a module and `app`. Nothing else goes here. |
+| `src/ui/` | Shadcn primitives and `cn`. Domain-agnostic — must work with any product, not just Ricochet. |
+| `src/db/` | The Supabase client, the generated `database.types.ts`, and the row-level security test. Only the `data-access/api/` folders import it. |
+| `src/lib/` | Third-party tools configured once at startup (e.g. `sentry.ts`, `i18n.ts`, `queryClient.ts`). A configured REST client belongs in `data-access/api/` instead. |
 | `src/config/` | Static app settings with no better owner. |
 | `src/locales/` | One translation file per language, `resources.ts`, and `languages.ts` (supported languages and their metadata). |
 | `src/styles/` | Tailwind theme tokens and global CSS. No JS/TS other than the test that checks the tokens. Components use tokens through Tailwind classes. |
 | `src/assets/` | Static files imported by code and processed by the bundler (as opposed to `public/`, which is copied verbatim). |
 
+Server data belongs to TanStack Query, and shareable view state belongs to the URL. Where client UI stores go is decided when the first real use case appears ([ADR 0002](../adr/ADR0002-adopt-type-safe-frontend-architecture.md)).
+
 ### Choosing between folders
 
-- **`types/` or `api/`?** A domain type and its schema go in `types/`. A shape that exists only because of the backend, such as a row, goes in `api/`.
-- **`types/` or `components/`?** A schema that defines what something is goes in `types/`. A schema for one form goes next to that form.
-- **`utils/` or the backend?** If the result must be trusted, it belongs in Supabase. If it only decides how something looks or which view is shown, it belongs in `utils/`.
-- **`utils/` or `hooks/`?** If it needs React state or effects, it is a hook. Otherwise it is a util.
+- **`features/` or `ui/`?** If it loads data, reads the URL or coordinates a flow, it belongs to a feature. If it renders what its props say, it belongs in `ui/`.
+- **Where does a hook go?** A hook that talks to the backend goes in `data-access/`. A hook that orchestrates one use case goes in its feature. Any other hook goes in `ui/`.
+- **`domain/` or `data-access/api/`?** A domain type and its schema go in `domain/`. A shape that exists only because of the backend, such as a row, goes in `data-access/api/`.
+- **`domain/` or `ui/`?** A schema that defines what something is goes in `domain/`. A schema for one form goes next to that form.
+- **`domain/` or the backend?** If the result must be trusted, it belongs in Supabase. If it only decides how something looks or which view is shown, it can stay in `domain/`.
 - **`lib/` or `config/`?** If it sets up a third-party tool, it goes in `lib/`. If it is plain settings, it goes in `config/`.
 
 ## Imports
 
-Inside `src/`, import a file in the same folder or below it with `./` (`./PlayerTable`). Import anything else with the `@/` alias (`@/features/players/types/player`). Never use `../`. ESLint enforces this (`no-restricted-imports`).
+Inside `src/`, import a file in the same folder or below it with `./` (`./PlayerTable`). Import anything else with the `@/` alias (`@/modules/players/domain/types/player`). Never use `../`. ESLint enforces this (`no-restricted-imports`).
 
 ## Import rules
 
-"Own" means the same feature, and "global" means the counterpart directly under `src/`. Files can also import others in the same folder, and any layer can import from `assets/`.
+"Own" means the same module. Files can also import others in the same layer, and any layer can import from `assets/`.
 
 | Layer | May import |
 | :--- | :--- |
-| `routes` | `app`; any feature's `components`, `types` |
-| `app` | any feature's `components`; global `components`, `hooks`, `store`, `types`, `utils`; `ui`, `lib`, `config` |
-| Feature `components` | own `hooks`, `store`, `types`, `utils`; global `components`, `hooks`, `store`, `types`, `utils`; `ui`, `config`, `locales/languages.ts` |
-| Feature `hooks` | own `api`, `store`, `types`, `utils`; global `api`, `hooks`, `store`, `types`, `utils`; `config`, `lib/sentry.ts`, `locales/languages.ts` |
-| Feature `api` | own `types`, `utils`; global `api`, `types`, `utils`; `db` |
-| Feature `store` | own `types`, `utils`; global `types`, `utils` |
-| Feature `utils` | own `types`; global `types`, `utils` |
-| Feature `types` | global `types` |
-| Global `components` | `ui`; global `hooks`, `store`, `types`, `utils`; `config`, `locales/languages.ts` |
-| Global `hooks` | global `api`, `store`, `types`, `utils`; `config`, `lib/sentry.ts`, `locales/languages.ts` |
-| Global `api` | `db`; global `types`, `utils` |
-| Global `store` | global `types`, `utils` |
-| Global `utils` | global `types` |
-| Global `types` | nothing else |
-| `ui` | global `utils` |
+| `routes` | `app`; any module's `features`, `domain` |
+| `app` | any module's `features`; `shared/ui`, `shared/data-access`, `shared/domain`; `ui`, `lib`, `config`, `locales/languages.ts` |
+| Module `features` | own `ui`, `data-access`, `domain`; `shared/ui`, `shared/data-access`, `shared/domain`; `ui`, `config`, `lib/sentry.ts`, `locales/languages.ts` |
+| Module `ui` | own `domain`; `shared/ui`, `shared/domain`; `ui`, `config`, `locales/languages.ts` |
+| Module `data-access` | own `data-access/api`, `domain`; `shared/data-access`, `shared/domain`; `config`, `lib/sentry.ts` |
+| Module `data-access/api` | own `domain`; `shared/data-access/api`, `shared/domain`; `db`, `config` |
+| Module `domain` | `shared/domain` |
+| `shared/ui` | `shared/domain`; `ui`, `config`, `locales/languages.ts` |
+| `shared/data-access` | `shared/data-access/api`, `shared/domain`; `config`, `lib/sentry.ts` |
+| `shared/data-access/api` | `shared/domain`; `db`, `config` |
+| `shared/domain` | nothing else |
 | `lib` | `config`, `locales` |
-| `db`, `config`, `locales` | nothing else |
+| `ui`, `db`, `config`, `locales` | nothing else |
 | `styles` | nothing else; only `main.tsx` imports it |
 
 `main.tsx` and `router.tsx` start the app and sit outside these rules.
 
 Rules of thumb:
 
-- **Features never import other features, and global code never imports features.** Code that a second feature needs moves to the global counterpart. The exceptions are `routes` and `app`, which compose features through their `components` (and, for `routes`, the `types` holding search schemas).
-- **Only hooks reach `api`.** A component that needs backend data calls a hook. `routes` and `app` go through a feature's components.
-- **Only `db` and the `api` folders import `@supabase/supabase-js`.** Supabase Auth, Realtime and Storage calls follow the same path as queries.
-- **`api`, `types` and `utils` don't use React.** They also don't use TanStack or i18next. `types` and `utils` don't call `fetch` either.
+- **Modules never import other modules, and features never import other features.** Code that a second module needs moves to `src/shared/`, and code that a second feature needs moves to the module's `ui/`, `data-access/` or `domain/`. Only `routes` and `app` work across modules.
+- **Only features reach a module's `data-access`.** A `ui` component that needs backend data gets it through props, or the code that needs it becomes a feature. `routes` go through a feature, and `app` can also use `shared/data-access`.
+- **Only `data-access` hooks reach `data-access/api`.** A feature calls `usePlayers`, never `fetchPlayers`, because the hook owns the query key and cache settings.
+- **Only `db` and the `data-access/api` folders import `@supabase/supabase-js`.** Supabase Auth, Realtime and Storage calls follow the same path as queries.
+- **`domain` and `data-access/api` don't use React.** They also don't use TanStack or i18next. `domain` doesn't call `fetch` either.
 - **Components get translations from `useTranslation`, not from `lib/i18n`.** Calling `i18n.t()` directly doesn't re-render a component when the language changes. Likewise, use `useQueryClient`, not `lib/queryClient`.
-- **Hooks import only `sentry.ts` from `lib`.** Failed queries and mutations are already reported by the shared `QueryCache` and `MutationCache`. A hook reports what they can't see, such as a dropped Realtime channel or a failure it handles itself.
-- **`ui` stays generic.** A component that needs app or domain knowledge belongs in `components/`.
-- **Component tests may import `lib/i18n`.** They render with the configured i18n instance. This is the only test-specific exception.
+- **Features and `data-access` hooks import only `sentry.ts` from `lib`.** Failed queries and mutations are already reported by the shared `QueryCache` and `MutationCache`. Report only what they can't see, such as a dropped Realtime channel or a failure the code handles itself.
+- **`src/ui` stays generic.** A component that needs app or domain knowledge belongs in a module's `ui/` or in `shared/ui/`.
+- **Tests of features and `ui` components may import `lib/i18n`.** They render with the configured i18n instance. This is the only test-specific exception.
 
 ## Enforcement
 
 The import rules are enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) through the `boundaries/dependencies` policy in `eslint.config.mjs`, which is the source of truth for what is allowed. Change the rules and the policy together, and update the table above to match.
 
-- Each feature folder is its own element (`feature-api`, `feature-hooks`, ...), captured per feature, so another feature's files match no policy.
-- `boundaries/no-unknown-files` rejects a TypeScript file outside every element, so a new top-level folder or a loose file in a feature root fails until it is added to this standard and the policy. Only `src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts` and `src/vite-env.d.ts` are exempt.
+- Each module layer is its own element (`module-features`, `module-ui`, ...), captured per module, so another module's files match no policy. `module-features` is also captured per feature.
+- `boundaries/no-unknown-files` rejects a TypeScript file outside every element, so a new top-level folder, a new folder in a module or in `src/shared/`, or a loose file in a module root fails until it is added to this standard and the policy. Only `src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts` and `src/vite-env.d.ts` are exempt.
 - `assets/` has no element, because unclassified imports aren't checked. This is what lets every layer use it.
 - Parent-relative imports (`../`) and `console.*` are rejected in `src/` by separate ESLint rules; see [Imports](#imports).
-- `api/`, `types/` and `utils/` reject imports of React, TanStack and i18next through ESLint overrides, and `types/` and `utils/` also reject `fetch`.
+- `domain/` and `data-access/api/` reject imports of React, TanStack and i18next through ESLint overrides, and `domain/` also rejects the `fetch` global.

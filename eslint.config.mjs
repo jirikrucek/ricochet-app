@@ -24,14 +24,14 @@ const uiAndDataPackagesPatterns = {
   ],
 };
 
-// A layer of the same feature as the importing file. Other features match no
+// A layer of the same module as the importing file. Other modules match no
 // policy, so they stay disallowed.
-const ownFeature = (...types) =>
+const ownModule = (...types) =>
   types.map((type) => ({
     to: {
       element: {
         type,
-        captured: { feature: '{{from.captured.feature}}' },
+        captured: { module: '{{from.captured.module}}' },
       },
     },
   }));
@@ -47,77 +47,72 @@ const layerPolicy = (type, ...allow) => ({
 });
 
 const languagesFile = fileOf('locales', 'src/locales/languages.ts');
+const sentryFile = fileOf('lib', 'src/lib/sentry.ts');
 
 const boundaryPolicies = [
-  layerPolicy('routes', layers('app', 'feature-components', 'feature-types')),
+  layerPolicy('routes', layers('app', 'module-features', 'module-domain')),
   layerPolicy(
     'app',
     layers(
-      'feature-components',
-      'components',
-      'hooks',
-      'store',
-      'types',
-      'utils',
+      'module-features',
+      'shared-ui',
+      'shared-data-access',
+      'shared-domain',
       'ui',
       'lib',
       'config',
     ),
-  ),
-  layerPolicy(
-    'feature-components',
-    ...ownFeature(
-      'feature-hooks',
-      'feature-store',
-      'feature-types',
-      'feature-utils',
-    ),
-    layers('components', 'hooks', 'store', 'types', 'utils', 'ui', 'config'),
     languagesFile,
   ),
   layerPolicy(
-    'feature-hooks',
-    ...ownFeature(
-      'feature-api',
-      'feature-store',
-      'feature-types',
-      'feature-utils',
-    ),
-    layers('api', 'hooks', 'store', 'types', 'utils', 'config'),
-    fileOf('lib', 'src/lib/sentry.ts'),
+    'module-features',
+    // The plugin doesn't treat files at different depths of a feature folder
+    // as one element, so a feature's access to itself is spelled out.
+    {
+      to: {
+        element: {
+          type: 'module-features',
+          captured: {
+            module: '{{from.captured.module}}',
+            feature: '{{from.captured.feature}}',
+          },
+        },
+      },
+    },
+    ...ownModule('module-ui', 'module-data-access', 'module-domain'),
+    layers('shared-ui', 'shared-data-access', 'shared-domain', 'ui', 'config'),
+    sentryFile,
     languagesFile,
   ),
   layerPolicy(
-    'feature-api',
-    ...ownFeature('feature-types', 'feature-utils'),
-    layers('api', 'types', 'utils', 'db'),
-  ),
-  layerPolicy(
-    'feature-store',
-    ...ownFeature('feature-types', 'feature-utils'),
-    layers('types', 'utils'),
-  ),
-  layerPolicy(
-    'feature-utils',
-    ...ownFeature('feature-types'),
-    layers('types', 'utils'),
-  ),
-  layerPolicy('feature-types', layers('types')),
-  layerPolicy(
-    'components',
-    layers('ui', 'hooks', 'store', 'types', 'utils', 'config'),
+    'module-ui',
+    ...ownModule('module-domain'),
+    layers('shared-ui', 'shared-domain', 'ui', 'config'),
     languagesFile,
   ),
   layerPolicy(
-    'hooks',
-    layers('api', 'store', 'types', 'utils', 'config'),
-    fileOf('lib', 'src/lib/sentry.ts'),
+    'module-data-access',
+    ...ownModule('module-api', 'module-domain'),
+    layers('shared-data-access', 'shared-domain', 'config'),
+    sentryFile,
+  ),
+  layerPolicy(
+    'module-api',
+    ...ownModule('module-domain'),
+    layers('shared-api', 'shared-domain', 'db', 'config'),
+  ),
+  layerPolicy('module-domain', layers('shared-domain')),
+  layerPolicy(
+    'shared-ui',
+    layers('shared-domain', 'ui', 'config'),
     languagesFile,
   ),
-  layerPolicy('api', layers('db', 'types', 'utils')),
-  layerPolicy('store', layers('types', 'utils')),
-  layerPolicy('utils', layers('types')),
-  layerPolicy('ui', layers('utils')),
+  layerPolicy(
+    'shared-data-access',
+    layers('shared-api', 'shared-domain', 'config'),
+    sentryFile,
+  ),
+  layerPolicy('shared-api', layers('shared-domain', 'db', 'config')),
   layerPolicy('lib', layers('config', 'locales')),
   {
     allow: {
@@ -135,7 +130,7 @@ const boundaryPolicies = [
     },
     message: 'Import Supabase only inside src/db and the api folders.',
   },
-  ...['db', 'api', 'feature-api'].map((type) => ({
+  ...['db', 'module-api', 'shared-api'].map((type) => ({
     from: { element: { type } },
     allow: {
       to: {
@@ -238,17 +233,37 @@ export default tseslint.config(
       'boundaries/elements': [
         { type: 'routes', pattern: 'src/routes/**', partialMatch: false },
         { type: 'app', pattern: 'src/app/**', partialMatch: false },
-        ...['api', 'components', 'hooks', 'store', 'types', 'utils'].flatMap(
-          (layer) => [
-            {
-              type: `feature-${layer}`,
-              pattern: `src/features/*/${layer}/**`,
-              partialMatch: false,
-              capture: ['feature'],
-            },
-            { type: layer, pattern: `src/${layer}/**`, partialMatch: false },
-          ],
-        ),
+        {
+          type: 'module-features',
+          pattern: 'src/modules/*/features/*/**',
+          partialMatch: false,
+          capture: ['module', 'feature'],
+        },
+        // Before data-access, because a file takes the first element it matches.
+        {
+          type: 'module-api',
+          pattern: 'src/modules/*/data-access/api/**',
+          partialMatch: false,
+          capture: ['module'],
+        },
+        {
+          type: 'shared-api',
+          pattern: 'src/shared/data-access/api/**',
+          partialMatch: false,
+        },
+        ...['ui', 'data-access', 'domain'].flatMap((layer) => [
+          {
+            type: `module-${layer}`,
+            pattern: `src/modules/*/${layer}/**`,
+            partialMatch: false,
+            capture: ['module'],
+          },
+          {
+            type: `shared-${layer}`,
+            pattern: `src/shared/${layer}/**`,
+            partialMatch: false,
+          },
+        ]),
         { type: 'ui', pattern: 'src/ui/**', partialMatch: false },
         { type: 'db', pattern: 'src/db/**', partialMatch: false },
         { type: 'lib', pattern: 'src/lib/**', partialMatch: false },
@@ -281,7 +296,7 @@ export default tseslint.config(
     rules: {
       'boundaries/dependencies': dependencyRule([
         ...boundaryPolicies,
-        ...['feature-components', 'components'].map((type) =>
+        ...['module-features', 'module-ui', 'shared-ui'].map((type) =>
           layerPolicy(type, fileOf('lib', 'src/lib/i18n.ts')),
         ),
       ]),
@@ -307,7 +322,10 @@ export default tseslint.config(
     // backend and know nothing about React or query caching, which hooks own.
     // This replaces the src-wide no-restricted-imports above for these files,
     // so it repeats the '../' pattern.
-    files: ['src/api/**/*.{ts,tsx}', 'src/features/*/api/**/*.{ts,tsx}'],
+    files: [
+      'src/shared/data-access/api/**/*.{ts,tsx}',
+      'src/modules/*/data-access/api/**/*.{ts,tsx}',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -325,22 +343,20 @@ export default tseslint.config(
     },
   },
   {
-    // docs/standards/project-structure-standard.md: types and utils are pure,
+    // docs/standards/project-structure-standard.md: domain folders are pure,
     // so no UI, data-fetching or localization libraries, and no fetch.
     // This replaces the src-wide no-restricted-imports above for these files,
     // so it repeats the '../' pattern.
     files: [
-      'src/types/**/*.{ts,tsx}',
-      'src/utils/**/*.{ts,tsx}',
-      'src/features/*/types/**/*.{ts,tsx}',
-      'src/features/*/utils/**/*.{ts,tsx}',
+      'src/shared/domain/**/*.{ts,tsx}',
+      'src/modules/*/domain/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-globals': [
         'error',
         {
           name: 'fetch',
-          message: 'types and utils do not fetch; the api folders do.',
+          message: 'domain folders do not fetch; the data-access folders do.',
         },
       ],
       'no-restricted-imports': [
@@ -351,7 +367,7 @@ export default tseslint.config(
             {
               ...uiAndDataPackagesPatterns,
               message:
-                'types and utils are pure: no React, TanStack or i18next.',
+                'domain folders are pure: no React, TanStack or i18next.',
             },
           ],
         },
