@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-08-10
-- Updated: 2026-10-28
+- Updated: 2026-11-03
 - Supersedes: ADR 0004
 
 ## Context
@@ -20,11 +20,11 @@ ADR 0004 considered and rejected a single-package layout at the time, on the gro
 Collapse the repository to a single npm package at the root:
 
 - Remove the `apps/*` / `packages/*` npm workspaces. One `package.json`, one `tsconfig.json`, one `src/` at the repo root.
-- Fold `packages/shared`'s intended purpose (shared contracts) into `src/domain/shared/`.
-- Adopt the folder layout and dependency graph defined in [`docs/standards/project-structure-standard.md`](../standards/project-structure-standard.md), which supersedes the folder mapping previously in ADR 0004.
+- Fold `packages/shared`'s intended purpose (shared contracts) into `src/shared/domain/`.
+- Adopt the folder layout and import rules defined in [`docs/standards/project-structure-standard.md`](../standards/project-structure-standard.md), which supersedes the folder mapping previously in ADR 0004.
 - Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see `eslint.config.mjs` for the rule set.
 
-This does not change the domain boundaries decided in ADR 0003, now recorded in ADR 0012 (players / tournaments / auth, repository seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
+This does not change the boundaries decided in ADR 0003, now recorded in ADR 0016 (module boundaries) and ADR 0017 (the seam between UI and Supabase); it changes how those boundaries are enforced, from a package boundary to a linted folder boundary.
 
 ## Alternatives Considered
 
@@ -42,4 +42,4 @@ This does not change the domain boundaries decided in ADR 0003, now recorded in 
 ## Notes
 
 - Supersedes ADR 0004.
-- `docs/standards/project-structure-standard.md` is the source of truth for the concrete folder layout, per-folder responsibilities, and the dependency graph; `eslint.config.mjs` holds the `eslint-plugin-boundaries` policy that enforces it. This ADR records only the shape decision and why it changed from ADR 0004.
+- `docs/standards/project-structure-standard.md` is the source of truth for the concrete folder layout, per-folder responsibilities, and the import rules; `eslint.config.mjs` holds the `eslint-plugin-boundaries` policy that enforces it. This ADR records only the shape decision and why it changed from ADR 0004.

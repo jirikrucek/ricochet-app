@@ -10,7 +10,7 @@ Rules for what data each test level may use and how tests reach a database. The 
 | Integration | `src/**/*.integration.test.ts` | **Seed data** in the local Supabase | Local only |
 | E2E | `tests/e2e/**/*.spec.ts` | **Seed data** in the local Supabase | Local only |
 
-- **Unit tests use mock data only.** They never reach the network; a component test mocks the repository function it uses, and a repository test passes in a fake client (loading `supabaseClient.ts` needs the two `VITE_SUPABASE_*` variables, so the test stubs them first). A component unit test gets a fresh `QueryClient` with `retry: false`.
+- **Unit tests use mock data only.** They never reach the network; a component test mocks the `data-access/api` function it uses, and an `api` test passes in a fake client (loading `supabaseClient.ts` needs the two `VITE_SUPABASE_*` variables, so the test stubs them first). A component unit test gets a fresh `QueryClient` with `retry: false`.
 - **Integration and E2E tests run against the local Supabase** (`supabase start`), loaded with the migrations and `supabase/seed.sql`. They only read the shared seed, so they can run in parallel. A test that needs to prove a write is refused may try it, but must assert that the data is unchanged afterwards.
 - **E2E tests intercept Supabase requests only for states the seed data can't produce**, such as an empty table, a server error, or a specific subset of rows. Everything else goes to the real local API.
 - **Production data is never used by any test.** It is never committed, never copied into the seed or a fixture, and never loaded into a local or CI database. Production data scripts live in the gitignored `supabase/data/`.
