@@ -1,8 +1,8 @@
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
 
-import { waitForFonts } from '../app-shell/shell';
+import { waitForFonts } from '../app/shell';
 
-export { DESKTOP, PHONE, expectNoHorizontalOverflow } from '../app-shell/shell';
+export { DESKTOP, PHONE, expectNoHorizontalOverflow } from '../app/shell';
 
 export const SMALL_PHONE = { width: 320, height: 640 };
 

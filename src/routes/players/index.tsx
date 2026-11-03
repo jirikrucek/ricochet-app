@@ -3,8 +3,8 @@ import { createFileRoute, stripSearchParams } from '@tanstack/react-router';
 import {
   playerOverviewSearchDefaults,
   playerOverviewSearchSchema,
-} from '@/domain/players/playerOverviewSearch';
-import { PlayerOverview } from '@/features/players/components/PlayerOverview';
+} from '@/modules/players/domain/types/playerOverviewSearch';
+import { PlayerOverview } from '@/modules/players/features/player-overview/PlayerOverview';
 
 export const Route = createFileRoute('/players/')({
   validateSearch: playerOverviewSearchSchema,
