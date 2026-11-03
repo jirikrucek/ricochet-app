@@ -18,7 +18,7 @@ All code that talks to the backend lives in `data-access/api/` folders and retur
 - `data-access/` is in the **module** by default, and moves to `src/shared/data-access/` when it becomes **shared code**.
 - A query selects explicit columns, maps each row to a **domain type**, and validates it with that type's Zod schema, for example `toPlayer(row)` with `playerSchema`. It throws on a Supabase error or a row that fails validation.
 - Row and DTO types stay in `data-access/api/`. `domain/` knows nothing about storage: no row shapes, no column names.
-- `src/db/` holds the Supabase client and the generated `database.types.ts`. Only `data-access/api/` folders import it.
+- `src/db/` holds the Supabase client and the generated `supabase.types.ts`. Only `data-access/api/` folders import it.
 - Only `src/db/` and `data-access/api/` folders may import `@supabase/supabase-js`.
 - TanStack Query hooks, with their query keys and cache settings, live directly in `data-access/`, so `data-access/api/` uses no React, TanStack or i18next.
 - Only **features** reach a **module**'s `data-access/` hooks, and only those hooks reach `data-access/api/`. `ui/` components get data through props.

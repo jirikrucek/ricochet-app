@@ -81,7 +81,7 @@ A module's layers and their counterparts in `src/shared/` hold the same kind of 
 | `src/app/` | The app shell: provider wiring, global layout chrome, and the error boundary. It composes features but owns none of their logic. |
 | `src/shared/` | `ui/`, `data-access/` and `domain/`, for code two or more modules use, or a module and `app`. Nothing else goes here. |
 | `src/ui/` | Shadcn primitives and `cn`. Domain-agnostic — must work with any product, not just Ricochet. |
-| `src/db/` | The Supabase client, the generated `database.types.ts`, and the row-level security test. Only the `data-access/api/` folders import it. |
+| `src/db/` | The Supabase client, the generated `supabase.types.ts`, and the row-level security test. Only the `data-access/api/` folders import it. |
 | `src/lib/` | Third-party tools configured once at startup (e.g. `sentry.ts`, `i18n.ts`, `queryClient.ts`). A configured REST client belongs in `data-access/api/` instead. |
 | `src/config/` | Static app settings with no better owner. |
 | `src/locales/` | One translation file per language, `resources.ts`, and `languages.ts` (supported languages and their metadata). |

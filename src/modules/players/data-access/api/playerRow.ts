@@ -1,4 +1,4 @@
-import type { Database } from '@/db/database.types';
+import type { Database } from '@/db/supabase.types';
 
 // The columns fetchPlayers selects.
 export const playerColumns =

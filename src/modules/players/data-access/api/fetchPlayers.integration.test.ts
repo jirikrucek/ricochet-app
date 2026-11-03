@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 
-import type { Database } from '@/db/database.types';
+import type { Database } from '@/db/supabase.types';
 import { fetchPlayers } from './fetchPlayers';
 
 describe('fetchPlayers', () => {

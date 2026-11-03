@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Player } from '@/modules/players/domain/types/player';
-import type { Database } from '@/db/database.types';
+import type { Database } from '@/db/supabase.types';
 import { supabase } from '@/db/supabaseClient';
 import { playerColumns } from './playerRow';
 import { toPlayer } from './toPlayer';

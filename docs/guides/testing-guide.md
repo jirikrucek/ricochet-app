@@ -14,7 +14,7 @@ Integration and E2E tests run against a local Supabase loaded with the migration
 
 How the tests get the connection: `tests/support/localSupabaseEnv.ts` runs `supabase status -o json` and takes its `API_URL` and `PUBLISHABLE_KEY`. It refuses any host other than `127.0.0.1` or `localhost`. Both are resolved when a run starts, not when a config loads, so unit tests and `playwright test --list` need no Supabase. A Vitest global setup (`tests/support/vitestLocalSupabase.ts`) puts the values in the process environment for the integration project. Playwright does the same with a global setup for the specs, and `tests/support/runWithLocalSupabaseEnv.ts` builds and serves the app with them. Process variables take precedence over `.env*` files, so your `.env.local` doesn't affect test runs, even if it points at the shared project. The rule for connection settings is in `docs/standards/testing-standard.md`.
 
-To restore the seed data, for example after editing `supabase/seed.sql` or a migration, run `npx supabase db reset`. It re-applies all migrations and the seed. After a migration change, also run `npm run supabase:types` to regenerate `src/db/database.types.ts`.
+To restore the seed data, for example after editing `supabase/seed.sql` or a migration, run `npx supabase db reset`. It re-applies all migrations and the seed. After a migration change, also run `npm run supabase:types` to regenerate `src/db/supabase.types.ts`.
 
 ## macOS
 
