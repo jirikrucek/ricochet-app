@@ -142,15 +142,14 @@ The system SHALL combine the **nationality** and **sex** filters with AND. Below
 - **THEN** the sex filter is shown below the nationality filter
 - **AND** the page does not scroll horizontally
 
-### Requirement: Player overview is paginated with a visitor-chosen page size
-The system SHALL show the filtered and sorted **players** one page at a time. Below the table it SHALL show a "Players per page" selector with the options 10, 25 (the default), and 50, and a summary of which **players** are shown out of the filtered total.
+### Requirement: Player overview is paginated with a fixed page size
+The system SHALL show the filtered and sorted **players** one page at a time, with 25 **players** per page. The **visitor** SHALL NOT be able to choose another page size. Below the table it SHALL show a summary of which **players** are shown out of the filtered total.
 
-#### Scenario: First page at the default page size
+#### Scenario: First page
 - **GIVEN** 100 players exist
 - **WHEN** a visitor opens the player overview
 - **THEN** 25 players are listed
 - **AND** the summary reads "Showing 1–25 of 100"
-- **AND** "Players per page" shows 25
 
 #### Scenario: Last page shows the remaining players
 - **GIVEN** 100 players exist, 40 of them female
@@ -159,82 +158,89 @@ The system SHALL show the filtered and sorted **players** one page at a time. Be
 - **THEN** 15 players are listed
 - **AND** the summary reads "Showing 26–40 of 40"
 
-#### Scenario: Changing the page size
+#### Scenario: Page size cannot be chosen
 - **GIVEN** 100 players exist
-- **WHEN** the visitor chooses 10 players per page
-- **THEN** 10 players are listed
-- **AND** the summary reads "Showing 1–10 of 100"
-- **AND** there are 10 pages
+- **WHEN** a visitor opens the player overview
+- **THEN** no control for choosing the number of players per page is shown
 
 #### Scenario: Summary counts only filtered players
 - **GIVEN** 100 players exist, 40 of them female
 - **WHEN** the visitor filters by the sex Female
 - **THEN** the summary reads "Showing 1–25 of 40"
 
+### Requirement: Only the shown page of players is loaded
+The system SHALL load only the **players** of the page being shown, with the backend applying the filters, the sort order, and the page. It SHALL NOT download the full list of **players** to the browser.
+
+#### Scenario: Opening the overview loads one page
+- **GIVEN** 100 players exist
+- **WHEN** a visitor opens the player overview
+- **THEN** the browser receives 25 players
+
+#### Scenario: Filtering is answered by the backend
+- **GIVEN** 100 players exist, 4 of them with nationality HU
+- **WHEN** the visitor filters by the nationality Hungary
+- **THEN** the browser receives only those 4 players
+
 ### Requirement: Page links show a compact page range on wide screens
 From 744px upward the system SHALL show numbered page links with Previous and Next. The links SHALL include the first page, the last page, and the current page with one page on each side, with an ellipsis for each gap of two or more pages. A gap of exactly one page SHALL show that page's number instead of an ellipsis. The current page SHALL be marked with `aria-current="page"`. Previous SHALL be disabled on the first page and Next on the last page.
 
 #### Scenario: First page of several
-- **GIVEN** 100 players exist
-- **AND** the visitor has chosen 10 players per page
+- **GIVEN** 250 players exist
 - **WHEN** the visitor is on page 1
 - **THEN** the page links read "Previous 1 2 … 10 Next"
 - **AND** page 1 is marked as the current page
 - **AND** Previous is disabled
 
 #### Scenario: Last page disables Next
-- **GIVEN** 100 players exist
-- **AND** the visitor has chosen 10 players per page
+- **GIVEN** 250 players exist
 - **WHEN** the visitor is on page 10
 - **THEN** the page links read "Previous 1 … 9 10 Next"
 - **AND** page 10 is marked as the current page
 - **AND** Next is disabled
 
 #### Scenario: Gaps collapse into ellipses
-- **GIVEN** 100 players exist
-- **AND** the visitor has chosen 10 players per page
+- **GIVEN** 250 players exist
 - **WHEN** the visitor is on page 5
 - **THEN** the page links read "Previous 1 … 4 5 6 … 10 Next"
 
 #### Scenario: One-page gap shows the page number
 - **GIVEN** 100 players exist
-- **WHEN** the visitor is on page 1 at the default 25 players per page
+- **WHEN** the visitor is on page 1
 - **THEN** the page links read "Previous 1 2 3 4 Next" with no ellipsis
 
 #### Scenario: Going to a numbered page
-- **GIVEN** 100 players exist
-- **AND** the visitor has chosen 10 players per page and is on page 1
+- **GIVEN** 250 players exist
+- **AND** the visitor is on page 1
 - **WHEN** the visitor activates the link to page 10
-- **THEN** the summary reads "Showing 91–100 of 100"
+- **THEN** the summary reads "Showing 226–250 of 250"
 
 ### Requirement: Pagination compacts below 744px
-Below 744px the system SHALL replace the numbered page links with "Previous · Page N of M · Next", and SHALL stack the summary and the "Players per page" selector above them.
+Below 744px the system SHALL replace the numbered page links with "Previous · Page N of M · Next", and SHALL stack the summary above them.
 
 #### Scenario: Compact pagination on a phone
 - **GIVEN** 100 players exist
 - **AND** the visitor is on page 2 with a viewport 375px wide
 - **WHEN** the pagination is shown
 - **THEN** it reads "Previous · Page 2 of 4 · Next" with no numbered page links
-- **AND** the summary and the "Players per page" selector are stacked above it
+- **AND** the summary is stacked above it
 - **AND** the page does not scroll horizontally
 
 ### Requirement: Pagination hides what does not apply
-When all filtered **players** fit on one page, the system SHALL hide the page links but keep the summary and the "Players per page" selector. When no **players** match, the system SHALL hide all pagination.
+When all filtered **players** fit on one page, the system SHALL hide the page links but keep the summary. When no **players** match, the system SHALL hide all pagination.
 
 #### Scenario: One page of results
 - **GIVEN** 100 players exist, 4 of them with nationality HU
 - **WHEN** the visitor filters by the nationality Hungary
 - **THEN** the summary reads "Showing 1–4 of 4"
-- **AND** the "Players per page" selector is shown
 - **AND** no page links are shown
 
 #### Scenario: No results
 - **GIVEN** no female players with nationality GB exist
 - **WHEN** the visitor filters by the nationality United Kingdom and the sex Female
-- **THEN** no summary, "Players per page" selector, or page links are shown
+- **THEN** no summary or page links are shown
 
 ### Requirement: Changing the view returns to the first page
-The system SHALL return to page 1 whenever the **visitor** changes a filter, the sort direction, or the page size, or uses Clear filters.
+The system SHALL return to page 1 whenever the **visitor** changes a filter or the sort direction, or uses Clear filters.
 
 #### Scenario: View change resets the page
 - **GIVEN** the visitor is on page 2 of the player overview
@@ -248,7 +254,6 @@ Examples:
 | filters by a nationality |
 | filters by a sex |
 | switches the sort direction |
-| chooses another page size |
 | uses Clear filters |
 
 ### Requirement: Page changes keep the visitor oriented
@@ -262,14 +267,14 @@ After the **visitor** changes the page, the system SHALL scroll to the top of th
 - **AND** the new summary, such as "Showing 26–50 of 100", is announced politely to screen readers
 
 ### Requirement: The view is kept in the URL
-The system SHALL keep the sort direction, the filters, the page (`page`), and the page size (`pageSize`) in the URL search params, so a view can be shared, reloaded, and walked through with back and forward. Default values SHALL be left out of the URL. Invalid values SHALL fall back to their defaults, and a `page` beyond the last page SHALL fall back to page 1.
+The system SHALL keep the sort direction, the filters, and the page (`page`) in the URL search params, so a view can be shared, reloaded, and walked through with back and forward. Default values SHALL be left out of the URL. Invalid values SHALL fall back to their defaults, unknown params SHALL be ignored, and a `page` beyond the last page SHALL fall back to page 1.
 
 #### Scenario: Shared link opens the same view
-- **GIVEN** 24 players with nationality CZ exist
-- **AND** a visitor has filtered by the nationality Czechia, sorted descending, chosen 10 players per page, and gone to page 2
+- **GIVEN** 40 female players exist
+- **AND** a visitor has filtered by the sex Female, sorted descending, and gone to page 2
 - **WHEN** another visitor opens the same URL
-- **THEN** they see Czech players sorted descending, 10 per page
-- **AND** the summary reads "Showing 11–20 of 24"
+- **THEN** they see female players sorted descending
+- **AND** the summary reads "Showing 26–40 of 40"
 
 #### Scenario: Reload keeps the view
 - **GIVEN** a visitor has filtered by the sex Male
@@ -296,7 +301,7 @@ Examples:
 
 | search params | outcome |
 | --- | --- |
-| `pageSize=7` | 25 players per page |
+| `pageSize=50` | 25 players per page |
 | `page=abc` | page 1 |
 | `page=9` | page 1 |
 | an unknown nationality code | players of every nationality |
