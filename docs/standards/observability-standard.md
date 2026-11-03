@@ -4,7 +4,7 @@ This is a client-only SPA ([ADR 0001](../adr/ADR0001-adopt-spa-platform-and-core
 
 ## Error reporting
 
-Error reporting is wired once, in `src/lib/sentry.ts`, `src/app/observability/` and `src/app/providers/AppProviders.tsx`:
+Error reporting is wired once, in `src/lib/sentry.ts`, `src/lib/queryClient.ts` and `src/app/AppErrorBoundary.tsx`:
 
 - `initSentry(router)` (from `src/lib/sentry.ts`) runs once in `main.tsx` before render. It does nothing when `VITE_SENTRY_DSN` is unset, so local dev needs no special-casing. The DSN stays blank in `.env.example` and is set per environment (see [deployment guide](../guides/deployment-guide.md)).
 - `AppErrorBoundary` wraps the app, reports render errors, and shows a translated fallback screen.

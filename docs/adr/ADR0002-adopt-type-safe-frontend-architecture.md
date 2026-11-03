@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-21
-- Updated: 2026-10-28
+- Updated: 2026-11-03
 
 ## Context
 
@@ -18,7 +18,7 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
   - Use TanStack Query for fetching, caching, invalidation, optimistic updates, and async state lifecycle.
 - Client state:
   - Keep ephemeral/local state in React component state.
-  - Use Zustand only for shared client UI state that should not live in URL or server cache.
+  - Prefer Zustand for shared client UI state that should not live in URL or server cache, once a first real use case needs it. It stays uninstalled until then.
 - URL state:
   - Keep filters, tabs, and shareable screen state in route search params.
 - Forms and validation:
@@ -42,9 +42,9 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
 - Positive: better separation of concerns between server state, client state, and URL state.
 - Positive: maintainable UI styling through token-based design.
 - Positive: easier AI-assisted changes due to predictable patterns and localized responsibilities.
-- Negative: requires team discipline to avoid bypassing repositories or mixing state layers.
+- Negative: requires team discipline to avoid bypassing data access or mixing state layers.
 - Negative: adds initial architectural setup overhead versus ad hoc feature coding.
 
 ## Notes
 
-- ADR 0012 defines the seam between the UI and Supabase and takes precedence over the "FE/BE decoupling" bullets above: features reach data only through repositories that return domain types, with no separate service layer.
+- ADR 0017 defines the seam between the UI and Supabase and takes precedence over the "FE/BE decoupling" bullets above: `ui/` components get data through props, features call `data-access/` hooks, and those hooks call `data-access/api/` folders that return domain types, with no separate service layer.

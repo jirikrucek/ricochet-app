@@ -11,7 +11,7 @@ rules:
   proposal:
     - Must use /glossary skill
     - Must use /grilling skill    
-    - Must organize specs by feature area
+    - Must organize specs by module and feature (`specs/<module>/<feature>/`), with app shell specs in `specs/app/<feature>/`
     - Must include an **Out of Scope** section
     - Must include a **Traceability** section with a link to a relevant issue in the issue tracker
   specs:

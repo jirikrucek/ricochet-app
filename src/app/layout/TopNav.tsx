@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from '@/assets/brand/ricochet-logo.svg';
-import { LanguageSelect } from '@/localization/language-selection/LanguageSelect';
+import { LanguageSelect } from './LanguageSelect';
 import {
   Sheet,
   SheetClose,
