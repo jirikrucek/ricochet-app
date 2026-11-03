@@ -18,6 +18,9 @@ export default defineConfig({
   testDir: './tests/e2e',
   globalSetup: './tests/support/playwrightLocalSupabase.ts',
   fullyParallel: true,
+  // Playwright's default of half the CPU cores overloads a dev container:
+  // tests time out at random, while 3 workers pass and finish sooner.
+  workers: 3,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     channel: undefined,
