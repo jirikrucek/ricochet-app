@@ -1,11 +1,11 @@
 -- Seed data: 100 fictional players for local runs and CI (docs/standards/testing-standard.md).
 -- Never put production data here. E2E expectations depend on these rows, and
--- src/repositories/players/seed.integration.test.ts checks the agreed facts:
+-- src/modules/players/data-access/api/seed.integration.test.ts checks the agreed facts:
 -- 100 players, 40 female, 24 CZ, 4 HU, no female GB, all six nationalities,
 -- surname prefixes (de Vries files under V), a jr./sr. pair with the same name,
 -- Horák/Chládek (Czech sorts "Ch" after "H"), Macbeth/MacDonald (case), and
 -- shared surnames (Szabó, Kovář).
--- 100 rows give 4 pages at 25, 10 pages at 10, and 2 pages at 50.
+-- 100 rows give 4 pages at the fixed page size of 25.
 
 insert into public.players (first_name, surname_prefix, surname, surname_suffix, nationality, sex)
 values

@@ -1,4 +1,9 @@
-import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import {
+  expect,
+  type APIRequestContext,
+  type Page,
+  type Route,
+} from '@playwright/test';
 
 import { waitForFonts } from '../app/shell';
 
@@ -83,13 +88,12 @@ async function shownPlayers(page: Page): Promise<ShownPlayer[]> {
   );
 }
 
-// Every player of a view in display order, read at 50 per page until the
+// Every player of a view in display order, read page by page until the
 // summary's last row is the total.
 export async function playersAcrossPages(page: Page, search = '') {
   const all: ShownPlayer[] = [];
   for (let pageNumber = 1; pageNumber <= 10; pageNumber++) {
     const params = new URLSearchParams(search);
-    params.set('pageSize', '50');
     if (pageNumber > 1) params.set('page', String(pageNumber));
     await openOverview(page, params.toString());
     all.push(...(await shownPlayers(page)));
@@ -209,6 +213,63 @@ export function summary(page: Page) {
     .filter({ hasText: /^Showing \d+–\d+ of \d+$/ });
 }
 
-export function pageSizeSelect(page: Page) {
-  return filterSelect(page, 'Players per page');
+// The two backend calls behind the overview, for the states the seed can't
+// produce (docs/standards/testing-standard.md).
+export const PLAYERS_API = '**/rest/v1/rpc/players_sorted*';
+export const NATIONALITIES_API = '**/rest/v1/player_nationalities*';
+
+export type PlayerRowInApi = {
+  id: number;
+  first_name: string;
+  surname_prefix: string | null;
+  surname: string;
+  surname_suffix: string | null;
+  nationality: string;
+  sex: 'male' | 'female';
+};
+
+// Answers a players request the way PostgREST does: the rows, and the total in
+// Content-Range, which supabase-js reads across origins.
+export function fulfillPlayers(
+  route: Route,
+  rows: PlayerRowInApi[],
+  total = rows.length,
+) {
+  const offset = Number(
+    new URL(route.request().url()).searchParams.get('offset') ?? 0,
+  );
+  return route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Expose-Headers': 'Content-Range',
+      'Content-Range':
+        rows.length === 0
+          ? `*/${total}`
+          : `${offset}-${offset + rows.length - 1}/${total}`,
+    },
+    body: JSON.stringify(rows),
+  });
+}
+
+// Pretends the backend holds `total` players, more than the seed has, answering
+// each page request with the rows of that page.
+export function pretendPlayerCount(page: Page, total: number) {
+  return page.route(PLAYERS_API, (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    const offset = Number(params.get('offset') ?? 0);
+    const limit = Number(params.get('limit'));
+    const count = Math.max(0, Math.min(limit, total - offset));
+    const rows = Array.from({ length: count }, (_, index) => ({
+      id: offset + index + 1,
+      first_name: 'Alex',
+      surname_prefix: null,
+      surname: `Example${offset + index + 1}`,
+      surname_suffix: null,
+      nationality: 'CZ',
+      sex: 'male' as const,
+    }));
+    return fulfillPlayers(route, rows, total);
+  });
 }

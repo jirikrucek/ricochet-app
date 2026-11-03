@@ -65,16 +65,8 @@ describe('playerOverviewSearchSchema page', () => {
   });
 });
 
-describe('playerOverviewSearchSchema pageSize', () => {
-  it('defaults to 25', () => {
-    expect(parse({}).pageSize).toBe(25);
-  });
-
-  it.each([10, 25, 50])('keeps %i', (pageSize) => {
-    expect(parse({ pageSize }).pageSize).toBe(pageSize);
-  });
-
-  it.each([7, 'abc', 100])('falls back to 25 for %s', (pageSize) => {
-    expect(parse({ pageSize }).pageSize).toBe(25);
+describe('playerOverviewSearchSchema unknown params', () => {
+  it('drops a leftover pageSize from an old shared link', () => {
+    expect(parse({ pageSize: 50 })).not.toHaveProperty('pageSize');
   });
 });

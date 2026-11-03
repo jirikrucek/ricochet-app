@@ -33,6 +33,33 @@ describe('players access with the publishable key', () => {
     expect(data?.length).toBeGreaterThan(0);
   });
 
+  it('reads the sorted players and the nationalities', async () => {
+    const sorted = await supabase
+      .rpc('players_sorted', { ui_language: 'en' })
+      .select('id')
+      .limit(1);
+    const nationalities = await supabase
+      .from('player_nationalities')
+      .select('nationality');
+
+    expect(sorted.error).toBeNull();
+    expect(sorted.data).toHaveLength(1);
+    expect(nationalities.error).toBeNull();
+    expect(nationalities.data?.length).toBeGreaterThan(0);
+  });
+
+  it('refuses a write through the nationalities view', async () => {
+    const before = await snapshot();
+
+    const { error } = await supabase
+      .from('player_nationalities')
+      .delete()
+      .eq('nationality', 'CZ');
+
+    expect(error).not.toBeNull();
+    expect(await snapshot()).toEqual(before);
+  });
+
   it('refuses an insert and leaves the players unchanged', async () => {
     const before = await snapshot();
 

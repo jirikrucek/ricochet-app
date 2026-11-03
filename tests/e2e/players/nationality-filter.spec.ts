@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   DESKTOP,
+  NATIONALITIES_API,
   chooseFilter,
   filterSelect,
   openOverview,
@@ -32,39 +33,11 @@ test.describe('Visitor can filter players by nationality', () => {
     page,
   }) => {
     // The seed has all six nationalities, so this state needs interception.
-    await page.route('**/rest/v1/players*', (route) =>
+    await page.route(NATIONALITIES_API, (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify([
-          {
-            id: 1,
-            first_name: 'Alena',
-            surname_prefix: null,
-            surname: 'Testová',
-            surname_suffix: null,
-            nationality: 'CZ',
-            sex: 'female',
-          },
-          {
-            id: 2,
-            first_name: 'Joost',
-            surname_prefix: 'van',
-            surname: 'Proef',
-            surname_suffix: null,
-            nationality: 'NL',
-            sex: 'male',
-          },
-          {
-            id: 3,
-            first_name: 'Karel',
-            surname_prefix: null,
-            surname: 'Zkouška',
-            surname_suffix: null,
-            nationality: 'CZ',
-            sex: 'male',
-          },
-        ]),
+        body: JSON.stringify([{ nationality: 'NL' }, { nationality: 'CZ' }]),
       }),
     );
     await openOverview(page);

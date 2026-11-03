@@ -1,5 +1,7 @@
 export const defaultLanguage = 'en';
 
+// Adding a language also needs a migration: a collation for it in
+// public.players_sorted (ADR 0020). Without one, players sort as in English.
 export const supportedLanguages = ['en', 'cs', 'de', 'pl', 'nl', 'hu'] as const;
 
 export type SupportedLanguage = (typeof supportedLanguages)[number];

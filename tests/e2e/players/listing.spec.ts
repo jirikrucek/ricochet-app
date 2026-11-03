@@ -2,10 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import {
   DESKTOP,
+  PLAYERS_API,
   SMALL_PHONE,
   bodyRows,
   expectNoHorizontalOverflow,
   expectPlayersListed,
+  fulfillPlayers,
   localSupabase,
   openOverview,
   playersTable,
@@ -19,7 +21,7 @@ test.describe('Player overview lists every player in a table', () => {
   test('Players shown with surname, first name, and nationality', async ({
     page,
   }) => {
-    await openOverview(page, 'nationality=CZ&pageSize=50');
+    await openOverview(page, 'nationality=CZ');
 
     const table = playersTable(page);
     await expect(table.getByRole('columnheader')).toHaveText([
@@ -33,10 +35,10 @@ test.describe('Player overview lists every player in a table', () => {
   });
 
   test('Surname shown with its prefix and suffix', async ({ page }) => {
-    await openOverview(page, 'pageSize=50&sort=desc');
+    await openOverview(page, 'nationality=NL');
     await expect(rowFor(page, 'de Vries', 'Pieter')).toHaveCount(1);
 
-    await openOverview(page, 'nationality=CZ&pageSize=50');
+    await openOverview(page, 'nationality=CZ');
     await expect(rowFor(page, 'Kovář jr.', 'Tomáš')).toHaveCount(1);
   });
 
@@ -56,22 +58,18 @@ test.describe('Player overview lists every player in a table', () => {
   test('Table kept on a phone with an unbroken long name', async ({ page }) => {
     // The seed has no names this long, so intercept the players request
     // (docs/standards/testing-standard.md).
-    await page.route('**/rest/v1/players*', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([
-          {
-            id: 1,
-            first_name: 'Maximiliánovič'.repeat(3),
-            surname_prefix: 'van der',
-            surname: 'Wolfeschlegelsteinhausenbergerdorff'.repeat(2),
-            surname_suffix: 'Jr.',
-            nationality: 'CZ',
-            sex: 'male',
-          },
-        ]),
-      }),
+    await page.route(PLAYERS_API, (route) =>
+      fulfillPlayers(route, [
+        {
+          id: 1,
+          first_name: 'Maximiliánovič'.repeat(3),
+          surname_prefix: 'van der',
+          surname: 'Wolfeschlegelsteinhausenbergerdorff'.repeat(2),
+          surname_suffix: 'Jr.',
+          nationality: 'CZ',
+          sex: 'male',
+        },
+      ]),
     );
 
     await openOverview(page, '', SMALL_PHONE);

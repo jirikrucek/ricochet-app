@@ -8,9 +8,6 @@ import { nationalitySchema, sexSchema } from './player';
 export const sortDirections = ['asc', 'desc'] as const;
 export type SortDirection = (typeof sortDirections)[number];
 
-export const pageSizes = [10, 25, 50] as const;
-export type PageSize = (typeof pageSizes)[number];
-
 // A filter that is either one value or "all" (no filtering).
 export const all = 'all';
 export type OrAll<TValue> = TValue | typeof all;
@@ -23,7 +20,6 @@ export const playerOverviewSearchDefaults = {
   nationality: all,
   sex: all,
   page: 1,
-  pageSize: 25,
 } as const satisfies Record<string, unknown>;
 
 export const playerOverviewSearchSchema = z.object({
@@ -37,18 +33,14 @@ export const playerOverviewSearchSchema = z.object({
   sex: orAll(sexSchema)
     .default(playerOverviewSearchDefaults.sex)
     .catch(playerOverviewSearchDefaults.sex),
-  // An out-of-range page is valid here; queryPlayers falls back to page 1
-  // once the page count is known.
+  // An out-of-range page is valid here; fetchPlayersPage falls back to page 1
+  // once the backend knows the total.
   page: z
     .number()
     .int()
     .positive()
     .default(playerOverviewSearchDefaults.page)
     .catch(playerOverviewSearchDefaults.page),
-  pageSize: z
-    .union(pageSizes.map((size) => z.literal(size)))
-    .default(playerOverviewSearchDefaults.pageSize)
-    .catch(playerOverviewSearchDefaults.pageSize),
 });
 
 export type PlayerOverviewView = z.output<typeof playerOverviewSearchSchema>;
