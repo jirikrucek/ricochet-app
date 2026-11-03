@@ -6,8 +6,8 @@ Place every file in the folder its scope below allows, and respect the import ru
 
 ## Principles
 
-- **Backend first.** Rules that must be trusted (permissions, integrity, scoring, brackets, ranking points) live in Supabase: RLS, constraints, Postgres functions and views, or Edge Functions. Client code can be read and changed by the user, so client checks only give quick feedback.
-- **Feature first.** Code starts in its feature. It moves to the matching global folder in `src/` only when a second feature needs it.
+- **Backend first.** Rules that must be trusted (permissions, integrity, scoring, brackets, ranking points) live in Supabase: RLS, constraints, Postgres functions and views, or Edge Functions. Client code can be read and changed by the user, so client checks only give quick feedback ([ADR 0018](../adr/ADR0018-trusted-business-rules-live-in-the-backend.md)).
+- **Feature first.** Code starts in its feature. It moves to the matching global folder in `src/` only when a second feature needs it ([ADR 0016](../adr/ADR0016-features-own-their-code-by-default.md)).
 - **A feature is a business area, not a screen.** A player overview and a player detail both belong in `features/players/`. Make a separate feature when the code has its own data and rules, and rarely changes alongside the rest.
 - **Features do not share types by default.** Two features that show the same entity each define the type they need, for example `Player` and `TournamentParticipant`, and each has its own query and mapper.
 - **Thin routes.** A route maps a URL to a screen and validates its search params. The screen's logic belongs to its feature.
@@ -73,7 +73,7 @@ Feature folders and their global counterparts hold the same kind of code. They d
 
 | Folder | Scope & allowed artifacts |
 | :--- | :--- |
-| `api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows. No React, TanStack or i18next. |
+| `api/` | Code that talks to the backend (Supabase, a REST API): queries, row and DTO types, and mappers. A mapper turns a row into a domain type and validates it with that type's schema, so the rest of the app never sees rows ([ADR 0017](../adr/ADR0017-api-folders-map-backend-rows-to-domain-types.md)). No React, TanStack or i18next. |
 | `components/` | UI components, their prop types, and form schemas. Global `components/` can know about the app and its domain, which is what separates it from `ui/`. |
 | `hooks/` | TanStack Query hooks, including their query keys and cache settings, and other React hooks. The only layer that can reach `api/`. Wrap pure logic from `utils/` rather than writing it inline, so it can be tested without React. |
 | `store/` | Zustand stores for shared client UI state. Server data belongs to TanStack Query, and shareable view state belongs to the URL. |

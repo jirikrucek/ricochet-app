@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-10-19
-- Updated: 2026-10-19
+- Updated: 2026-11-02
 
 ## Context
 
@@ -10,9 +10,9 @@ The **player overview** (issue #58) is the first table in the app. It has three 
 
 ## Decision
 
-Render tables with Shadcn `table` markup (`src/ui/table`) and no table library. Filtering, sorting, and page slicing are a single pure query function in the owning domain module, for example `queryPlayers(players, view, locale)` in `src/domain/players/`. It returns the visible rows plus the total, the effective page, and the page count. The feature component calls it and renders the result. View state (sort, filters, page, page size) lives in route search params, as ADR 0002 requires.
+Render tables with Shadcn `table` markup (`src/ui/table`) and no table library. Filtering, sorting, and page slicing are a single pure query function in the owning feature, for example `queryPlayers(players, view, locale)` in `src/features/players/utils/`. It returns the visible rows plus the total, the effective page, and the page count. The feature component calls it and renders the result. View state (sort, filters, page, page size) lives in route search params, as ADR 0002 requires.
 
-Generic helpers that carry no business meaning, such as the page-link range, go in `src/lib/` so other tables can reuse them.
+Generic helpers that carry no business meaning, such as the page-link range, go in the feature's `utils/`, and move to `src/utils/` when another feature's table needs them.
 
 Revisit this decision when any of these appears:
 

@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-21
-- Updated: 2026-10-28
+- Updated: 2026-11-02
 
 ## Context
 
@@ -47,4 +47,4 @@ Adopt a type-safe frontend architecture with explicit state boundaries and headl
 
 ## Notes
 
-- ADR 0012 defines the seam between the UI and Supabase and takes precedence over the "FE/BE decoupling" bullets above: features reach data only through repositories that return domain types, with no separate service layer.
+- ADR 0017 defines the seam between the UI and Supabase and takes precedence over the "FE/BE decoupling" bullets above: components reach data only through hooks, which call `api/` folders that return domain types, with no separate service layer.

@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-07-22
-- Updated: 2026-10-28
+- Updated: 2026-11-02
 
 ## Context
 
@@ -12,7 +12,7 @@ Ricochet App must support multiple UI languages with English as default, while k
 
 Adopt `i18next` with `react-i18next` and browser language detection for frontend localization.
 
-- Use one locale file per supported language under `src/localization/locales`.
+- Use one locale file per supported language under `src/locales`.
 - Keep English (`en`) as the fallback language.
 - Support these language codes:
   - `en` (English)
@@ -21,10 +21,10 @@ Adopt `i18next` with `react-i18next` and browser language detection for frontend
   - `pl` (Polish)
   - `nl` (Dutch)
   - `hu` (Hungarian)
-- Store translation resources in a dedicated localization module:
-  - `src/localization/i18n.ts`
-  - `src/localization/locales/resources.ts`
-  - `src/localization/languages.ts`
+- Keep translation resources and the language list in `src/locales`, and the i18next setup in `src/lib`:
+  - `src/lib/i18n.ts`
+  - `src/locales/resources.ts`
+  - `src/locales/languages.ts`
 - Require user-facing text to be referenced by translation key (`t(...)`) instead of hardcoded strings.
 
 ## Alternatives Considered
