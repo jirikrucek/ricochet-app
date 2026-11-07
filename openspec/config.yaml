@@ -22,6 +22,7 @@ rules:
     - Must ensure tests (unit, integration, and E2E) are always written before implementation; follow TDD
     - Must cover each spec, its all requirement scenarios, by an E2E test
     - Must end each slice with a task to run /code-health on the work so far and fix its critical findings
+    - Must end the tasks with a task to run /production-readiness and fix its critical findings, followed by a final task to run the Definition of Done from AGENTS.md
 
 operations:
   apply:

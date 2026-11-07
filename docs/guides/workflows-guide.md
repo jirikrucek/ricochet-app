@@ -11,16 +11,14 @@ Each step ends on its **done when**; finish it before moving on. A human or an a
 1. **Branch**: create a Conventional Branch off `main`. Done when `HEAD` is on the new branch.
 2. **Create change**: run `/openspec-new-change`. Done when `openspec/changes/<name>/` exists.
 3. **Plan**: run `/openspec-continue-change` once per planning artifact, or `/openspec-ff-change` to create them all in one pass. Done when `openspec status --change <name>` shows every artifact complete.
-4. **Implement**: run `/openspec-apply-change`; each slice ends with a `/code-health` task. When the plan turns out wrong mid-way, revise it with `/openspec-update-change` and resume. Done when every task in `tasks.md` is checked.
-5. **Verify**: run `/openspec-verify-change`. Done when it reports no CRITICAL issues.
-6. **Production readiness**: run `/production-readiness` and fix what it finds. Done when no critical finding is open.
-7. **Definition of Done**: run its phases from `AGENTS.md`. Done when the final report is all OK.
-8. **Pull request**: commit, then write the body with `/pr`. Done when the PR is open against `main` and its checks pass.
-9. **Review** _(human only)_: review the PR and request changes. Address each one, re-running Verify and Definition of Done after any code change. Done when the PR is approved.
-10. **Archive**: run `/openspec-archive-change`, then commit and push to the PR branch. Done when the change sits under `openspec/changes/archive/`, its delta specs are merged into `openspec/specs/`, `npm run spec:validate` passes on the merged specs, and the PR checks pass again.
-11. **Merge** _(human only)_: merge the PR into `main`. Done when the PR shows as merged.
+4. **Implement**: run `/openspec-apply-change`. Each slice ends with a `/code-health` task, and the task list ends with `/production-readiness`, then the Definition of Done from `AGENTS.md`. When the plan turns out wrong mid-way, revise it with `/openspec-update-change` and resume. Done when every task in `tasks.md` is checked.
+5. **Verify**: run `/openspec-verify-change`, and re-run the Definition of Done after any code change it leads to. Done when it reports no CRITICAL issues.
+6. **Pull request**: commit, then write the body with `/pr`. Done when the PR is open against `main` and its checks pass.
+7. **Review** _(human only)_: review the PR and request changes. Address each one, re-running Verify and the Definition of Done after any code change. Done when the PR is approved.
+8. **Archive**: run `/openspec-archive-change`, then commit and push to the PR branch. Done when the change sits under `openspec/changes/archive/`, its delta specs are merged into `openspec/specs/`, `npm run spec:validate` passes on the merged specs, and the PR checks pass again.
+9. **Merge** _(human only)_: merge the PR into `main`. Done when the PR shows as merged.
 
-Dependency updates, tooling config, and docs-only edits run only steps 1, 7, 8, 9, and 11: branch, Definition of Done, pull request, review, merge.
+Dependency updates, tooling config, and docs-only edits have no `tasks.md`: create the branch, run the Definition of Done from `AGENTS.md`, then follow steps 6, 7, and 9.
 
 ## Maintenance
 
