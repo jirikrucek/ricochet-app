@@ -50,10 +50,10 @@
 
 ## 6. Slice: translations
 
-- [ ] 6.1 Write failing e2e tests for "Filters panel text follows the UI language" and for the Filters button in "Page text follows the UI language", for each of the six languages. Confirm the locale key-parity integration test fails when a key is missing.
-- [ ] 6.2 Complete every `listFilters.*` and changed `players.filters.*` string in all six languages. Mark the non-English translations in the pull request for the owner's review before merge.
-- [ ] 6.3 Make the tests from 6.1 pass.
-- [ ] 6.4 Run `/code-health` on the work so far and fix its critical findings.
+- [x] 6.1 Write failing e2e tests for "Filters panel text follows the UI language" and for the Filters button in "Page text follows the UI language", for each of the six languages. Confirm the locale key-parity integration test fails when a key is missing.
+- [x] 6.2 Complete every `listFilters.*` and changed `players.filters.*` string in all six languages. Mark the non-English translations in the pull request for the owner's review before merge.
+- [x] 6.3 Make the tests from 6.1 pass.
+- [x] 6.4 Run `/code-health` on the work so far and fix its critical findings.
 
 ## 7. Verify and finish
 

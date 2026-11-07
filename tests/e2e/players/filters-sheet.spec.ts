@@ -63,7 +63,7 @@ test.describe('Closing the sheet', () => {
     await useUiLanguage(page, 'de');
     await openOverview(page);
 
-    await openFiltersPanel(page, /^Filter/);
+    await openFiltersPanel(page, 'Filter');
 
     await expect(
       page.getByRole('dialog').getByRole('button', { name: 'Schließen' }),

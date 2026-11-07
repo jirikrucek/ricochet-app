@@ -43,7 +43,7 @@ test.describe('Visitor can filter players by sex', () => {
     await useUiLanguage(page, 'de');
     await openOverview(page);
 
-    await openFiltersPanel(page, /^Filter/);
+    await openFiltersPanel(page, 'Filter');
     await filterSelect(page, 'Geschlecht').click();
 
     await expect(page.getByRole('option')).toHaveText([

@@ -145,9 +145,10 @@ export function applyButton(page: Page) {
   return page.getByRole('button', { name: 'Apply', exact: true });
 }
 
-export async function openFiltersPanel(page: Page, name?: RegExp) {
+// `name` is the button's exact name in another language, or a pattern.
+export async function openFiltersPanel(page: Page, name?: string | RegExp) {
   const button = name
-    ? page.getByRole('button', { name })
+    ? page.getByRole('button', { name, exact: typeof name === 'string' })
     : filtersButton(page);
   if ((await button.getAttribute('aria-expanded')) !== 'true') {
     await button.click();

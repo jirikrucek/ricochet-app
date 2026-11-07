@@ -14,6 +14,9 @@ void i18n
     supportedLngs: supportedLanguages,
     load: 'languageOnly',
     interpolation: {
+      // React escapes text and attributes itself, and this relies on that: revisit
+      // it before an interpolated string reaches <Trans> with HTML,
+      // dangerouslySetInnerHTML or innerHTML.
       escapeValue: false,
     },
     detection: {
