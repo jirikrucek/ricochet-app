@@ -14,6 +14,10 @@ import {
   chooseFilters,
   expectFilterValue,
   openFiltersPanel,
+  appliedFilters,
+  clearAllFilters,
+  filtersButton,
+  removeFilter,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
@@ -77,19 +81,19 @@ test.describe('No players match the filters', () => {
     await expect(
       page.getByText('No players match the selected filters'),
     ).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'Clear filters' }),
-    ).toBeVisible();
+    await expect(removeFilter(page, 'United Kingdom')).toBeVisible();
+    await expect(removeFilter(page, 'Female')).toBeVisible();
+    await expect(clearAllFilters(page)).toBeVisible();
     await expect(playersTable(page)).toHaveCount(0);
   });
 
   test('Clearing filters from the no-match state', async ({ page }) => {
     await openOverview(page, 'nationality=GB&sex=female');
 
-    await page.getByRole('button', { name: 'Clear filters' }).click();
+    await clearAllFilters(page).click();
 
-    await expect(filterSelect(page, 'Nationality')).toContainText('All');
-    await expect(filterSelect(page, 'Sex')).toContainText('All');
+    await expect(filtersButton(page)).toHaveAccessibleName('Filters');
+    await expect(appliedFilters(page)).toHaveCount(0);
     await expectPlayersListed(page);
     await expect(page).toHaveURL(/\/players$/);
   });
@@ -110,7 +114,7 @@ test.describe('The view is kept in the URL', () => {
   test('Default view has a clean URL', async ({ page }) => {
     await openOverview(page, 'sex=female');
 
-    await chooseFilter(page, 'Sex', 'All');
+    await removeFilter(page, 'Female').click();
 
     await expect(page).toHaveURL(/\/players$/);
   });

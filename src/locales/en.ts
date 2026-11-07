@@ -15,6 +15,9 @@ const en = {
   listFilters: {
     title: 'Filters',
     apply: 'Apply',
+    appliedFilters: 'Applied filters',
+    removeFilter: 'Remove filter: {{name}}',
+    clearAll: 'Clear all filters',
   },
   players: {
     heading: 'Players',
@@ -36,7 +39,6 @@ const en = {
     },
     noMatch: {
       message: 'No players match the selected filters',
-      clearFilters: 'Clear filters',
     },
     pagination: {
       label: 'Pagination',

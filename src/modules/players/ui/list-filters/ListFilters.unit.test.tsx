@@ -10,7 +10,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import i18n from '@/lib/i18n';
-import { ListFilters, type FilterDefinition } from './ListFilters';
+import {
+  ListFilters,
+  type FilterDefinition,
+  type FilterLinkProps,
+} from './ListFilters';
 
 // A list with two filters, as the player overview has. Mock data only.
 const filters: FilterDefinition[] = [
@@ -19,9 +23,9 @@ const filters: FilterDefinition[] = [
     label: 'Nationality',
     allValue: 'all',
     options: [
-      { value: 'all', label: 'All' },
-      { value: 'CZ', label: 'Czechia' },
-      { value: 'PL', label: 'Poland' },
+      { value: 'all', label: 'All', text: 'All' },
+      { value: 'CZ', label: 'Czechia', text: 'Czechia' },
+      { value: 'PL', label: 'Poland', text: 'Poland' },
     ],
   },
   {
@@ -29,9 +33,9 @@ const filters: FilterDefinition[] = [
     label: 'Sex',
     allValue: 'all',
     options: [
-      { value: 'all', label: 'All' },
-      { value: 'male', label: 'Male' },
-      { value: 'female', label: 'Female' },
+      { value: 'all', label: 'All', text: 'All' },
+      { value: 'male', label: 'Male', text: 'Male' },
+      { value: 'female', label: 'Female', text: 'Female' },
     ],
   },
 ];
@@ -41,6 +45,23 @@ const none = { nationality: 'all', sex: 'all' };
 
 const onApply = vi.fn();
 
+// Stands in for the router link the player overview passes: it makes the target
+// of each link readable as a query string.
+function FilterLink({
+  change,
+  children,
+  ...props
+}: FilterLinkProps<Record<string, string>>) {
+  return (
+    <a
+      href={`/?${new URLSearchParams(change as Record<string, string>)}`}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+}
+
 function renderFilters(values: Record<string, string> = none) {
   render(
     <ListFilters
@@ -49,6 +70,7 @@ function renderFilters(values: Record<string, string> = none) {
       schema={schema}
       action="/players"
       onApply={onApply}
+      FilterLink={FilterLink}
     />,
   );
 }
@@ -172,5 +194,68 @@ describe('ListFilters', () => {
     expect(
       screen.getByRole('combobox', { name: 'Nationality' }).textContent,
     ).toContain('Czechia');
+  });
+});
+
+describe('ListFilters applied filters', () => {
+  const chips = () =>
+    within(screen.getByRole('list', { name: 'Applied filters' }));
+
+  it('shows no chip and no Clear all filters while every filter is on "All"', () => {
+    renderFilters();
+
+    expect(screen.queryByRole('list', { name: 'Applied filters' })).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: 'Clear all filters' }),
+    ).toBeNull();
+  });
+
+  it('shows a chip for each applied filter, named after its option', () => {
+    renderFilters({ nationality: 'PL', sex: 'female' });
+
+    expect(
+      chips()
+        .getAllByRole('link')
+        .map((chip) => chip.getAttribute('aria-label')),
+    ).toEqual(['Remove filter: Poland', 'Remove filter: Female']);
+  });
+
+  it('links each chip to the view without that filter', () => {
+    renderFilters({ nationality: 'PL', sex: 'female' });
+
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: Poland' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all');
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: Female' })
+        .getAttribute('href'),
+    ).toBe('/?sex=all');
+  });
+
+  it('offers Clear all filters even for a single applied filter, linking to every filter on "All"', () => {
+    renderFilters({ nationality: 'all', sex: 'female' });
+
+    expect(
+      screen
+        .getByRole('link', { name: 'Clear all filters' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all&sex=all');
+  });
+
+  it('still counts, shows a chip for, and offers to clear an applied value that is not among the options', () => {
+    renderFilters({ nationality: 'XX', sex: 'all' });
+
+    expect(screen.getByRole('button', { name: 'Filters 1' })).toBeTruthy();
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: XX' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all');
+    expect(
+      screen.getByRole('link', { name: 'Clear all filters' }),
+    ).toBeTruthy();
   });
 });

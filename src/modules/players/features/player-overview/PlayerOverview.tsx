@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { itemsPerPage } from '@/config/pagination';
 import type { Nationality } from '@/modules/players/domain/types/player';
 import type { PlayerOverviewPage } from '@/modules/players/domain/types/playerOverviewPage';
-import {
-  all,
-  type PlayerOverviewView,
-} from '@/modules/players/domain/types/playerOverviewSearch';
+import type { PlayerOverviewView } from '@/modules/players/domain/types/playerOverviewSearch';
 import { pageBounds } from '@/modules/players/ui/pageRange';
 import { Button } from '@/ui/button';
 import { usePlayerNationalities } from '@/modules/players/data-access/usePlayerNationalities';
@@ -136,9 +133,7 @@ function PlayerResults({
         onApply={changeView}
       />
       {total === 0 ? (
-        <NoMatch
-          onClearFilters={() => changeView({ nationality: all, sex: all })}
-        />
+        <NoMatch />
       ) : (
         <>
           <PlayerTable
@@ -164,17 +159,14 @@ function PlayerResults({
   );
 }
 
-function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {
+// The applied filters and Clear all filters stay shown beside the Filters
+// button, so the message needs no button of its own.
+function NoMatch() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-start gap-base">
-      <p className="type-body-md m-0 text-muted">
-        {t('players.noMatch.message')}
-      </p>
-      <Button variant="outline" onClick={onClearFilters}>
-        {t('players.noMatch.clearFilters')}
-      </Button>
-    </div>
+    <p className="type-body-md m-0 text-muted">
+      {t('players.noMatch.message')}
+    </p>
   );
 }

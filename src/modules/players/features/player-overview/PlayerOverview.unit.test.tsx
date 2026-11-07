@@ -238,22 +238,33 @@ describe('PlayerOverview with filters that match no players', () => {
     );
   });
 
-  it('shows the no-match message with Clear filters instead of the table', async () => {
+  it('shows the no-match message with the applied filters and Clear all filters instead of the table', async () => {
     renderPlayerOverview('/players?nationality=GB&sex=female');
 
     expect(
       await screen.findByText('No players match the selected filters'),
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'Remove filter: United Kingdom' }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'Remove filter: Female' }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'Clear all filters' }),
+    ).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Clear filters' })).toBeNull();
     expect(screen.queryByRole('table')).toBeNull();
   });
 
-  it('Clear filters resets nationality and sex and keeps the sort', async () => {
+  it('Clear all filters resets nationality and sex and keeps the sort', async () => {
     const { router } = renderPlayerOverview(
       '/players?nationality=GB&sex=female&sort=desc',
     );
 
-    const clear = await screen.findByRole('button', { name: 'Clear filters' });
+    const clear = await screen.findByRole('link', {
+      name: 'Clear all filters',
+    });
     await act(async () => {
       fireEvent.click(clear);
     });
@@ -264,6 +275,36 @@ describe('PlayerOverview with filters that match no players', () => {
     expect(
       screen.queryByText('No players match the selected filters'),
     ).toBeNull();
+  });
+
+  it('names an applied nationality that no player has, so it can still be removed', async () => {
+    fetchPlayerNationalities.mockResolvedValue(['CZ']);
+    renderPlayerOverview('/players?nationality=GB');
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Remove filter: United Kingdom',
+      }),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Filters 1' })).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'Clear all filters' }),
+    ).toBeTruthy();
+  });
+
+  it('a chip links to the same view without its filter, keeping the sort and dropping the page', async () => {
+    renderPlayerOverview('/players?nationality=GB&sex=female&sort=desc&page=2');
+
+    const chip = await screen.findByRole('link', {
+      name: 'Remove filter: Female',
+    });
+
+    const href = new URL(chip.getAttribute('href') ?? '', 'http://localhost');
+    expect(href.pathname).toBe('/players');
+    expect(Object.fromEntries(href.searchParams)).toEqual({
+      nationality: 'GB',
+      sort: 'desc',
+    });
   });
 });
 

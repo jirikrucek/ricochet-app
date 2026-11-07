@@ -15,6 +15,9 @@ const de = {
   listFilters: {
     title: 'Filter',
     apply: 'Anwenden',
+    appliedFilters: 'Angewendete Filter',
+    removeFilter: 'Filter entfernen: {{name}}',
+    clearAll: 'Alle Filter zurücksetzen',
   },
   players: {
     heading: 'Spieler',
@@ -36,7 +39,6 @@ const de = {
     },
     noMatch: {
       message: 'Keine Spieler entsprechen den gewählten Filtern',
-      clearFilters: 'Filter zurücksetzen',
     },
     pagination: {
       label: 'Seitennavigation',

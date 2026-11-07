@@ -15,6 +15,9 @@ const hu = {
   listFilters: {
     title: 'Szűrők',
     apply: 'Alkalmaz',
+    appliedFilters: 'Alkalmazott szűrők',
+    removeFilter: 'Szűrő eltávolítása: {{name}}',
+    clearAll: 'Összes szűrő törlése',
   },
   players: {
     heading: 'Játékosok',
@@ -36,7 +39,6 @@ const hu = {
     },
     noMatch: {
       message: 'Egy játékos sem felel meg a kiválasztott szűrőknek',
-      clearFilters: 'Szűrők törlése',
     },
     pagination: {
       label: 'Lapozás',

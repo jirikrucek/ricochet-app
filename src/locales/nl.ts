@@ -15,6 +15,9 @@ const nl = {
   listFilters: {
     title: 'Filters',
     apply: 'Toepassen',
+    appliedFilters: 'Toegepaste filters',
+    removeFilter: 'Filter verwijderen: {{name}}',
+    clearAll: 'Alle filters wissen',
   },
   players: {
     heading: 'Spelers',
@@ -36,7 +39,6 @@ const nl = {
     },
     noMatch: {
       message: 'Geen spelers voldoen aan de gekozen filters',
-      clearFilters: 'Filters wissen',
     },
     pagination: {
       label: 'Paginering',

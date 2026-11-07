@@ -152,6 +152,22 @@ export async function openFiltersPanel(page: Page, name?: RegExp) {
   }
 }
 
+// The chips of the applied filters, beside the Filters button.
+export function appliedFilters(page: Page) {
+  return page.getByRole('list', { name: 'Applied filters' });
+}
+
+export function removeFilter(page: Page, name: string) {
+  return page.getByRole('link', {
+    name: `Remove filter: ${name}`,
+    exact: true,
+  });
+}
+
+export function clearAllFilters(page: Page) {
+  return page.getByRole('link', { name: 'Clear all filters', exact: true });
+}
+
 // The panel the Filters button opens: a popover or a sheet, both a dialog.
 export function filtersPanel(page: Page) {
   return page.getByRole('dialog', { name: 'Filters' });

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +9,11 @@ import {
   type PlayerFilters as PlayerFilterValues,
 } from '@/modules/players/domain/types/playerOverviewSearch';
 import { Flag } from '@/shared/ui/Flag';
-import { ListFilters, type FilterDefinition } from './list-filters/ListFilters';
+import {
+  ListFilters,
+  type FilterDefinition,
+  type FilterLinkProps,
+} from './list-filters/ListFilters';
 
 type PlayerFiltersProps = {
   nationalities: Nationality[];
@@ -17,6 +22,23 @@ type PlayerFiltersProps = {
   values: PlayerFilterValues;
   onApply: (values: PlayerFilterValues) => void;
 };
+
+// A link to the player overview with some filters changed. It keeps every other
+// search param, such as the sort direction, and drops the page: a changed
+// filter starts again at page 1. The route strips default values from the URL.
+function PlayerFilterLink({
+  change,
+  ...props
+}: FilterLinkProps<PlayerFilterValues>) {
+  return (
+    <Link
+      from="/players/"
+      to="."
+      search={(prev) => ({ ...prev, ...change, page: undefined })}
+      {...props}
+    />
+  );
+}
 
 // The player overview's filters, declared for the generic filters panel.
 export function PlayerFilters({
@@ -29,9 +51,20 @@ export function PlayerFilters({
 
   const filters = useMemo<FilterDefinition[]>(() => {
     const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
-    const allOption = { value: all, label: t('players.filters.all') };
+    const allOption = {
+      value: all,
+      label: t('players.filters.all'),
+      text: t('players.filters.all'),
+    };
 
-    const countries = nationalities
+    // The applied nationality stays offered even when no player has it any
+    // more, so the select, the count and the chip never disagree about it.
+    const offered =
+      values.nationality === all || nationalities.includes(values.nationality)
+        ? nationalities
+        : [...nationalities, values.nationality];
+
+    const countries = offered
       .map((nationality) => ({
         nationality,
         name: t(`countries.${nationality}`),
@@ -48,7 +81,7 @@ export function PlayerFilters({
             {name}
           </>
         );
-        return { value: nationality, label };
+        return { value: nationality, label, text: name };
       });
 
     return [
@@ -67,11 +100,12 @@ export function PlayerFilters({
           ...sexes.map((sex) => ({
             value: sex,
             label: t(`players.sex.${sex}`),
+            text: t(`players.sex.${sex}`),
           })),
         ],
       },
     ];
-  }, [nationalities, locale, t]);
+  }, [nationalities, values.nationality, locale, t]);
 
   return (
     <ListFilters
@@ -80,6 +114,7 @@ export function PlayerFilters({
       schema={playerFiltersSchema}
       action="/players"
       onApply={onApply}
+      FilterLink={PlayerFilterLink}
     />
   );
 }

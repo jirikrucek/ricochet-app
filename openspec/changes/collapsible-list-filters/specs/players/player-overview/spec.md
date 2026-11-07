@@ -177,7 +177,7 @@ The system SHALL combine the **nationality** and **sex** filters with AND.
 ## MODIFIED Requirements
 
 ### Requirement: Visitor can filter players by nationality
-The system SHALL offer a single-select **nationality** filter in the **filters panel**. Its first option SHALL be "All", which is the default. Its other options SHALL show a flag with the country name in the current UI language, and SHALL offer only the **nationalities** of existing **players**.
+The system SHALL offer a single-select **nationality** filter in the **filters panel**. Its first option SHALL be "All", which is the default. Its other options SHALL show a flag with the country name in the current UI language, and SHALL offer the **nationalities** of existing **players** and nothing else, apart from the **nationality** that is applied, which stays offered even when no **player** has it, so that it can always be seen and removed.
 
 #### Scenario: Filtering by one nationality
 - **GIVEN** players with the nationalities CZ, DE, and PL exist
@@ -188,6 +188,12 @@ The system SHALL offer a single-select **nationality** filter in the **filters p
 - **GIVEN** players exist only with the nationalities CZ and NL
 - **WHEN** the visitor opens the nationality filter in the filters panel
 - **THEN** the options are All, Czechia, and Netherlands, each country with its flag
+
+#### Scenario: An applied nationality that no player has stays offered
+- **GIVEN** players exist only with the nationalities CZ and NL
+- **WHEN** a visitor opens a link to the player overview filtered by the nationality United Kingdom
+- **THEN** the Filters button shows the count 1
+- **AND** a chip with the United Kingdom flag and "United Kingdom" is shown with Clear all filters
 
 #### Scenario: Returning to all nationalities
 - **GIVEN** the player overview is filtered by the nationality Germany

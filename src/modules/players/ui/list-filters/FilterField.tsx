@@ -12,6 +12,8 @@ export type FilterOption = {
   value: string;
   // What the option shows in the select, such as a flag with a country name.
   label: ReactNode;
+  // The option's name as plain text, for names that can't hold a node.
+  text: string;
 };
 
 export type FilterDefinition = {

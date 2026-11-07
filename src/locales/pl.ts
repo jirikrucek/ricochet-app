@@ -15,6 +15,9 @@ const pl = {
   listFilters: {
     title: 'Filtry',
     apply: 'Zastosuj',
+    appliedFilters: 'Zastosowane filtry',
+    removeFilter: 'Usuń filtr: {{name}}',
+    clearAll: 'Wyczyść wszystkie filtry',
   },
   players: {
     heading: 'Gracze',
@@ -36,7 +39,6 @@ const pl = {
     },
     noMatch: {
       message: 'Żaden gracz nie pasuje do wybranych filtrów',
-      clearFilters: 'Wyczyść filtry',
     },
     pagination: {
       label: 'Paginacja',

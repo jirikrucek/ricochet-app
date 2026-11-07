@@ -1,5 +1,5 @@
 import { ChevronDownIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
@@ -10,10 +10,13 @@ import {
   PopoverTrigger,
 } from '@/ui/popover';
 import { cn } from '@/ui/cn';
+import { AppliedFilterChips, type FilterLinkProps } from './AppliedFilterChips';
+import { appliedFilters } from './appliedFilters';
 import { FiltersForm } from './FiltersForm';
 import type { FilterDefinition } from './FilterField';
 
 export type { FilterDefinition, FilterOption } from './FilterField';
+export type { FilterLinkProps } from './AppliedFilterChips';
 
 type ListFiltersProps<TValues extends Record<string, string>> = {
   filters: FilterDefinition[];
@@ -23,6 +26,8 @@ type ListFiltersProps<TValues extends Record<string, string>> = {
   // The list's route, for the form's GET `action`.
   action: string;
   onApply: (values: TValues) => void;
+  // Renders a link to the list with some filters changed, for the chips.
+  FilterLink: ComponentType<FilterLinkProps<TValues>>;
 };
 
 const buttonClassName =
@@ -37,49 +42,55 @@ export function ListFilters<TValues extends Record<string, string>>({
   schema,
   action,
   onApply,
+  FilterLink,
 }: ListFiltersProps<TValues>) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const appliedCount = filters.filter(
-    (filter) => values[filter.name] !== filter.allValue,
-  ).length;
+  const applied = appliedFilters(filters, values);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className={buttonClassName}>
-        {t('listFilters.title')}
-        {appliedCount > 0 && (
-          <>
-            {' '}
-            <span className="type-caption-sm rounded-full bg-ink px-sm py-xxs text-on-dark">
-              {appliedCount}
-            </span>
-          </>
-        )}
-        <ChevronDownIcon
-          aria-hidden="true"
-          className={cn(
-            'size-4 text-muted-foreground transition-transform',
-            'group-data-popup-open/filters:rotate-180',
-          )}
-        />
-      </PopoverTrigger>
-      <PopoverContent align="start" className="p-base">
-        <PopoverTitle className="sr-only">
+    <div className="flex flex-wrap items-center gap-sm">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger className={buttonClassName}>
           {t('listFilters.title')}
-        </PopoverTitle>
-        <FiltersForm
-          filters={filters}
-          values={values}
-          schema={schema}
-          action={action}
-          className="w-form-field"
-          onApply={(applied) => {
-            onApply(applied);
-            setOpen(false);
-          }}
-        />
-      </PopoverContent>
-    </Popover>
+          {applied.length > 0 && (
+            <>
+              {' '}
+              <span className="type-caption-sm rounded-full bg-ink px-sm py-xxs text-on-dark">
+                {applied.length}
+              </span>
+            </>
+          )}
+          <ChevronDownIcon
+            aria-hidden="true"
+            className={cn(
+              'size-4 text-muted-foreground transition-transform',
+              'group-data-popup-open/filters:rotate-180',
+            )}
+          />
+        </PopoverTrigger>
+        <PopoverContent align="start" className="p-base">
+          <PopoverTitle className="sr-only">
+            {t('listFilters.title')}
+          </PopoverTitle>
+          <FiltersForm
+            filters={filters}
+            values={values}
+            schema={schema}
+            action={action}
+            className="w-form-field"
+            onApply={(applied) => {
+              onApply(applied);
+              setOpen(false);
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+      <AppliedFilterChips
+        filters={filters}
+        applied={applied}
+        FilterLink={FilterLink}
+      />
+    </div>
   );
 }

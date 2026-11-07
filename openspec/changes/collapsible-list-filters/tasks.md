@@ -21,14 +21,14 @@
 
 ## 3. Slice: applied filters as chips, and Clear all filters
 
-- [ ] 3.1 Write failing e2e tests at 1000px for the requirements "Applied filters are shown beside the filters button" and "Clear all filters removes every applied filter at once": no filter applied, applied filters visible with the panel closed, removing one applied filter, Clear all filters offered with one applied filter, not shown without applied filters, and clearing all applied filters.
-- [ ] 3.2 Update the e2e tests for the modified requirements in `sex-filter.spec.ts`, `pagination.spec.ts` and `states.spec.ts`: "No players match the filters" shows the chips and Clear all filters, "Clearing filters from the no-match state" uses Clear all filters, every row of the "View change resets the page" examples, "Applying two filters is one history step", and "Default view has a clean URL" through the chip.
-- [ ] 3.3 Write failing unit tests for the chips: the nationality chip shows the flag and the country name, a chip is a link whose `href` keeps the other search params and drops `page`, Clear all filters appears whenever at least one **filter** is applied, and nothing is shown with none applied.
-- [ ] 3.4 Build `AppliedFilterChips` and the Clear all filters link in `ui/list-filters/`, taking the link from a `chipLink` prop. Make `PlayerFilters` supply it with the router `Link`, as `PlayerPagination` does.
-- [ ] 3.5 Remove the "Clear filters" button from the no-match message in `PlayerOverview.tsx`. In `PlayerOverview.unit.test.tsx`, replace the two "Clear filters" tests with Clear all filters equivalents.
-- [ ] 3.6 Add the new strings (Applied filters, Remove filter: {{name}}, Clear all filters) in all six locale files.
-- [ ] 3.7 Make the tests from 3.1 to 3.3 pass and verify the whole suite still passes.
-- [ ] 3.8 Run `/code-health` on the work so far and fix its critical findings.
+- [x] 3.1 Write failing e2e tests at 1000px for the requirements "Applied filters are shown beside the filters button" and "Clear all filters removes every applied filter at once": no filter applied, applied filters visible with the panel closed, removing one applied filter, Clear all filters offered with one applied filter, not shown without applied filters, and clearing all applied filters.
+- [x] 3.2 Update the e2e tests for the modified requirements in `sex-filter.spec.ts`, `pagination.spec.ts` and `states.spec.ts`: "No players match the filters" shows the chips and Clear all filters, "Clearing filters from the no-match state" uses Clear all filters, every row of the "View change resets the page" examples, "Applying two filters is one history step", and "Default view has a clean URL" through the chip.
+- [x] 3.3 Write failing unit tests for the chips: the nationality chip shows the flag and the country name, a chip is a link whose `href` keeps the other search params and drops `page`, Clear all filters appears whenever at least one **filter** is applied, and nothing is shown with none applied.
+- [x] 3.4 Build `AppliedFilterChips` and the Clear all filters link in `ui/list-filters/`, taking the link from a `chipLink` prop. Make `PlayerFilters` supply it with the router `Link`, as `PlayerPagination` does.
+- [x] 3.5 Remove the "Clear filters" button from the no-match message in `PlayerOverview.tsx`. In `PlayerOverview.unit.test.tsx`, replace the two "Clear filters" tests with Clear all filters equivalents.
+- [x] 3.6 Add the new strings (Applied filters, Remove filter: {{name}}, Clear all filters) in all six locale files.
+- [x] 3.7 Make the tests from 3.1 to 3.3 pass and verify the whole suite still passes.
+- [x] 3.8 Run `/code-health` on the work so far and fix its critical findings.
 
 ## 4. Slice: focus return, announcement and keyboard use
 

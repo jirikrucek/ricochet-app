@@ -15,6 +15,9 @@ const cs = {
   listFilters: {
     title: 'Filtry',
     apply: 'Použít',
+    appliedFilters: 'Použité filtry',
+    removeFilter: 'Odebrat filtr: {{name}}',
+    clearAll: 'Zrušit všechny filtry',
   },
   players: {
     heading: 'Hráči',
@@ -36,7 +39,6 @@ const cs = {
     },
     noMatch: {
       message: 'Vybraným filtrům neodpovídá žádný hráč',
-      clearFilters: 'Zrušit filtry',
     },
     pagination: {
       label: 'Stránkování',
