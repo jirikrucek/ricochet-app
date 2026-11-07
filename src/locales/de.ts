@@ -10,6 +10,7 @@ const de = {
     openMenu: 'Menü öffnen',
     closeMenu: 'Menü schließen',
     menuTitle: 'Menü',
+    previewBadge: 'Preview',
   },
   players: {
     heading: 'Spieler',

@@ -10,6 +10,7 @@ const cs = {
     openMenu: 'Otevřít menu',
     closeMenu: 'Zavřít menu',
     menuTitle: 'Menu',
+    previewBadge: 'Preview',
   },
   players: {
     heading: 'Hráči',
