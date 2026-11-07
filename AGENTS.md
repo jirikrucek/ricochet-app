@@ -33,6 +33,7 @@
 
 ### Guides
 
+- **workflows**: when starting a feature, bug fix, or refactor, or choosing which skill fits a task, read `docs/guides/workflows-guide.md` first
 - **issue tracker**: when creating, reading, updating, or triaging an issue or PR, read `docs/guides/issue-tracker-guide.md` first
 - **triage labels**: when applying a triage label, read `docs/guides/triage-labels-guide.md` first
 - **ADRs**: when deciding whether a decision needs an ADR, or writing, editing, or superseding one, read `docs/guides/adrs-guide.md` first

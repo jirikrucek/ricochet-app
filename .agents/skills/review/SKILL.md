@@ -1,7 +1,6 @@
 ---
 name: review
 description: "Pre-merge review of the current branch through six lenses (quality, simplification, security, performance, observability, launch readiness), run in parallel sub-agents."
-disable-model-invocation: true
 ---
 
 Review the diff between `HEAD` and a fixed point through six **lenses**, each a separate skill run by its own sub-agent so no lens pollutes another's context. This skill dispatches and aggregates; the lens skills hold the criteria.
