@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import logo from '@/assets/brand/ricochet-logo.svg';
 import { LanguageSelect } from './LanguageSelect';
 import { PreviewBadge } from './PreviewBadge';
+import { tabletMediaQuery } from '@/shared/ui/useIsTablet';
 import {
   Sheet,
   SheetClose,
@@ -16,15 +17,6 @@ import {
 // A brand name, identical in every UI language, so not a translation key.
 const BRAND_NAME = 'Ricochet';
 
-// Read from the `tablet` breakpoint token in globals.css, so the menu closes at
-// exactly the width where the menu button hides.
-function tabletMediaQuery() {
-  const width = getComputedStyle(document.documentElement)
-    .getPropertyValue('--breakpoint-tablet')
-    .trim();
-  return `(min-width: ${width})`;
-}
-
 const iconButtonClassName =
   'inline-flex size-xxl shrink-0 items-center justify-center rounded-full text-ink outline-none transition-colors hover:bg-surface-strong focus-visible:ring-3 focus-visible:ring-ring/50';
 
@@ -33,6 +25,8 @@ export function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
+  // The query comes from the `tablet` breakpoint token, so the menu closes at
+  // exactly the width where the menu button hides.
   // Without this, a menu left open while the viewport widens would keep its
   // overlay and scroll lock over the full nav, with no visible way to close it.
   useEffect(() => {

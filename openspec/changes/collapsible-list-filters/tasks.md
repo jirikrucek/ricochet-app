@@ -1,10 +1,10 @@
 ## 1. Prefactoring: the shared media query and the Popover primitive
 
-- [ ] 1.1 Write a failing unit test for `tabletMediaQuery()` and `useIsTablet()` in `src/shared/ui/`: the query reads the `--breakpoint-tablet` token, and the hook follows `matchMedia` changes. Add a reusable `matchMedia` stub for unit tests where the test setup lives, since jsdom has none.
-- [ ] 1.2 Add `tabletMediaQuery()` and `useIsTablet()` to `src/shared/ui/` and make 1.1 pass.
-- [ ] 1.3 Make `TopNav` import `tabletMediaQuery()` in place of its private copy, keeping its own close-on-change listener. Verify the existing `TopNav` behaviour tests, and the e2e specs for the mobile menu under `tests/e2e/app/`, still pass.
-- [ ] 1.4 Add `src/ui/popover.tsx` with `npx shadcn@latest add popover` (style `base-nova`), then replace numeric spacing and `text-xs`/`text-sm` with the nearest design tokens, as the design system standard requires. Verify `npm run design:lint` and `npm run lint` pass.
-- [ ] 1.5 Run `/code-health` on the work so far and fix its critical findings.
+- [x] 1.1 Write a failing unit test for `tabletMediaQuery()` and `useIsTablet()` in `src/shared/ui/`: the query reads the `--breakpoint-tablet` token, and the hook follows `matchMedia` changes. Add a reusable `matchMedia` stub for unit tests where the test setup lives, since jsdom has none.
+- [x] 1.2 Add `tabletMediaQuery()` and `useIsTablet()` to `src/shared/ui/` and make 1.1 pass.
+- [x] 1.3 Make `TopNav` import `tabletMediaQuery()` in place of its private copy, keeping its own close-on-change listener. Verify the existing `TopNav` behaviour tests, and the e2e specs for the mobile menu under `tests/e2e/app/`, still pass.
+- [x] 1.4 Add `src/ui/popover.tsx` with `npx shadcn@latest add popover` (style `base-nova`), then replace numeric spacing and `text-xs`/`text-sm` with the nearest design tokens, as the design system standard requires. Verify `npm run design:lint` and `npm run lint` pass.
+- [x] 1.5 Run `/code-health` on the work so far and fix its critical findings.
 
 ## 2. Slice: open the filters panel as a popover, choose, and Apply (wide screens)
 
