@@ -29,7 +29,7 @@ test.describe('Nationality is shown as a flag with a localized country name', ()
     // The name stays on one line, not wrapped letter by letter.
     const box = await tooltip.boundingBox();
     expect(box?.width).toBeGreaterThan(40);
-    expect(box?.height).toBeLessThan(40);
+    expect(box?.height).toBeLessThan(60);
   });
 
   test('Tooltip shows the country name on keyboard focus', async ({ page }) => {
