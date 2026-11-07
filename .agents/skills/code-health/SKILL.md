@@ -17,13 +17,21 @@ Assess the diff between `HEAD` and a fixed point through three **lenses**, each 
 
 The target is the agent session's work: the branch's commits plus the uncommitted working tree. The fixed point is whatever the user supplied (SHA, branch, tag); default to `main`.
 
-Capture the commands once:
+Resolve it to the **base**, the merge-base SHA, in one call that passes the fixed point only as a single-quoted value. Accept a fixed point made of letters, digits, `.`, `_`, `/`, and `-` that does not start with `-`; ask the user about any other.
 
-- Diff: `git diff $(git merge-base <fixed-point> HEAD)` (merge-base to working tree, so commits, staged and unstaged edits all appear).
+```bash
+fixed_point='main'
+git rev-parse --verify --quiet --end-of-options "$fixed_point^{commit}" >/dev/null &&
+  git merge-base "$fixed_point" HEAD
+```
+
+Capture the commands once, with the base's literal SHA in place of `<base>`, so the sub-agents' commands carry nothing the user typed:
+
+- Diff: `git diff <base>` (base to working tree, so commits, staged and unstaged edits all appear).
 - New files: `git ls-files --others --exclude-standard` (untracked files the diff misses; each lens reads them directly).
-- Commits: `git log <fixed-point>..HEAD --oneline` (empty when the work is uncommitted).
+- Commits: `git log --oneline <base>..HEAD` (empty when the work is uncommitted).
 
-Confirm `git rev-parse <fixed-point>` resolves and the diff or the new-file list is non-empty. A bad ref or nothing to assess ends the run here, before any sub-agent starts.
+A fixed point that fails to resolve, or an empty diff with an empty new-file list, ends the run here, before any sub-agent starts.
 
 ### 2. Dispatch three sub-agents in one turn
 
