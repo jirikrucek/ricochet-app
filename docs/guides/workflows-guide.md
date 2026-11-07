@@ -11,22 +11,23 @@ Each step ends on its **done when**; finish it before moving on. A human or an a
 1. **Branch**: create a Conventional Branch off `main`. Done when `HEAD` is on the new branch.
 2. **Create change**: run `/openspec-new-change`. Done when `openspec/changes/<name>/` exists.
 3. **Plan**: run `/openspec-continue-change` once per planning artifact, or `/openspec-ff-change` to create them all in one pass. Done when `openspec status --change <name>` shows every artifact complete.
-4. **Implement**: run `/openspec-apply-change`. When the plan turns out wrong mid-way, revise it with `/openspec-update-change` and resume. Done when every task in `tasks.md` is checked.
+4. **Implement**: run `/openspec-apply-change`; each slice ends with a `/code-health` task. When the plan turns out wrong mid-way, revise it with `/openspec-update-change` and resume. Done when every task in `tasks.md` is checked.
 5. **Verify**: run `/openspec-verify-change`. Done when it reports no CRITICAL issues.
-6. **Self-review**: run `/review` and fix what it finds. Done when no critical finding is open.
+6. **Production readiness**: run `/production-readiness` and fix what it finds. Done when no critical finding is open.
 7. **Definition of Done**: run its phases from `AGENTS.md`. Done when the final report is all OK.
 8. **Pull request**: commit, then write the body with `/pr`. Done when the PR is open against `main` and its checks pass.
-9. **Human review** _(human only)_: review the PR and request changes. Address each one, re-running Verify and Definition of Done after any code change. Done when the PR is approved.
+9. **Review** _(human only)_: review the PR and request changes. Address each one, re-running Verify and Definition of Done after any code change. Done when the PR is approved.
 10. **Archive**: run `/openspec-archive-change`, then commit and push to the PR branch. Done when the change sits under `openspec/changes/archive/`, its delta specs are merged into `openspec/specs/`, `npm run spec:validate` passes on the merged specs, and the PR checks pass again.
 11. **Merge** _(human only)_: merge the PR into `main`. Done when the PR shows as merged.
 
-Dependency updates, tooling config, and docs-only edits run only steps 1, 7, 8, 9, and 11: branch, Definition of Done, pull request, human review, merge.
+Dependency updates, tooling config, and docs-only edits run only steps 1, 7, 8, 9, and 11: branch, Definition of Done, pull request, review, merge.
 
 ## Maintenance
 
 | Workflow             | Skill                                                                     | Reach for it when                                                                    |
 | -------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Diagnose a bug       | `/diagnosing-bugs`                                                        | something is broken, failing, or slow and the cause is unclear; the fix then enters the change workflow |
+| Diagnose a bug       | `/diagnosing-bugs`                                                        | something is broken, failing, or got slower and the cause is unclear; the fix then enters the change workflow |
+| Optimize performance | `/performance-optimization`                                               | a page or query misses a performance target (Core Web Vitals, a budget in the spec); measure first, and the fix enters the change workflow |
 | Improve architecture | `/improve-codebase-architecture` _(human only)_                            | you want a visual report of which modules are worth deepening first                  |
 | Audit                | `/audit` _(human only)_                                                    | you want to sweep the codebase for violations of standards and accepted ADRs, fix the approved ones, and commit |
 | Validate docs        | `/validate-adrs`, `/validate-guides`, `/validate-standards` _(human only)_ | you changed `docs/adr/`, `docs/guides/`, or `docs/standards/`, or want to check they still hold |
