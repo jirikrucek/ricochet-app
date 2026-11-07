@@ -23,7 +23,13 @@ test.describe('Nationality is shown as a flag with a localized country name', ()
       .first()
       .hover();
 
-    await expect(page.getByRole('tooltip')).toHaveText('Hungary');
+    const tooltip = page.getByRole('tooltip');
+    await expect(tooltip).toHaveText('Hungary');
+
+    // The name stays on one line, not wrapped letter by letter.
+    const box = await tooltip.boundingBox();
+    expect(box?.width).toBeGreaterThan(40);
+    expect(box?.height).toBeLessThan(40);
   });
 
   test('Tooltip shows the country name on keyboard focus', async ({ page }) => {
