@@ -12,6 +12,10 @@ const en = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filters',
+    apply: 'Apply',
+  },
   players: {
     heading: 'Players',
     caption: 'List of players',

@@ -12,10 +12,7 @@ import { pageBounds } from '@/modules/players/ui/pageRange';
 import { Button } from '@/ui/button';
 import { usePlayerNationalities } from '@/modules/players/data-access/usePlayerNationalities';
 import { usePlayersPage } from '@/modules/players/data-access/usePlayersPage';
-import {
-  NationalityFilter,
-  SexFilter,
-} from '@/modules/players/ui/PlayerFilters';
+import { PlayerFilters } from '@/modules/players/ui/PlayerFilters';
 import { PlayerPagination } from '@/modules/players/ui/PlayerPagination';
 import {
   PlayerTable,
@@ -132,15 +129,12 @@ function PlayerResults({
 
   return (
     <div className="flex flex-col gap-lg" aria-busy={isShowingPreviousPage}>
-      <div className="flex flex-col gap-base tablet:flex-row">
-        <NationalityFilter
-          nationalities={nationalities}
-          locale={locale}
-          value={search.nationality}
-          onChange={(nationality) => changeView({ nationality })}
-        />
-        <SexFilter value={search.sex} onChange={(sex) => changeView({ sex })} />
-      </div>
+      <PlayerFilters
+        nationalities={nationalities}
+        locale={locale}
+        values={{ nationality: search.nationality, sex: search.sex }}
+        onApply={changeView}
+      />
       {total === 0 ? (
         <NoMatch
           onClearFilters={() => changeView({ nationality: all, sex: all })}

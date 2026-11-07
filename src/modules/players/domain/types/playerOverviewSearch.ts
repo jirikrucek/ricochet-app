@@ -44,3 +44,12 @@ export const playerOverviewSearchSchema = z.object({
 });
 
 export type PlayerOverviewView = z.output<typeof playerOverviewSearchSchema>;
+
+// The two filters on their own: what the filters panel's form holds, validated
+// the same way as the URL, so the form and the URL agree on what a filter is.
+export const playerFiltersSchema = playerOverviewSearchSchema.pick({
+  nationality: true,
+  sex: true,
+});
+
+export type PlayerFilters = z.output<typeof playerFiltersSchema>;

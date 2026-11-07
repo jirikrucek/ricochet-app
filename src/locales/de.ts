@@ -12,6 +12,10 @@ const de = {
     menuTitle: 'Menü',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filter',
+    apply: 'Anwenden',
+  },
   players: {
     heading: 'Spieler',
     caption: 'Liste der Spieler',

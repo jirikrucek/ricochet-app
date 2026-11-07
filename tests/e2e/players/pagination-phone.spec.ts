@@ -10,6 +10,7 @@ import {
   playersTable,
   summary,
   useUiLanguage,
+  chooseFilter,
 } from './overview';
 
 test.beforeEach(async ({ page }) => {
@@ -63,8 +64,7 @@ test.describe('Page changes keep the visitor oriented', () => {
     await openOverview(page, 'page=2');
     await expect(summary(page)).toHaveText('Showing 26–50 of 100');
 
-    await page.getByRole('combobox', { name: 'Sex', exact: true }).click();
-    await page.getByRole('option', { name: 'Female', exact: true }).click();
+    await chooseFilter(page, 'Sex', 'Female');
 
     await expect(summary(page)).toHaveText('Showing 1–25 of 40');
     await expect(page.locator('[aria-live="polite"]')).toHaveText('');

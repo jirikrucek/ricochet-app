@@ -1,69 +1,44 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  sexes,
-  type Nationality,
-  type Sex,
-} from '@/modules/players/domain/types/player';
+import { sexes, type Nationality } from '@/modules/players/domain/types/player';
 import {
   all,
-  type OrAll,
+  playerFiltersSchema,
+  type PlayerFilters as PlayerFilterValues,
 } from '@/modules/players/domain/types/playerOverviewSearch';
 import { Flag } from '@/shared/ui/Flag';
-import { FilterSelect, type FilterOption } from './FilterSelect';
+import { ListFilters, type FilterDefinition } from './list-filters/ListFilters';
 
-export function SexFilter({
-  value,
-  onChange,
-}: {
-  value: OrAll<Sex>;
-  onChange: (value: OrAll<Sex>) => void;
-}) {
-  const { t } = useTranslation();
-  const options: FilterOption<OrAll<Sex>>[] = [
-    { value: all, label: t('players.filters.all') },
-    ...sexes.map((sex) => ({ value: sex, label: t(`players.sex.${sex}`) })),
-  ];
-
-  return (
-    <FilterSelect
-      id="player-sex-filter"
-      label={t('players.filters.sex')}
-      value={value}
-      options={options}
-      onChange={onChange}
-    />
-  );
-}
-
-export function NationalityFilter({
-  nationalities,
-  locale,
-  value,
-  onChange,
-}: {
+type PlayerFiltersProps = {
   nationalities: Nationality[];
   locale: string;
-  value: OrAll<Nationality>;
-  onChange: (value: OrAll<Nationality>) => void;
-}) {
+  // The applied filters.
+  values: PlayerFilterValues;
+  onApply: (values: PlayerFilterValues) => void;
+};
+
+// The player overview's filters, declared for the generic filters panel.
+export function PlayerFilters({
+  nationalities,
+  locale,
+  values,
+  onApply,
+}: PlayerFiltersProps) {
   const { t } = useTranslation();
 
-  const options = useMemo<FilterOption<OrAll<Nationality>>[]>(() => {
+  const filters = useMemo<FilterDefinition[]>(() => {
     const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
+    const allOption = { value: all, label: t('players.filters.all') };
+
     const countries = nationalities
       .map((nationality) => ({
         nationality,
         name: t(`countries.${nationality}`),
       }))
-      .sort((a, b) => collator.compare(a.name, b.name));
-
-    return [
-      { value: all, label: t('players.filters.all') },
-      ...countries.map(({ nationality, name }) => ({
-        value: nationality,
-        label: (
+      .sort((a, b) => collator.compare(a.name, b.name))
+      .map(({ nationality, name }) => {
+        const label = (
           <>
             <Flag
               countryCode={nationality}
@@ -72,18 +47,39 @@ export function NationalityFilter({
             />
             {name}
           </>
-        ),
-      })),
+        );
+        return { value: nationality, label };
+      });
+
+    return [
+      {
+        name: 'nationality',
+        label: t('players.filters.nationality'),
+        allValue: all,
+        options: [allOption, ...countries],
+      },
+      {
+        name: 'sex',
+        label: t('players.filters.sex'),
+        allValue: all,
+        options: [
+          allOption,
+          ...sexes.map((sex) => ({
+            value: sex,
+            label: t(`players.sex.${sex}`),
+          })),
+        ],
+      },
     ];
   }, [nationalities, locale, t]);
 
   return (
-    <FilterSelect
-      id="player-nationality-filter"
-      label={t('players.filters.nationality')}
-      value={value}
-      options={options}
-      onChange={onChange}
+    <ListFilters
+      filters={filters}
+      values={values}
+      schema={playerFiltersSchema}
+      action="/players"
+      onApply={onApply}
     />
   );
 }

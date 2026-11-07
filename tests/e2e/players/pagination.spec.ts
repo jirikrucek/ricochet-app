@@ -14,6 +14,9 @@ import {
   surnameHeader,
   surnameSortButton,
   useUiLanguage,
+  expectFilterValue,
+  filtersPanel,
+  openFiltersPanel,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
@@ -44,7 +47,8 @@ test.describe('Player overview is paginated with a fixed page size', () => {
     await openOverview(page);
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
 
-    await expect(page.getByRole('main').getByRole('combobox')).toHaveCount(2);
+    await openFiltersPanel(page);
+    await expect(filtersPanel(page).getByRole('combobox')).toHaveCount(2);
     await expect(filterSelect(page, 'Players per page')).toHaveCount(0);
     await expect(page.getByText('Players per page')).toHaveCount(0);
   });
@@ -276,7 +280,7 @@ test.describe('The view is kept in the URL', () => {
       'aria-sort',
       'descending',
     );
-    await expect(filterSelect(other, 'Sex')).toContainText('Female');
+    await expectFilterValue(other, 'Sex', 'Female');
     await otherContext.close();
   });
 
@@ -306,6 +310,6 @@ test.describe('The view is kept in the URL', () => {
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
     await expect(page).not.toHaveURL(/[?&]page=/);
     await expect(playersTable(page)).toBeVisible();
-    await expect(filterSelect(page, 'Nationality')).toContainText('All');
+    await expectFilterValue(page, 'Nationality', 'All');
   });
 });

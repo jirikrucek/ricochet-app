@@ -218,6 +218,9 @@ describe('PlayerOverview requests', () => {
     renderPlayerOverview();
     await screen.findByRole('table');
 
+    // The only selects on the page are the two filters in the filters panel.
+    expect(screen.queryByRole('combobox')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /^Filters/ }));
     expect(screen.queryByLabelText('Players per page')).toBeNull();
     expect(screen.getAllByRole('combobox')).toHaveLength(2);
   });

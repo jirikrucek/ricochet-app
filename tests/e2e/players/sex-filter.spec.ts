@@ -2,10 +2,8 @@ import { expect, test } from '@playwright/test';
 
 import {
   DESKTOP,
-  PHONE,
   asNameSet,
   chooseFilter,
-  expectNoHorizontalOverflow,
   expectPlayersListed,
   filterSelect,
   openOverview,
@@ -13,6 +11,9 @@ import {
   playersTable,
   seededPlayers,
   useUiLanguage,
+  chooseFilters,
+  expectFilterValue,
+  openFiltersPanel,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
@@ -38,6 +39,7 @@ test.describe('Visitor can filter players by sex', () => {
     await useUiLanguage(page, 'de');
     await openOverview(page);
 
+    await openFiltersPanel(page, /^Filter/);
     await filterSelect(page, 'Geschlecht').click();
 
     await expect(page.getByRole('option')).toHaveText([
@@ -48,12 +50,11 @@ test.describe('Visitor can filter players by sex', () => {
   });
 });
 
-test.describe('Filters combine and adapt to narrow screens', () => {
+test.describe('Filters combine with AND', () => {
   test('Both filters applied together', async ({ page, request }) => {
     await openOverview(page);
 
-    await chooseFilter(page, 'Nationality', 'Poland');
-    await chooseFilter(page, 'Sex', 'Male');
+    await chooseFilters(page, { Nationality: 'Poland', Sex: 'Male' });
 
     await expect(page).toHaveURL(/nationality=PL/);
     await expect(page).toHaveURL(/sex=male/);
@@ -63,20 +64,6 @@ test.describe('Filters combine and adapt to narrow screens', () => {
         await seededPlayers(request, { nationality: 'PL', sex: 'male' }),
       ),
     );
-  });
-
-  test('Filters stack on a phone', async ({ page }) => {
-    await openOverview(page, '', PHONE);
-    await expectPlayersListed(page);
-
-    const nationality = await filterSelect(page, 'Nationality').boundingBox();
-    const sex = await filterSelect(page, 'Sex').boundingBox();
-
-    expect(nationality).not.toBeNull();
-    expect(sex).not.toBeNull();
-    expect(sex!.y).toBeGreaterThanOrEqual(nationality!.y + nationality!.height);
-    expect(Math.abs(sex!.x - nationality!.x)).toBeLessThanOrEqual(1);
-    await expectNoHorizontalOverflow(page);
   });
 });
 
@@ -116,7 +103,7 @@ test.describe('The view is kept in the URL', () => {
 
     await page.reload();
 
-    await expect(filterSelect(page, 'Sex')).toContainText('Male');
+    await expectFilterValue(page, 'Sex', 'Male');
     await expect(page).toHaveURL(/[?&]sex=male/);
   });
 
@@ -130,7 +117,7 @@ test.describe('The view is kept in the URL', () => {
 
   test('an unknown sex lists players of both sexes', async ({ page }) => {
     await openOverview(page, 'sex=unknown');
-    await expect(filterSelect(page, 'Sex')).toContainText('All');
+    await expectFilterValue(page, 'Sex', 'All');
 
     expect(await playersAcrossPages(page, 'sex=unknown')).toHaveLength(100);
   });

@@ -12,6 +12,10 @@ const hu = {
     menuTitle: 'Menü',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Szűrők',
+    apply: 'Alkalmaz',
+  },
   players: {
     heading: 'Játékosok',
     caption: 'Játékosok listája',

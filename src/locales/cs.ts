@@ -12,6 +12,10 @@ const cs = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filtry',
+    apply: 'Použít',
+  },
   players: {
     heading: 'Hráči',
     caption: 'Seznam hráčů',

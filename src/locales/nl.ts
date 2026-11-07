@@ -12,6 +12,10 @@ const nl = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filters',
+    apply: 'Toepassen',
+  },
   players: {
     heading: 'Spelers',
     caption: 'Lijst van spelers',

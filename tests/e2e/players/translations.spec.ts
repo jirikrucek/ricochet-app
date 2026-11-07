@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { DESKTOP, openOverview, playersTable, useUiLanguage } from './overview';
+import {
+  DESKTOP,
+  openFiltersPanel,
+  openOverview,
+  playersTable,
+  useUiLanguage,
+} from './overview';
 
 test.use({ viewport: DESKTOP });
 
@@ -8,6 +14,8 @@ const languages = [
   {
     language: 'English',
     code: 'en',
+    filtersButton: 'Filters',
+    apply: 'Apply',
     heading: 'Players',
     columns: ['Surname', 'First name', 'Nationality'],
     filters: ['Nationality', 'Sex'],
@@ -19,6 +27,8 @@ const languages = [
   {
     language: 'Czech',
     code: 'cs',
+    filtersButton: 'Filtry',
+    apply: 'Použít',
     heading: 'Hráči',
     columns: ['Příjmení', 'Jméno', 'Národnost'],
     filters: ['Národnost', 'Pohlaví'],
@@ -30,6 +40,8 @@ const languages = [
   {
     language: 'German',
     code: 'de',
+    filtersButton: 'Filter',
+    apply: 'Anwenden',
     heading: 'Spieler',
     columns: ['Nachname', 'Vorname', 'Nationalität'],
     filters: ['Nationalität', 'Geschlecht'],
@@ -41,6 +53,8 @@ const languages = [
   {
     language: 'Polish',
     code: 'pl',
+    filtersButton: 'Filtry',
+    apply: 'Zastosuj',
     heading: 'Gracze',
     columns: ['Nazwisko', 'Imię', 'Narodowość'],
     filters: ['Narodowość', 'Płeć'],
@@ -52,6 +66,8 @@ const languages = [
   {
     language: 'Dutch',
     code: 'nl',
+    filtersButton: 'Filters',
+    apply: 'Toepassen',
     heading: 'Spelers',
     columns: ['Achternaam', 'Voornaam', 'Nationaliteit'],
     filters: ['Nationaliteit', 'Geslacht'],
@@ -63,6 +79,8 @@ const languages = [
   {
     language: 'Hungarian',
     code: 'hu',
+    filtersButton: 'Szűrők',
+    apply: 'Alkalmaz',
     heading: 'Játékosok',
     columns: ['Vezetéknév', 'Keresztnév', 'Nemzetiség'],
     filters: ['Nemzetiség', 'Nem'],
@@ -89,11 +107,16 @@ test.describe('Player overview is translated into every supported UI language', 
       await expect(playersTable(page).getByRole('columnheader')).toHaveText(
         expected.columns,
       );
+      await openFiltersPanel(page, new RegExp(`^${expected.filtersButton}`));
       for (const label of expected.filters) {
         await expect(
           page.getByRole('combobox', { name: label, exact: true }),
         ).toBeVisible();
       }
+      await expect(
+        page.getByRole('button', { name: expected.apply, exact: true }),
+      ).toBeVisible();
+      await page.keyboard.press('Escape');
       await expect(
         page.getByRole('paragraph').filter({ hasText: expected.summary }),
       ).toHaveText(expected.summary);
