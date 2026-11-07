@@ -30,6 +30,7 @@ import {
 } from '@/modules/players/domain/types/playerOverviewSearch';
 import { buildPlayer } from '@/modules/players/domain/types/playerMocks';
 import i18n from '@/lib/i18n';
+import { mockMatchMedia } from '@/shared/ui/matchMediaMocks';
 import { PlayerOverview } from './PlayerOverview';
 
 // Mock data only (docs/standards/testing-standard.md): the two data-access/api
@@ -89,7 +90,11 @@ function renderPlayerOverview(path = '/players') {
   return { router };
 }
 
+let viewport: ReturnType<typeof mockMatchMedia>;
+
 beforeEach(async () => {
+  // The filters panel follows the viewport; jsdom has no matchMedia.
+  viewport = mockMatchMedia(true);
   fetchPlayersPage.mockReset();
   fetchPlayerNationalities.mockReset();
   fetchPlayerNationalities.mockResolvedValue(['CZ', 'GB']);
@@ -102,6 +107,7 @@ beforeEach(async () => {
 
 afterEach(() => {
   cleanup();
+  viewport.restore();
 });
 
 describe('PlayerOverview states', () => {

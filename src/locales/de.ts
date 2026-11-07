@@ -14,6 +14,9 @@ const de = {
   },
   listFilters: {
     title: 'Filter',
+    close: 'Schließen',
+    description:
+      'Wählen Sie bei jedem Filter eine Option und wenden Sie sie dann an.',
     apply: 'Anwenden',
     appliedFilters: 'Angewendete Filter',
     removeFilter: 'Filter entfernen: {{name}}',

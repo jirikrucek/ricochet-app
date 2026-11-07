@@ -118,6 +118,7 @@ The generic strings (the button, Apply, Clear all filters, the "Applied filters"
 - [The sheet inside a phone browser: where the select's own list opens when its trigger sits near the bottom edge, and how the sheet follows the browser toolbars] → The real-device gate. If it fails on a phone, fall back to native pickers on mobile only.
 - [Chips appearing on a phone add one line, so the table moves once after the first Apply] → Accepted. Opening and closing the panel never moves the table, which is what the spec requires.
 - [Two live regions] → They never speak for the same event, because the page-change one reacts to a changed page and the new one to a user action on a filter.
+- [A viewport change while focus is inside the panel, such as a rotation, drops focus to the page body, because the old overlay unmounts] → Accepted: the spec is silent on it, the panel closing is the point, and a keyboard user rarely rotates a device mid-task. A layout effect that refocuses the button is the fix if it matters.
 - [Changing the e2e helper touches many specs] → The helper keeps its signature, so the specs change only where the Clear action or the layout assumptions were hard-coded.
 - [The standard is written before a second list exists] → The generic API is shaped by one list. The standard says to revisit it when the second list arrives.
 

@@ -14,6 +14,8 @@ const cs = {
   },
   listFilters: {
     title: 'Filtry',
+    close: 'Zavřít',
+    description: 'U každého filtru vyberte možnost a potom ji použijte.',
     apply: 'Použít',
     appliedFilters: 'Použité filtry',
     removeFilter: 'Odebrat filtr: {{name}}',

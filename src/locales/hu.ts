@@ -14,6 +14,8 @@ const hu = {
   },
   listFilters: {
     title: 'Szűrők',
+    close: 'Bezárás',
+    description: 'Válasszon egy lehetőséget minden szűrőnél, majd alkalmazza.',
     apply: 'Alkalmaz',
     appliedFilters: 'Alkalmazott szűrők',
     removeFilter: 'Szűrő eltávolítása: {{name}}',

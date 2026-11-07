@@ -14,6 +14,8 @@ const nl = {
   },
   listFilters: {
     title: 'Filters',
+    close: 'Sluiten',
+    description: 'Kies bij elk filter een optie en pas ze daarna toe.',
     apply: 'Toepassen',
     appliedFilters: 'Toegepaste filters',
     removeFilter: 'Filter verwijderen: {{name}}',

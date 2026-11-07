@@ -41,12 +41,12 @@
 
 ## 5. Slice: the sheet on narrow screens
 
-- [ ] 5.1 Write failing e2e tests at 375px and across the breakpoint for "Filters panel is a sheet on narrow screens", "Filters panel adapts when the viewport changes" and the remaining keyboard scenario: the sheet on a phone with no horizontal scroll, opening the panel does not move the table, crossing the breakpoint closes the panel and discards the draft, and Tab stays inside the sheet. Press Tab with a short pause between keystrokes, because back-to-back synthetic keypresses outrun the dialog's focus guard.
-- [ ] 5.2 Write failing unit tests that the overlay is keyed by `useIsTablet()` so a change remounts it closed, and that the sheet opens from the bottom with `max-h-svh` and scrolling.
-- [ ] 5.3 Make `ListFilters` choose between the Popover and `Sheet` with `side="bottom"` through `useIsTablet()`, keyed by the result, with no arbitrary values.
-- [ ] 5.4 Extend the existing e2e specs that run at phone width, such as `pagination-phone.spec.ts`, so the filters work through the sheet there too.
-- [ ] 5.5 Make the tests from 5.1 and 5.2 pass.
-- [ ] 5.6 Run `/code-health` on the work so far and fix its critical findings.
+- [x] 5.1 Write failing e2e tests at 375px and across the breakpoint for "Filters panel is a sheet on narrow screens", "Filters panel adapts when the viewport changes" and the remaining keyboard scenario: the sheet on a phone with no horizontal scroll, opening the panel does not move the table, crossing the breakpoint closes the panel and discards the draft, and Tab stays inside the sheet. Press Tab with a short pause between keystrokes, because back-to-back synthetic keypresses outrun the dialog's focus guard.
+- [x] 5.2 Write failing unit tests that the overlay is keyed by `useIsTablet()` so a change remounts it closed, and that the sheet opens from the bottom with `max-h-svh` and scrolling.
+- [x] 5.3 Make `ListFilters` choose between the Popover and `Sheet` with `side="bottom"` through `useIsTablet()`, keyed by the result, with no arbitrary values.
+- [x] 5.4 Extend the existing e2e specs that run at phone width, such as `pagination-phone.spec.ts`, so the filters work through the sheet there too.
+- [x] 5.5 Make the tests from 5.1 and 5.2 pass.
+- [x] 5.6 Run `/code-health` on the work so far and fix its critical findings.
 
 ## 6. Slice: translations
 

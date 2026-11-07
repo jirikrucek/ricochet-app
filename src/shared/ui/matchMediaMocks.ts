@@ -3,6 +3,7 @@
 // only external I/O faked, and `setMatches` plays the part of the viewport
 // crossing the breakpoint.
 export function mockMatchMedia(initiallyMatches: boolean) {
+  const original = window.matchMedia;
   let matches = initiallyMatches;
   const queries: string[] = [];
   const listeners = new Set<(event: MediaQueryListEvent) => void>();
@@ -31,6 +32,10 @@ export function mockMatchMedia(initiallyMatches: boolean) {
 
   return {
     queries,
+    // Puts the real (absent) matchMedia back, so no test inherits the stub.
+    restore() {
+      window.matchMedia = original;
+    },
     setMatches(next: boolean) {
       matches = next;
       for (const listener of listeners) {

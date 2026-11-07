@@ -1,4 +1,5 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -10,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import i18n from '@/lib/i18n';
+import { mockMatchMedia } from '@/shared/ui/matchMediaMocks';
 import {
   ListFilters,
   type FilterDefinition,
@@ -111,13 +113,18 @@ function choose(label: string, option: string) {
   fireEvent.click(item);
 }
 
+let viewport: ReturnType<typeof mockMatchMedia>;
+
 beforeEach(async () => {
+  // A tablet-width viewport, unless a test says otherwise.
+  viewport = mockMatchMedia(true);
   onApply.mockReset();
   await i18n.changeLanguage('en');
 });
 
 afterEach(() => {
   cleanup();
+  viewport.restore();
 });
 
 describe('ListFilters', () => {
@@ -358,5 +365,80 @@ describe('ListFilters focus and announcement', () => {
         'Showing 1–25 of 100',
       ),
     );
+  });
+});
+
+describe('ListFilters overlay', () => {
+  it('opens as a popover from the tablet breakpoint upward', () => {
+    renderFilters();
+
+    expect(openPanel().getAttribute('data-slot')).toBe('popover-content');
+  });
+
+  it('opens as a sheet from the bottom edge below it, that scrolls when it is tall', () => {
+    viewport.setMatches(false);
+    renderFilters();
+
+    const sheet = openPanel();
+
+    expect(sheet.getAttribute('data-slot')).toBe('sheet-content');
+    expect(sheet.getAttribute('data-side')).toBe('bottom');
+    expect(sheet.className).toContain('max-h-svh');
+    expect(sheet.className).toContain('overflow-y-auto');
+  });
+
+  it('still has a select for each filter and Apply in the sheet', () => {
+    viewport.setMatches(false);
+    renderFilters({ nationality: 'PL', sex: 'all' });
+
+    const sheet = openPanel();
+
+    expect(
+      within(sheet).getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Poland');
+    expect(within(sheet).getByRole('button', { name: 'Apply' })).toBeTruthy();
+  });
+
+  it('closes the panel and forgets the draft when the viewport crosses the breakpoint', () => {
+    renderFilters({ nationality: 'CZ', sex: 'all' });
+    openPanel();
+    choose('Nationality', 'Poland');
+
+    act(() => viewport.setMatches(false));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    openPanel();
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Czechia');
+  });
+
+  it("names the sheet's Close control in the UI language", async () => {
+    viewport.setMatches(false);
+    await i18n.changeLanguage('de');
+    renderFilters();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Filter/ }));
+    const sheet = screen.getByRole('dialog');
+
+    expect(
+      within(sheet).getByRole('button', { name: 'Schließen' }),
+    ).toBeTruthy();
+  });
+
+  it('discards the draft when the sheet is closed with Close, applying nothing', () => {
+    viewport.setMatches(false);
+    renderFilters({ nationality: 'CZ', sex: 'all' });
+    openPanel();
+    choose('Nationality', 'Poland');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onApply).not.toHaveBeenCalled();
+    openPanel();
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Czechia');
   });
 });

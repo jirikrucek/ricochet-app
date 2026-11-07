@@ -14,6 +14,8 @@ const en = {
   },
   listFilters: {
     title: 'Filters',
+    close: 'Close',
+    description: 'Pick an option for each filter, then apply.',
     apply: 'Apply',
     appliedFilters: 'Applied filters',
     removeFilter: 'Remove filter: {{name}}',
