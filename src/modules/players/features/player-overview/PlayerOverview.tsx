@@ -12,15 +12,14 @@ import { pageBounds } from '@/modules/players/ui/pageRange';
 import { Button } from '@/ui/button';
 import { usePlayerNationalities } from '@/modules/players/data-access/usePlayerNationalities';
 import { usePlayersPage } from '@/modules/players/data-access/usePlayersPage';
-import {
-  NationalityFilter,
-  SexFilter,
-} from '@/modules/players/ui/PlayerFilters';
 import { PlayerPagination } from '@/modules/players/ui/PlayerPagination';
 import {
   PlayerTable,
   PlayerTableSkeleton,
 } from '@/modules/players/ui/PlayerTable';
+import { PrototypeFilters } from './prototype/PrototypeFilters';
+import { PrototypeSwitcher } from './prototype/PrototypeSwitcher';
+import { usePrototypeFlags } from './prototype/usePrototypeFlags';
 import { useCanonicalPage } from './useCanonicalPage';
 import { usePageChangeOrientation } from './usePageChangeOrientation';
 
@@ -42,10 +41,10 @@ export function PlayerOverview() {
 // visitor.
 function PlayerOverviewContent() {
   const { t, i18n } = useTranslation();
-  const search = routeApi.useSearch();
+  const { view } = usePrototypeFlags();
   const locale = i18n.resolvedLanguage ?? i18n.language;
   const nationalities = usePlayerNationalities();
-  const playersPage = usePlayersPage(search, locale);
+  const playersPage = usePlayersPage(view, locale);
 
   if (nationalities.isPending || playersPage.isPending) {
     return <PlayerTableSkeleton />;
@@ -102,7 +101,7 @@ function PlayerResults({
   locale: string;
 }) {
   const { t } = useTranslation();
-  const search = routeApi.useSearch();
+  const { view: search, variant, enhanced } = usePrototypeFlags();
   const navigate = routeApi.useNavigate();
   const { rows, total, page, pageCount } = playersPage;
 
@@ -132,15 +131,17 @@ function PlayerResults({
 
   return (
     <div className="flex flex-col gap-lg" aria-busy={isShowingPreviousPage}>
-      <div className="flex flex-col gap-base tablet:flex-row">
-        <NationalityFilter
-          nationalities={nationalities}
-          locale={locale}
-          value={search.nationality}
-          onChange={(nationality) => changeView({ nationality })}
-        />
-        <SexFilter value={search.sex} onChange={(sex) => changeView({ sex })} />
-      </div>
+      <PrototypeFilters
+        nationalities={nationalities}
+        locale={locale}
+        value={{ nationality: search.nationality, sex: search.sex }}
+        variant={variant}
+        enhanced={enhanced}
+        onChange={changeView}
+        resultText={total === 0 ? t('players.noMatch.message') : summary}
+        isShowingPreviousPage={isShowingPreviousPage}
+      />
+      <PrototypeSwitcher variant={variant} enhanced={enhanced} />
       {total === 0 ? (
         <NoMatch
           onClearFilters={() => changeView({ nationality: all, sex: all })}
