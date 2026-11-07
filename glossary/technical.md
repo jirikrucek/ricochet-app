@@ -8,3 +8,5 @@
 | Feature | One use case of a module, usually reached through a route, whose folder under `features/` orchestrates the module's UI, data access, and domain code. | Describing a use case and the code that orchestrates it. | module, screen, container |
 | Shared code | Code in `src/shared/` used by two or more modules, or by a module and `app`. | Describing where code moves when a second module needs it. | global counterpart, common code |
 | Domain type | A TypeScript type describing a business concept as the app uses it, usually inferred from a Zod schema and free of storage details. | Contrasting what the app works with against backend rows and UI-only types. | model, entity, DTO |
+| Popover | A floating panel anchored to the control that opened it, which neither dims nor blocks the page behind it. | Describing the filters panel at and above 744px. | dropdown, tooltip |
+| Sheet | A panel that slides in from a screen edge over a dimmed page and keeps focus inside until it closes (the Shadcn `Sheet`). | Describing the filters panel below 744px and the mobile menu. | drawer, modal (for this component) |
