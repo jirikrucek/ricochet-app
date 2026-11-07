@@ -28,7 +28,7 @@ None. The pattern's rules for future lists live in the ADR and the standard, not
 
 ## Impact
 
-- **Code:** `src/modules/players/ui/` (new generic filters component, existing filter components reworked), `src/modules/players/features/player-overview/` (wiring, announcement), `src/ui/popover.tsx` (new), and `src/locales/` (six languages).
+- **Code:** `src/modules/players/ui/` (new generic filters component, existing filter components reworked), `src/modules/players/features/player-overview/` (wiring, announcement), `src/ui/popover.tsx` (new), `src/shared/ui/` (the 744px media query, now also used by `TopNav`), and `src/locales/` (six languages).
 - **Tests:** `PlayerOverview.unit.test.tsx`, the e2e specs `sex-filter`, `translations`, `pagination` and `pagination-phone`, and new unit and e2e coverage.
 - **Docs:** a new ADR, a new standard, `AGENTS.md`, the glossary, and the `player-overview` spec.
 - **Unchanged:** the URL search params, the backend filtering, and the page size (ADR 0002 and ADR 0020).
