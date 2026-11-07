@@ -21,6 +21,7 @@ rules:
     - Must break the work into tracer bullets, small slices of functionality that get built end-to-end; each slice cuts a narrow but complete path through every layer (schema, API, UI, tests), vertical NOT horizontal; each slice is demoable/verifiable on its own and sized to fit in a single fresh context window; any prefactoring should be done first
     - Must ensure tests (unit, integration, and E2E) are always written before implementation; follow TDD
     - Must cover each spec, its all requirement scenarios, by an E2E test
+    - Must end each slice with a task to run /code-health on the work so far and fix its critical findings
 
 operations:
   apply:
