@@ -62,8 +62,16 @@ function FilterLink({
   );
 }
 
-function renderFilters(values: Record<string, string> = none) {
-  render(
+const resultOf = (resultText: string, isShowingPreviousPage = false) => ({
+  resultText,
+  isShowingPreviousPage,
+});
+
+function listFilters(
+  values: Record<string, string>,
+  result = resultOf('Showing 1–25 of 100'),
+) {
+  return (
     <ListFilters
       filters={filters}
       values={values}
@@ -71,8 +79,21 @@ function renderFilters(values: Record<string, string> = none) {
       action="/players"
       onApply={onApply}
       FilterLink={FilterLink}
-    />,
+      {...result}
+    />
   );
+}
+
+function renderFilters(
+  values: Record<string, string> = none,
+  result = resultOf('Showing 1–25 of 100'),
+) {
+  const view = render(listFilters(values, result));
+  return {
+    // The same filters after the view changed, as the page re-renders them.
+    showView: (nextValues: Record<string, string>, nextResult = result) =>
+      view.rerender(listFilters(nextValues, nextResult)),
+  };
 }
 
 function openPanel() {
@@ -257,5 +278,85 @@ describe('ListFilters applied filters', () => {
     expect(
       screen.getByRole('link', { name: 'Clear all filters' }),
     ).toBeTruthy();
+  });
+});
+
+describe('ListFilters focus and announcement', () => {
+  const button = () => screen.getByRole('button', { name: /^Filters/ });
+
+  it('returns focus to the Filters button and says the current result when Apply changes nothing', async () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+    openPanel();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(button()));
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe(
+        'Showing 1–25 of 100',
+      ),
+    );
+  });
+
+  it('moves focus to the Filters button when a chip is used, since the chip goes away', () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Remove filter: Poland' }),
+    );
+
+    expect(document.activeElement).toBe(button());
+  });
+
+  it('leaves focus alone when a chip is opened in a new tab', () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+    const chip = screen.getByRole('link', { name: 'Remove filter: Poland' });
+    chip.focus();
+
+    fireEvent.click(chip, { ctrlKey: true });
+
+    expect(document.activeElement).toBe(chip);
+  });
+
+  it('says the new result once the rows of the applied view are shown, not before', async () => {
+    const view = renderFilters(none, resultOf('Showing 1–25 of 100'));
+    openPanel();
+    choose('Sex', 'Female');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    await waitFor(() => expect(onApply).toHaveBeenCalled());
+    // The search changed; the old rows are still on screen.
+    view.showView(
+      { nationality: 'all', sex: 'female' },
+      resultOf('Showing 1–25 of 100', true),
+    );
+    expect(screen.getByRole('status').textContent).toBe('');
+
+    view.showView(
+      { nationality: 'all', sex: 'female' },
+      resultOf('Showing 1–25 of 40'),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe('Showing 1–25 of 40'),
+    );
+  });
+
+  it('says the new result after a chip is used, once the rows are shown', async () => {
+    const view = renderFilters(
+      { nationality: 'PL', sex: 'all' },
+      resultOf('Showing 1–10 of 10'),
+    );
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Remove filter: Poland' }),
+    );
+    view.showView(none, resultOf('Showing 1–25 of 100'));
+
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe(
+        'Showing 1–25 of 100',
+      ),
+    );
   });
 });

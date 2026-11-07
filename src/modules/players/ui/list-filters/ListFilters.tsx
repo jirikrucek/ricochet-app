@@ -1,5 +1,5 @@
 import { ChevronDownIcon } from 'lucide-react';
-import { useState, type ComponentType } from 'react';
+import { useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
@@ -12,6 +12,7 @@ import {
 import { cn } from '@/ui/cn';
 import { AppliedFilterChips, type FilterLinkProps } from './AppliedFilterChips';
 import { appliedFilters } from './appliedFilters';
+import { useFilterAnnouncement } from './useFilterAnnouncement';
 import { FiltersForm } from './FiltersForm';
 import type { FilterDefinition } from './FilterField';
 
@@ -28,6 +29,10 @@ type ListFiltersProps<TValues extends Record<string, string>> = {
   onApply: (values: TValues) => void;
   // Renders a link to the list with some filters changed, for the chips.
   FilterLink: ComponentType<FilterLinkProps<TValues>>;
+  // What to announce about the list after a filter change.
+  resultText: string;
+  // True while the rows of the previous view are still on screen.
+  isShowingPreviousPage: boolean;
 };
 
 const buttonClassName =
@@ -43,15 +48,23 @@ export function ListFilters<TValues extends Record<string, string>>({
   action,
   onApply,
   FilterLink,
+  resultText,
+  isShowingPreviousPage,
 }: ListFiltersProps<TValues>) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const applied = appliedFilters(filters, values);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const { announcement, announceResult } = useFilterAnnouncement({
+    resultText,
+    isShowingPreviousPage,
+    viewKey: JSON.stringify(values),
+  });
 
   return (
     <div className="flex flex-wrap items-center gap-sm">
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger className={buttonClassName}>
+        <PopoverTrigger ref={triggerRef} className={buttonClassName}>
           {t('listFilters.title')}
           {applied.length > 0 && (
             <>
@@ -79,9 +92,13 @@ export function ListFilters<TValues extends Record<string, string>>({
             schema={schema}
             action={action}
             className="w-form-field"
-            onApply={(applied) => {
-              onApply(applied);
+            onApply={(newValues) => {
+              const viewWillChange = filters.some(
+                (filter) => newValues[filter.name] !== values[filter.name],
+              );
+              onApply(newValues);
               setOpen(false);
+              announceResult(viewWillChange);
             }}
           />
         </PopoverContent>
@@ -90,7 +107,15 @@ export function ListFilters<TValues extends Record<string, string>>({
         filters={filters}
         applied={applied}
         FilterLink={FilterLink}
+        onUse={() => {
+          // The chip goes away with the change, so focus would be lost.
+          triggerRef.current?.focus();
+          announceResult(true);
+        }}
       />
+      <div role="status" className="sr-only">
+        {announcement}
+      </div>
     </div>
   );
 }

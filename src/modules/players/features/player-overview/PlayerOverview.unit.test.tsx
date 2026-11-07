@@ -407,7 +407,10 @@ describe('PlayerOverview while another page loads', () => {
     await act(() => router.navigate({ to: '/players', search: { page: 2 } }));
 
     expect(screen.getByText('FirstPage')).toBeTruthy();
-    expect(screen.queryByRole('status')).toBeNull();
+    // The filters' live region is a status too, so look for the skeleton by name.
+    expect(
+      screen.queryByRole('status', { name: 'Loading players' }),
+    ).toBeNull();
     expect(router.state.location.search).toEqual({ page: 2 });
   });
 

@@ -21,6 +21,9 @@ type PlayerFiltersProps = {
   // The applied filters.
   values: PlayerFilterValues;
   onApply: (values: PlayerFilterValues) => void;
+  // What to announce about the list after a filter change.
+  resultText: string;
+  isShowingPreviousPage: boolean;
 };
 
 // A link to the player overview with some filters changed. It keeps every other
@@ -46,6 +49,8 @@ export function PlayerFilters({
   locale,
   values,
   onApply,
+  resultText,
+  isShowingPreviousPage,
 }: PlayerFiltersProps) {
   const { t } = useTranslation();
 
@@ -115,6 +120,8 @@ export function PlayerFilters({
       action="/players"
       onApply={onApply}
       FilterLink={PlayerFilterLink}
+      resultText={resultText}
+      isShowingPreviousPage={isShowingPreviousPage}
     />
   );
 }

@@ -32,12 +32,12 @@
 
 ## 4. Slice: focus return, announcement and keyboard use
 
-- [ ] 4.1 Write failing e2e tests at 1000px for "Filter changes keep the visitor oriented" and "Filters panel can be used with a keyboard": applying filters announces the result, removing a chip announces the result, a no-match result is announced, applying without a change announces the current result, opening with the keyboard reports the button as expanded, and Escape closes the panel and returns focus to the Filters button. Each focus check also asserts that focus is not on `<body>`.
-- [ ] 4.2 Write failing unit tests for `useFilterAnnouncement`: nothing is announced until the new rows are shown (`isShowingPreviousPage` is false), a no-change action announces immediately, a zero total announces the no-match message, and a URL change that is not a user action announces nothing. Keep the existing test "does not treat a filter change as a page change" passing.
-- [ ] 4.3 Implement `useFilterAnnouncement` and its `role="status"` region in `ui/list-filters/`, with `resultText` and `isShowingPreviousPage` passed down from `PlayerOverview.tsx`.
-- [ ] 4.4 Return focus to the **filters button** through a ref when a chip or Clear all filters is used, and verify the popover returns focus itself on Apply and Escape.
-- [ ] 4.5 Make the tests from 4.1 and 4.2 pass.
-- [ ] 4.6 Run `/code-health` on the work so far and fix its critical findings.
+- [x] 4.1 Write failing e2e tests at 1000px for "Filter changes keep the visitor oriented" and "Filters panel can be used with a keyboard": applying filters announces the result, removing a chip announces the result, a no-match result is announced, applying without a change announces the current result, opening with the keyboard reports the button as expanded, and Escape closes the panel and returns focus to the Filters button. Each focus check also asserts that focus is not on `<body>`.
+- [x] 4.2 Write failing unit tests for `useFilterAnnouncement`: nothing is announced until the new rows are shown (`isShowingPreviousPage` is false), a no-change action announces immediately, a zero total announces the no-match message, and a URL change that is not a user action announces nothing. Keep the existing test "does not treat a filter change as a page change" passing.
+- [x] 4.3 Implement `useFilterAnnouncement` and its `role="status"` region in `ui/list-filters/`, with `resultText` and `isShowingPreviousPage` passed down from `PlayerOverview.tsx`.
+- [x] 4.4 Return focus to the **filters button** through a ref when a chip or Clear all filters is used, and verify the popover returns focus itself on Apply and Escape.
+- [x] 4.5 Make the tests from 4.1 and 4.2 pass.
+- [x] 4.6 Run `/code-health` on the work so far and fix its critical findings.
 
 ## 5. Slice: the sheet on narrow screens
 

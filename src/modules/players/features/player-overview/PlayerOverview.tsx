@@ -109,6 +109,7 @@ function PlayerResults({
 
   // The one place the "Showing X–Y of Z" text is built: the pagination shows
   // it and the page-change orientation announces it.
+  const noMatchMessage = t('players.noMatch.message');
   const summary = t('players.pagination.summary', {
     ...pageBounds(page, itemsPerPage, total),
     total,
@@ -131,9 +132,11 @@ function PlayerResults({
         locale={locale}
         values={{ nationality: search.nationality, sex: search.sex }}
         onApply={changeView}
+        resultText={total === 0 ? noMatchMessage : summary}
+        isShowingPreviousPage={isShowingPreviousPage}
       />
       {total === 0 ? (
-        <NoMatch />
+        <NoMatch message={noMatchMessage} />
       ) : (
         <>
           <PlayerTable
@@ -161,12 +164,6 @@ function PlayerResults({
 
 // The applied filters and Clear all filters stay shown beside the Filters
 // button, so the message needs no button of its own.
-function NoMatch() {
-  const { t } = useTranslation();
-
-  return (
-    <p className="type-body-md m-0 text-muted">
-      {t('players.noMatch.message')}
-    </p>
-  );
+function NoMatch({ message }: { message: string }) {
+  return <p className="type-body-md m-0 text-muted">{message}</p>;
 }
