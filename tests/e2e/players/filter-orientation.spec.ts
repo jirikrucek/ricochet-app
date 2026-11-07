@@ -45,7 +45,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     await expect(announcement(page)).toHaveText('Showing 1–25 of 100');
   });
 
-  test('No match is announced', async ({ page }) => {
+  test('No match announced', async ({ page }) => {
     await openOverview(page);
 
     await chooseFilters(page, { Nationality: 'United Kingdom', Sex: 'Female' });

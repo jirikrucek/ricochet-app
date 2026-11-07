@@ -29,7 +29,8 @@ Every list with at least one **filter** follows this standard. It applies the de
 
 ## Building a list's filters
 
-- Declare the **filters** (name, label, options, chip label) and pass them to the generic `ListFilters` component. Don't hand-build the button, draft, chips, or announcement.
+- Declare the **filters** (name, label, the option that means "no narrowing", and options that each have a label and a plain-text name) and pass them to the generic `ListFilters` component. Don't hand-build the button, draft, chips, or announcement.
+- Keep an **applied filter**'s value among its select's options even when no row has it any more, so the select, the count and the chip never disagree about it and it can always be removed.
 - The component starts in the **module** that owns the first list, in its `ui/`. When a second **module** needs it, move it to `src/shared/ui/` with its translations, as the structure standard says. Don't copy it.
 - The **filter draft** is a React Hook Form form validated by a Zod schema derived from the list's search schema, so there is one definition of what a valid view is.
 - Generic strings live under `listFilters.*` and per-list labels under that list's own keys. Every string exists in all six languages.
@@ -37,6 +38,6 @@ Every list with at least one **filter** follows this standard. It applies the de
 
 ## Tests
 
-- Unit tests cover the draft, Apply, discard on close, the chips, Clear all filters, and the announcement. jsdom has no `matchMedia`, so stub it.
+- Unit tests cover the draft, Apply, discard on close, the chips, Clear all filters, and the announcement. jsdom has no `matchMedia`, so install the stub in `src/shared/ui/matchMediaMocks.ts` and restore it afterwards.
 - End-to-end tests run at a viewport above and below 744px. They check the **popover** versus the **sheet**, the keyboard flow with focus returning to the button, the announcement, chip removal, and the viewport crossing 744px. They assert roles and attributes, never pixels ([ADR 0009](../adr/ADR0009-e2e-tests-do-not-use-pixel-snapshots.md)).
 - Changing the **sheet** or the **popover** needs a manual check on iOS Safari and Android Chrome before release, because the automated tests only run in Chromium.

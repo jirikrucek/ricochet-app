@@ -57,8 +57,8 @@
 
 ## 7. Verify and finish
 
-- [ ] 7.1 Check every scenario in `specs/players/player-overview/spec.md` is covered by an e2e test, and list any gap in the pull request. Run `openspec validate collapsible-list-filters --type change --strict` and fix any error.
-- [ ] 7.2 Check `docs/standards/list-filters-standard.md` and ADRs 0021 and 0022 still describe what was built, and update them in place if the built behaviour differs in wording only. If a decision changed, stop and ask the owner.
-- [ ] 7.3 Do the real-device check on iOS Safari and Android Chrome: the sheet, where the select's list opens near its bottom edge, the browser toolbars, Clear all filters in the no-match state, and a screen reader pass. Record the outcome in the pull request, and fall back to native pickers on mobile only if it fails.
-- [ ] 7.4 Run `/production-readiness` and fix its critical findings.
-- [ ] 7.5 Run the Definition of Done from `AGENTS.md`: standards, ADRs, `npm run typecheck`, `npm run lint`, `npm run spec:validate`, `npm run design:lint`, `npm run build`, `npm run test:all`, and the final report.
+- [x] 7.1 Check every scenario in `specs/players/player-overview/spec.md` is covered by an e2e test, and list any gap in the pull request. Run `openspec validate collapsible-list-filters --type change --strict` and fix any error.
+- [x] 7.2 Check `docs/standards/list-filters-standard.md` and ADRs 0021 and 0022 still describe what was built, and update them in place if the built behaviour differs in wording only. If a decision changed, stop and ask the owner.
+- [ ] 7.3 Do the real-device check on iOS Safari and Android Chrome: the sheet, where the select's list opens near its bottom edge, the browser toolbars, Clear all filters in the no-match state, a screen reader pass, and the browser console on the Vercel Preview for Content Security Policy errors when the popover and the sheet open, because only Vercel serves the policy. Record the outcome in the pull request, and fall back to native pickers on mobile only if it fails.
+- [x] 7.4 Run `/production-readiness` and fix its critical findings.
+- [x] 7.5 Run the Definition of Done from `AGENTS.md`: standards, ADRs, `npm run typecheck`, `npm run lint`, `npm run spec:validate`, `npm run design:lint`, `npm run build`, `npm run test:all`, and the final report.

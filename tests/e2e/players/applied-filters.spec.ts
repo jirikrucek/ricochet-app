@@ -85,8 +85,10 @@ test.describe('Clear all filters removes every applied filter at once', () => {
   });
 });
 
-test.describe('An applied nationality that no player has', () => {
-  test('stays named and removable', async ({ page }) => {
+test.describe('Visitor can filter players by nationality', () => {
+  test('An applied nationality that no player has stays offered', async ({
+    page,
+  }) => {
     // The seed has all six nationalities, so this state needs interception.
     await page.route(NATIONALITIES_API, (route) =>
       route.fulfill({

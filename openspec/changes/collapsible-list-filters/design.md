@@ -60,7 +60,7 @@ flowchart LR
 ```
 
 - **`ui/list-filters/` (generic).** `ListFilters` owns the button, the count, the chip row, Clear all filters, the choice of overlay, and the live region. `FiltersForm` owns the **filter draft**. `AppliedFilterChips` and `FilterField` (the current `FilterSelect`, labelled and rendered through Base UI Select) are its parts. It knows nothing about players, the router or Supabase.
-- **`ui/PlayerFilters.tsx` (players).** It declares the nationality and sex **filters** (labels, options with flags, the chip label) and supplies the chip links. It replaces `NationalityFilter`, `SexFilter` and `FilterSelect`.
+- **`ui/PlayerFilters.tsx` (players).** It declares the nationality and sex **filters** (labels, options with a flag and a plain-text name) and supplies the chip links. The applied nationality stays among the options even when no player has it. It replaces `NationalityFilter`, `SexFilter` and `FilterSelect`.
 - **`features/player-overview/`.** `PlayerOverview.tsx` keeps `changeView`, which already returns to page 1 in one navigation, and passes the applied values, `changeView`, the result text and `isShowingPreviousPage` down.
 - **`domain/types/playerOverviewSearch.ts`.** Adds `playerFiltersSchema`, the nationality and sex fields picked from the search schema. It is the form's schema and the one place that decides what a valid **filter draft** is.
 
@@ -68,13 +68,15 @@ flowchart LR
 
 ### 2. Filters are declared, not hand-rendered
 
-`ListFilters` takes `filters`, a list of `{ name, label, options }` where each option has a `value`, a `label` (a node, so nationality can show a flag) and a `chipLabel`, plus `values`, `onApply(values)` and a `chipLink` render prop. A new list declares its filters and gets the button, form, chips, Clear all filters, focus handling and announcement for free. Only single-select exists, as the proposal says.
+`ListFilters` takes `filters`, a list of `{ name, label, options }` where each option has a `value`, a `label` (a node, so nationality can show a flag) and `text` (its plain-text name, for a chip's accessible name), plus `values`, `onApply(values)`, a `FilterLink` component for the chips, and the `resultText` and `isShowingPreviousPage` the announcement needs. A new list declares its filters and gets the button, form, chips, Clear all filters, focus handling and announcement for free. Only single-select exists, as the proposal says.
 
 *Alternative:* children-based composition, where the caller lays out the fields. Rejected: every caller would have to rewire the draft, the chips and the count, which is where the accessibility rules live.
 
 ### 3. Popover on wide screens, bottom Sheet on narrow ones, switched by viewport width
 
 `useIsTablet()` picks the overlay. The overlay is rendered with `key={isTablet ? 'popover' : 'sheet'}` and holds its own open state, so crossing 744px remounts it closed and drops the **filter draft** without an effect. The popover is Base UI's Popover, added to `src/ui/popover.tsx` through shadcn (ADR 0015). The sheet is the existing `Sheet` with `side="bottom"`, `max-h-svh` and `overflow-y-auto`, so it needs no arbitrary values and avoids the width bug in #92. Base UI returns focus to the trigger when either closes, which covers Apply and Escape. The popover is non-modal, and the sheet traps focus.
+
+The sheet's built-in Close control takes a translated `closeLabel` from the primitive, which otherwise defaults to English.
 
 The panel holds only single-selects, which never open the on-screen keyboard, so the keyboard is not a layout concern here. `index.html` sets no `viewport-fit=cover`, so phone browsers already keep fixed content clear of the home indicator and the sheet needs no `env(safe-area-inset-bottom)` padding, which the design-system standard would reject as an arbitrary value. If `viewport-fit=cover` is ever added, the sheet needs revisiting.
 
@@ -98,7 +100,7 @@ The chips and Clear all filters are links with real `href`s, so they work in a n
 
 - **Apply, Escape, Close:** handled by the overlay's own focus return.
 - **Chip removal and Clear all filters:** the chip or link disappears, so `ListFilters` focuses the **filters button** through a ref in the click handler. The router navigation then runs as usual.
-- **Announcement:** `useFilterAnnouncement(resultText, isShowingPreviousPage)` lives in `ui/list-filters/`. A user action marks a result as pending. The hook says it once the rows of the new view are on screen, which is when `isShowingPreviousPage` is false, because the search changes before the rows do. If the action changed nothing, it announces the current result at once. The text is the summary, or the no-match message when the total is zero, and comes from the feature.
+- **Announcement:** `useFilterAnnouncement` lives in `ui/list-filters/`. A user action makes a request that records the view it started from. The request is bound to the navigation once the view changes, so an unrelated change, such as a refetch of the old view, can't use it up. It then waits until the rows of the new view are on screen, which is when `isShowingPreviousPage` is false, because the search changes before the rows do. A request whose navigation never happens expires after two seconds, so a later Back is not announced, and the text clears itself after ten seconds. If the action changed nothing, the hook announces the current result at once. The text is the summary, or the no-match message when the total is zero, and comes from the feature.
 - It uses its own `role="status"` region. The existing page-change region and `usePageChangeOrientation` stay untouched, and a URL change that is not a user action, such as Back, still announces nothing, as the existing test requires.
 
 ### 8. Strings live under `listFilters.*`
