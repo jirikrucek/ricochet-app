@@ -3,11 +3,14 @@ import { expect, test } from '@playwright/test';
 import {
   DESKTOP,
   PHONE,
+  chooseFilter,
   expectNoHorizontalOverflow,
+  filtersPanel,
   openOverview,
   pagination,
   paginationText,
   playersTable,
+  removeFilter,
   summary,
   useUiLanguage,
 } from './overview';
@@ -63,10 +66,39 @@ test.describe('Page changes keep the visitor oriented', () => {
     await openOverview(page, 'page=2');
     await expect(summary(page)).toHaveText('Showing 26–50 of 100');
 
-    await page.getByRole('combobox', { name: 'Sex', exact: true }).click();
-    await page.getByRole('option', { name: 'Female', exact: true }).click();
+    await chooseFilter(page, 'Sex', 'Female');
 
     await expect(summary(page)).toHaveText('Showing 1–25 of 40');
     await expect(page.locator('[aria-live="polite"]')).toHaveText('');
+  });
+});
+
+test.describe('Filters work through the sheet on a phone', () => {
+  test.use({ viewport: PHONE });
+
+  test('Applying a filter in the sheet shows the first page of the result', async ({
+    page,
+  }) => {
+    await openOverview(page, 'page=2');
+    await expect(summary(page)).toHaveText('Showing 26–50 of 100');
+
+    await chooseFilter(page, 'Sex', 'Female');
+
+    await expect(filtersPanel(page)).toHaveCount(0);
+    await expect(summary(page)).toHaveText('Showing 1–25 of 40');
+    await expect(page).not.toHaveURL(/[?&]page=/);
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test('A chip removes the filter without opening the sheet', async ({
+    page,
+  }) => {
+    await openOverview(page, 'sex=female');
+    await expect(summary(page)).toHaveText('Showing 1–25 of 40');
+
+    await removeFilter(page, 'Female').click();
+
+    await expect(summary(page)).toHaveText('Showing 1–25 of 100');
+    await expect(filtersPanel(page)).toHaveCount(0);
   });
 });

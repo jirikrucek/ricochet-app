@@ -8,6 +8,8 @@ import {
   openOverview,
   shownNationalities,
   useUiLanguage,
+  expectFilterValue,
+  openFiltersPanel,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
@@ -23,7 +25,7 @@ test.describe('Visitor can filter players by nationality', () => {
     await chooseFilter(page, 'Nationality', 'Germany');
 
     await expect(page).toHaveURL(/[?&]nationality=DE/);
-    await expect(filterSelect(page, 'Nationality')).toContainText('Germany');
+    await expectFilterValue(page, 'Nationality', 'Germany');
     await expect
       .poll(async () => new Set(await shownNationalities(page)))
       .toEqual(new Set(['DE']));
@@ -42,6 +44,7 @@ test.describe('Visitor can filter players by nationality', () => {
     );
     await openOverview(page);
 
+    await openFiltersPanel(page);
     await filterSelect(page, 'Nationality').click();
 
     const options = page.getByRole('option');
@@ -77,7 +80,7 @@ test.describe('Invalid URL values fall back to the defaults', () => {
   }) => {
     await openOverview(page, 'nationality=FR');
 
-    await expect(filterSelect(page, 'Nationality')).toContainText('All');
+    await expectFilterValue(page, 'Nationality', 'All');
     await expect
       .poll(async () => new Set(await shownNationalities(page)).size)
       .toBeGreaterThan(1);

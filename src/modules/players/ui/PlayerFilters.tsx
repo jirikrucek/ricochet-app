@@ -1,69 +1,82 @@
+import { Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  sexes,
-  type Nationality,
-  type Sex,
-} from '@/modules/players/domain/types/player';
+import { sexes, type Nationality } from '@/modules/players/domain/types/player';
 import {
   all,
-  type OrAll,
+  playerFiltersSchema,
+  type PlayerFilters as PlayerFilterValues,
 } from '@/modules/players/domain/types/playerOverviewSearch';
 import { Flag } from '@/shared/ui/Flag';
-import { FilterSelect, type FilterOption } from './FilterSelect';
+import {
+  ListFilters,
+  type FilterDefinition,
+  type FilterLinkProps,
+} from './list-filters/ListFilters';
 
-export function SexFilter({
-  value,
-  onChange,
-}: {
-  value: OrAll<Sex>;
-  onChange: (value: OrAll<Sex>) => void;
-}) {
-  const { t } = useTranslation();
-  const options: FilterOption<OrAll<Sex>>[] = [
-    { value: all, label: t('players.filters.all') },
-    ...sexes.map((sex) => ({ value: sex, label: t(`players.sex.${sex}`) })),
-  ];
+type PlayerFiltersProps = {
+  nationalities: Nationality[];
+  locale: string;
+  // The applied filters.
+  values: PlayerFilterValues;
+  onApply: (values: PlayerFilterValues) => void;
+  // What to announce about the list after a filter change.
+  resultText: string;
+  isShowingPreviousPage: boolean;
+};
 
+// A link to the player overview with some filters changed. It keeps every other
+// search param, such as the sort direction, and drops the page: a changed
+// filter starts again at page 1. The route strips default values from the URL.
+function PlayerFilterLink({
+  change,
+  ...props
+}: FilterLinkProps<PlayerFilterValues>) {
   return (
-    <FilterSelect
-      id="player-sex-filter"
-      label={t('players.filters.sex')}
-      value={value}
-      options={options}
-      onChange={onChange}
+    <Link
+      from="/players/"
+      to="."
+      search={(prev) => ({ ...prev, ...change, page: undefined })}
+      {...props}
     />
   );
 }
 
-export function NationalityFilter({
+// The player overview's filters, declared for the generic filters panel.
+export function PlayerFilters({
   nationalities,
   locale,
-  value,
-  onChange,
-}: {
-  nationalities: Nationality[];
-  locale: string;
-  value: OrAll<Nationality>;
-  onChange: (value: OrAll<Nationality>) => void;
-}) {
+  values,
+  onApply,
+  resultText,
+  isShowingPreviousPage,
+}: PlayerFiltersProps) {
   const { t } = useTranslation();
 
-  const options = useMemo<FilterOption<OrAll<Nationality>>[]>(() => {
+  const filters = useMemo<FilterDefinition[]>(() => {
     const collator = new Intl.Collator(locale, { sensitivity: 'accent' });
-    const countries = nationalities
+    const allOption = {
+      value: all,
+      label: t('players.filters.all'),
+      text: t('players.filters.all'),
+    };
+
+    // The applied nationality stays offered even when no player has it any
+    // more, so the select, the count and the chip never disagree about it.
+    const offered =
+      values.nationality === all || nationalities.includes(values.nationality)
+        ? nationalities
+        : [...nationalities, values.nationality];
+
+    const countries = offered
       .map((nationality) => ({
         nationality,
         name: t(`countries.${nationality}`),
       }))
-      .sort((a, b) => collator.compare(a.name, b.name));
-
-    return [
-      { value: all, label: t('players.filters.all') },
-      ...countries.map(({ nationality, name }) => ({
-        value: nationality,
-        label: (
+      .sort((a, b) => collator.compare(a.name, b.name))
+      .map(({ nationality, name }) => {
+        const label = (
           <>
             <Flag
               countryCode={nationality}
@@ -72,18 +85,43 @@ export function NationalityFilter({
             />
             {name}
           </>
-        ),
-      })),
+        );
+        return { value: nationality, label, text: name };
+      });
+
+    return [
+      {
+        name: 'nationality',
+        label: t('players.filters.nationality'),
+        allValue: all,
+        options: [allOption, ...countries],
+      },
+      {
+        name: 'sex',
+        label: t('players.filters.sex'),
+        allValue: all,
+        options: [
+          allOption,
+          ...sexes.map((sex) => ({
+            value: sex,
+            label: t(`players.sex.${sex}`),
+            text: t(`players.sex.${sex}`),
+          })),
+        ],
+      },
     ];
-  }, [nationalities, locale, t]);
+  }, [nationalities, values.nationality, locale, t]);
 
   return (
-    <FilterSelect
-      id="player-nationality-filter"
-      label={t('players.filters.nationality')}
-      value={value}
-      options={options}
-      onChange={onChange}
+    <ListFilters
+      filters={filters}
+      values={values}
+      schema={playerFiltersSchema}
+      action="/players"
+      onApply={onApply}
+      FilterLink={PlayerFilterLink}
+      resultText={resultText}
+      isShowingPreviousPage={isShowingPreviousPage}
     />
   );
 }

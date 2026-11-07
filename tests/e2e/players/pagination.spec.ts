@@ -14,6 +14,12 @@ import {
   surnameHeader,
   surnameSortButton,
   useUiLanguage,
+  expectFilterValue,
+  filtersPanel,
+  openFiltersPanel,
+  clearAllFilters,
+  removeFilter,
+  chooseFilters,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
@@ -44,7 +50,8 @@ test.describe('Player overview is paginated with a fixed page size', () => {
     await openOverview(page);
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
 
-    await expect(page.getByRole('main').getByRole('combobox')).toHaveCount(2);
+    await openFiltersPanel(page);
+    await expect(filtersPanel(page).getByRole('combobox')).toHaveCount(2);
     await expect(filterSelect(page, 'Players per page')).toHaveCount(0);
     await expect(page.getByText('Players per page')).toHaveCount(0);
   });
@@ -188,16 +195,28 @@ test.describe('Pagination hides what does not apply', () => {
 test.describe('Changing the view returns to the first page', () => {
   const viewChanges = [
     {
-      change: 'filters by a nationality',
+      change: 'applies filters (nationality)',
       start: 'page=2',
       act: (page: Page) => chooseFilter(page, 'Nationality', 'Czechia'),
       expected: 'Showing 1–24 of 24',
     },
     {
-      change: 'filters by a sex',
+      change: 'applies filters (sex)',
       start: 'page=2',
       act: (page: Page) => chooseFilter(page, 'Sex', 'Male'),
       expected: 'Showing 1–25 of 60',
+    },
+    {
+      change: 'removes an applied filter',
+      start: 'sex=female&page=2',
+      act: (page: Page) => removeFilter(page, 'Female').click(),
+      expected: 'Showing 1–25 of 100',
+    },
+    {
+      change: 'uses Clear all filters',
+      start: 'sex=female&page=2',
+      act: (page: Page) => clearAllFilters(page).click(),
+      expected: 'Showing 1–25 of 100',
     },
     {
       change: 'switches the sort direction',
@@ -221,18 +240,16 @@ test.describe('Changing the view returns to the first page', () => {
     });
   }
 
-  test('View change resets the page when the visitor uses Clear filters', async ({
-    page,
-  }) => {
-    await openOverview(page, 'page=2');
-    await expect(summary(page)).toHaveText('Showing 26–50 of 100');
-    await chooseFilter(page, 'Nationality', 'United Kingdom');
-    await chooseFilter(page, 'Sex', 'Female');
-
-    await page.getByRole('button', { name: 'Clear filters' }).click();
-
+  test('Applying two filters is one history step', async ({ page }) => {
+    await openOverview(page);
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
-    await expect(page).not.toHaveURL(/[?&]page=/);
+    await chooseFilters(page, { Nationality: 'Poland', Sex: 'Male' });
+    await expect(page).toHaveURL(/nationality=PL/);
+
+    await page.goBack();
+
+    await expect(page).toHaveURL(/\/players$/);
+    await expect(summary(page)).toHaveText('Showing 1–25 of 100');
   });
 });
 
@@ -276,7 +293,7 @@ test.describe('The view is kept in the URL', () => {
       'aria-sort',
       'descending',
     );
-    await expect(filterSelect(other, 'Sex')).toContainText('Female');
+    await expectFilterValue(other, 'Sex', 'Female');
     await otherContext.close();
   });
 
@@ -306,6 +323,6 @@ test.describe('The view is kept in the URL', () => {
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
     await expect(page).not.toHaveURL(/[?&]page=/);
     await expect(playersTable(page)).toBeVisible();
-    await expect(filterSelect(page, 'Nationality')).toContainText('All');
+    await expectFilterValue(page, 'Nationality', 'All');
   });
 });

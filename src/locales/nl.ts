@@ -12,6 +12,15 @@ const nl = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filters',
+    close: 'Sluiten',
+    description: 'Kies bij elk filter een optie en pas ze daarna toe.',
+    apply: 'Toepassen',
+    appliedFilters: 'Toegepaste filters',
+    removeFilter: 'Filter verwijderen: {{name}}',
+    clearAll: 'Alle filters wissen',
+  },
   players: {
     heading: 'Spelers',
     caption: 'Lijst van spelers',
@@ -32,7 +41,6 @@ const nl = {
     },
     noMatch: {
       message: 'Geen spelers voldoen aan de gekozen filters',
-      clearFilters: 'Filters wissen',
     },
     pagination: {
       label: 'Paginering',

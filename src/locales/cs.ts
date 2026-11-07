@@ -12,6 +12,15 @@ const cs = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filtry',
+    close: 'Zavřít',
+    description: 'U každého filtru vyberte možnost a potom ji použijte.',
+    apply: 'Použít',
+    appliedFilters: 'Použité filtry',
+    removeFilter: 'Odebrat filtr: {{name}}',
+    clearAll: 'Zrušit všechny filtry',
+  },
   players: {
     heading: 'Hráči',
     caption: 'Seznam hráčů',
@@ -32,7 +41,6 @@ const cs = {
     },
     noMatch: {
       message: 'Vybraným filtrům neodpovídá žádný hráč',
-      clearFilters: 'Zrušit filtry',
     },
     pagination: {
       label: 'Stránkování',

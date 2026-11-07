@@ -10,6 +10,8 @@ import { waitForFonts } from '../app/shell';
 export { DESKTOP, PHONE, expectNoHorizontalOverflow } from '../app/shell';
 
 export const SMALL_PHONE = { width: 320, height: 640 };
+// A viewport below the 744px tablet breakpoint that is not a phone.
+export const BELOW_TABLET = { width: 600, height: 800 };
 
 type Viewport = { width: number; height: number };
 
@@ -133,13 +135,84 @@ export function surnameSortButton(page: Page) {
   return surnameHeader(page).getByRole('button', { name: 'Surname' });
 }
 
+// The one button that opens the filters panel. Its name starts with "Filters"
+// and ends with the count of applied filters when there are any.
+export function filtersButton(page: Page) {
+  return page.getByRole('button', { name: /^Filters/ });
+}
+
+export function applyButton(page: Page) {
+  return page.getByRole('button', { name: 'Apply', exact: true });
+}
+
+// `name` is the button's exact name in another language, or a pattern.
+export async function openFiltersPanel(page: Page, name?: string | RegExp) {
+  const button = name
+    ? page.getByRole('button', { name, exact: typeof name === 'string' })
+    : filtersButton(page);
+  if ((await button.getAttribute('aria-expanded')) !== 'true') {
+    await button.click();
+  }
+}
+
+// The chips of the applied filters, beside the Filters button.
+export function appliedFilters(page: Page) {
+  return page.getByRole('list', { name: 'Applied filters' });
+}
+
+export function removeFilter(page: Page, name: string) {
+  return page.getByRole('link', {
+    name: `Remove filter: ${name}`,
+    exact: true,
+  });
+}
+
+export function clearAllFilters(page: Page) {
+  return page.getByRole('link', { name: 'Clear all filters', exact: true });
+}
+
+// The panel the Filters button opens: a popover or a sheet, both a dialog.
+export function filtersPanel(page: Page) {
+  return page.getByRole('dialog', { name: 'Filters' });
+}
+
+// A select inside the open filters panel.
 export function filterSelect(page: Page, label: string) {
   return page.getByRole('combobox', { name: label, exact: true });
 }
 
+// Chooses one option in the filters panel and applies it, so a test that
+// filters twice applies twice, as it did when each select applied on change.
 export async function chooseFilter(page: Page, label: string, option: string) {
+  await openFiltersPanel(page);
   await filterSelect(page, label).click();
   await page.getByRole('option', { name: option, exact: true }).click();
+  await applyButton(page).click();
+}
+
+// Chooses an option in several filters and applies them all with one Apply.
+export async function chooseFilters(
+  page: Page,
+  choices: Record<string, string>,
+) {
+  await openFiltersPanel(page);
+  for (const [label, option] of Object.entries(choices)) {
+    await filterSelect(page, label).click();
+    await page.getByRole('option', { name: option, exact: true }).click();
+  }
+  await applyButton(page).click();
+}
+
+// Reads what the panel shows for one filter, then puts the panel away again.
+export async function expectFilterValue(
+  page: Page,
+  label: string,
+  value: string,
+) {
+  await openFiltersPanel(page);
+  await expect(filterSelect(page, label)).toContainText(value);
+  await page.keyboard.press('Escape');
+  await expect(filtersPanel(page)).toHaveCount(0);
 }
 
 // Nationality codes of the listed rows, read from the flags.

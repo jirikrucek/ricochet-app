@@ -4,18 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { itemsPerPage } from '@/config/pagination';
 import type { Nationality } from '@/modules/players/domain/types/player';
 import type { PlayerOverviewPage } from '@/modules/players/domain/types/playerOverviewPage';
-import {
-  all,
-  type PlayerOverviewView,
-} from '@/modules/players/domain/types/playerOverviewSearch';
+import type { PlayerOverviewView } from '@/modules/players/domain/types/playerOverviewSearch';
 import { pageBounds } from '@/modules/players/ui/pageRange';
 import { Button } from '@/ui/button';
 import { usePlayerNationalities } from '@/modules/players/data-access/usePlayerNationalities';
 import { usePlayersPage } from '@/modules/players/data-access/usePlayersPage';
-import {
-  NationalityFilter,
-  SexFilter,
-} from '@/modules/players/ui/PlayerFilters';
+import { PlayerFilters } from '@/modules/players/ui/PlayerFilters';
 import { PlayerPagination } from '@/modules/players/ui/PlayerPagination';
 import {
   PlayerTable,
@@ -115,6 +109,7 @@ function PlayerResults({
 
   // The one place the "Showing X–Y of Z" text is built: the pagination shows
   // it and the page-change orientation announces it.
+  const noMatchMessage = t('players.noMatch.message');
   const summary = t('players.pagination.summary', {
     ...pageBounds(page, itemsPerPage, total),
     total,
@@ -132,19 +127,16 @@ function PlayerResults({
 
   return (
     <div className="flex flex-col gap-lg" aria-busy={isShowingPreviousPage}>
-      <div className="flex flex-col gap-base tablet:flex-row">
-        <NationalityFilter
-          nationalities={nationalities}
-          locale={locale}
-          value={search.nationality}
-          onChange={(nationality) => changeView({ nationality })}
-        />
-        <SexFilter value={search.sex} onChange={(sex) => changeView({ sex })} />
-      </div>
+      <PlayerFilters
+        nationalities={nationalities}
+        locale={locale}
+        values={{ nationality: search.nationality, sex: search.sex }}
+        onApply={changeView}
+        resultText={total === 0 ? noMatchMessage : summary}
+        isShowingPreviousPage={isShowingPreviousPage}
+      />
       {total === 0 ? (
-        <NoMatch
-          onClearFilters={() => changeView({ nationality: all, sex: all })}
-        />
+        <NoMatch message={noMatchMessage} />
       ) : (
         <>
           <PlayerTable
@@ -170,17 +162,8 @@ function PlayerResults({
   );
 }
 
-function NoMatch({ onClearFilters }: { onClearFilters: () => void }) {
-  const { t } = useTranslation();
-
-  return (
-    <div className="flex flex-col items-start gap-base">
-      <p className="type-body-md m-0 text-muted">
-        {t('players.noMatch.message')}
-      </p>
-      <Button variant="outline" onClick={onClearFilters}>
-        {t('players.noMatch.clearFilters')}
-      </Button>
-    </div>
-  );
+// The applied filters and Clear all filters stay shown beside the Filters
+// button, so the message needs no button of its own.
+function NoMatch({ message }: { message: string }) {
+  return <p className="type-body-md m-0 text-muted">{message}</p>;
 }

@@ -12,6 +12,16 @@ const de = {
     menuTitle: 'Menü',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filter',
+    close: 'Schließen',
+    description:
+      'Wählen Sie bei jedem Filter eine Option und wenden Sie sie dann an.',
+    apply: 'Anwenden',
+    appliedFilters: 'Angewendete Filter',
+    removeFilter: 'Filter entfernen: {{name}}',
+    clearAll: 'Alle Filter zurücksetzen',
+  },
   players: {
     heading: 'Spieler',
     caption: 'Liste der Spieler',
@@ -32,7 +42,6 @@ const de = {
     },
     noMatch: {
       message: 'Keine Spieler entsprechen den gewählten Filtern',
-      clearFilters: 'Filter zurücksetzen',
     },
     pagination: {
       label: 'Seitennavigation',

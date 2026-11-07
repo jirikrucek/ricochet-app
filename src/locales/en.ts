@@ -12,6 +12,15 @@ const en = {
     menuTitle: 'Menu',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Filters',
+    close: 'Close',
+    description: 'Pick an option for each filter, then apply.',
+    apply: 'Apply',
+    appliedFilters: 'Applied filters',
+    removeFilter: 'Remove filter: {{name}}',
+    clearAll: 'Clear all filters',
+  },
   players: {
     heading: 'Players',
     caption: 'List of players',
@@ -32,7 +41,6 @@ const en = {
     },
     noMatch: {
       message: 'No players match the selected filters',
-      clearFilters: 'Clear filters',
     },
     pagination: {
       label: 'Pagination',

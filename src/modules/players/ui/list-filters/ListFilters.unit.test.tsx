@@ -1,0 +1,444 @@
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
+
+import i18n from '@/lib/i18n';
+import { mockMatchMedia } from '@/shared/ui/matchMediaMocks';
+import {
+  ListFilters,
+  type FilterDefinition,
+  type FilterLinkProps,
+} from './ListFilters';
+
+// A list with two filters, as the player overview has. Mock data only.
+const filters: FilterDefinition[] = [
+  {
+    name: 'nationality',
+    label: 'Nationality',
+    allValue: 'all',
+    options: [
+      { value: 'all', label: 'All', text: 'All' },
+      { value: 'CZ', label: 'Czechia', text: 'Czechia' },
+      { value: 'PL', label: 'Poland', text: 'Poland' },
+    ],
+  },
+  {
+    name: 'sex',
+    label: 'Sex',
+    allValue: 'all',
+    options: [
+      { value: 'all', label: 'All', text: 'All' },
+      { value: 'male', label: 'Male', text: 'Male' },
+      { value: 'female', label: 'Female', text: 'Female' },
+    ],
+  },
+];
+
+const schema = z.object({ nationality: z.string(), sex: z.string() });
+const none = { nationality: 'all', sex: 'all' };
+
+const onApply = vi.fn();
+
+// Stands in for the router link the player overview passes: it makes the target
+// of each link readable as a query string.
+function FilterLink({
+  change,
+  children,
+  ...props
+}: FilterLinkProps<Record<string, string>>) {
+  return (
+    <a
+      href={`/?${new URLSearchParams(change as Record<string, string>)}`}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+}
+
+const resultOf = (resultText: string, isShowingPreviousPage = false) => ({
+  resultText,
+  isShowingPreviousPage,
+});
+
+function listFilters(
+  values: Record<string, string>,
+  result = resultOf('Showing 1–25 of 100'),
+) {
+  return (
+    <ListFilters
+      filters={filters}
+      values={values}
+      schema={schema}
+      action="/players"
+      onApply={onApply}
+      FilterLink={FilterLink}
+      {...result}
+    />
+  );
+}
+
+function renderFilters(
+  values: Record<string, string> = none,
+  result = resultOf('Showing 1–25 of 100'),
+) {
+  const view = render(listFilters(values, result));
+  return {
+    // The same filters after the view changed, as the page re-renders them.
+    showView: (nextValues: Record<string, string>, nextResult = result) =>
+      view.rerender(listFilters(nextValues, nextResult)),
+  };
+}
+
+function openPanel() {
+  fireEvent.click(screen.getByRole('button', { name: /^Filters/ }));
+  return screen.getByRole('dialog', { name: 'Filters' });
+}
+
+// Picks an option in one select of the open panel, like a visitor would: open
+// it, hover the option, click it. Base UI ignores a click on an option that was
+// never hovered.
+function choose(label: string, option: string) {
+  fireEvent.click(screen.getByRole('combobox', { name: label }));
+  const item = screen.getByRole('option', { name: option });
+  fireEvent.mouseMove(item);
+  fireEvent.click(item);
+}
+
+let viewport: ReturnType<typeof mockMatchMedia>;
+
+beforeEach(async () => {
+  // A tablet-width viewport, unless a test says otherwise.
+  viewport = mockMatchMedia(true);
+  onApply.mockReset();
+  await i18n.changeLanguage('en');
+});
+
+afterEach(() => {
+  cleanup();
+  viewport.restore();
+});
+
+describe('ListFilters', () => {
+  it('shows one Filters button and no filter until it is opened', () => {
+    renderFilters();
+
+    expect(screen.getByRole('button', { name: 'Filters' })).toBeTruthy();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it.each([
+    [{ nationality: 'PL', sex: 'all' }, 'Filters 1'],
+    [{ nationality: 'all', sex: 'female' }, 'Filters 1'],
+    [{ nationality: 'PL', sex: 'female' }, 'Filters 2'],
+  ])('counts the applied filters on the button: %j', (values, name) => {
+    renderFilters(values);
+
+    expect(screen.getByRole('button', { name })).toBeTruthy();
+  });
+
+  it('shows no count while every filter is on "All"', () => {
+    renderFilters();
+
+    expect(screen.getByRole('button', { name: 'Filters' }).textContent).toBe(
+      'Filters',
+    );
+  });
+
+  it('opens a panel with a select for each filter, showing the applied options, and an Apply button', () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+
+    const panel = openPanel();
+
+    expect(
+      within(panel).getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Poland');
+    expect(
+      within(panel).getByRole('combobox', { name: 'Sex' }).textContent,
+    ).toContain('All');
+    expect(within(panel).getByRole('button', { name: 'Apply' })).toBeTruthy();
+  });
+
+  it('is a form that submits by GET to the list, with a control named after each search param', () => {
+    renderFilters({ nationality: 'PL', sex: 'female' });
+
+    const form = openPanel().querySelector('form') as HTMLFormElement;
+
+    expect(form.getAttribute('method')).toBe('get');
+    expect(form.getAttribute('action')).toBe('/players');
+    expect(
+      (form.elements.namedItem('nationality') as HTMLInputElement).value,
+    ).toBe('PL');
+    expect((form.elements.namedItem('sex') as HTMLInputElement).value).toBe(
+      'female',
+    );
+  });
+
+  it('applies nothing while options are only being chosen', () => {
+    renderFilters();
+    openPanel();
+
+    choose('Nationality', 'Poland');
+
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Poland');
+    expect(onApply).not.toHaveBeenCalled();
+  });
+
+  it('applies the whole draft at once on Apply, and closes the panel', async () => {
+    renderFilters();
+    openPanel();
+    choose('Nationality', 'Poland');
+    choose('Sex', 'Male');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+    // The form validates the draft before it applies it, which is asynchronous.
+    await waitFor(() => expect(onApply).toHaveBeenCalledTimes(1));
+    expect(onApply).toHaveBeenCalledWith({ nationality: 'PL', sex: 'male' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('discards the draft when the panel closes any other way', () => {
+    renderFilters({ nationality: 'CZ', sex: 'all' });
+    const panel = openPanel();
+    choose('Nationality', 'Poland');
+
+    fireEvent.keyDown(panel, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onApply).not.toHaveBeenCalled();
+    openPanel();
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Czechia');
+  });
+});
+
+describe('ListFilters applied filters', () => {
+  const chips = () =>
+    within(screen.getByRole('list', { name: 'Applied filters' }));
+
+  it('shows no chip and no Clear all filters while every filter is on "All"', () => {
+    renderFilters();
+
+    expect(screen.queryByRole('list', { name: 'Applied filters' })).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: 'Clear all filters' }),
+    ).toBeNull();
+  });
+
+  it('shows a chip for each applied filter, named after its option', () => {
+    renderFilters({ nationality: 'PL', sex: 'female' });
+
+    expect(
+      chips()
+        .getAllByRole('link')
+        .map((chip) => chip.getAttribute('aria-label')),
+    ).toEqual(['Remove filter: Poland', 'Remove filter: Female']);
+  });
+
+  it('links each chip to the view without that filter', () => {
+    renderFilters({ nationality: 'PL', sex: 'female' });
+
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: Poland' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all');
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: Female' })
+        .getAttribute('href'),
+    ).toBe('/?sex=all');
+  });
+
+  it('offers Clear all filters even for a single applied filter, linking to every filter on "All"', () => {
+    renderFilters({ nationality: 'all', sex: 'female' });
+
+    expect(
+      screen
+        .getByRole('link', { name: 'Clear all filters' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all&sex=all');
+  });
+
+  it('still counts, shows a chip for, and offers to clear an applied value that is not among the options', () => {
+    renderFilters({ nationality: 'XX', sex: 'all' });
+
+    expect(screen.getByRole('button', { name: 'Filters 1' })).toBeTruthy();
+    expect(
+      chips()
+        .getByRole('link', { name: 'Remove filter: XX' })
+        .getAttribute('href'),
+    ).toBe('/?nationality=all');
+    expect(
+      screen.getByRole('link', { name: 'Clear all filters' }),
+    ).toBeTruthy();
+  });
+});
+
+describe('ListFilters focus and announcement', () => {
+  const button = () => screen.getByRole('button', { name: /^Filters/ });
+
+  it('returns focus to the Filters button and says the current result when Apply changes nothing', async () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+    openPanel();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(button()));
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe(
+        'Showing 1–25 of 100',
+      ),
+    );
+  });
+
+  it('moves focus to the Filters button when a chip is used, since the chip goes away', () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Remove filter: Poland' }),
+    );
+
+    expect(document.activeElement).toBe(button());
+  });
+
+  it('leaves focus alone when a chip is opened in a new tab', () => {
+    renderFilters({ nationality: 'PL', sex: 'all' });
+    const chip = screen.getByRole('link', { name: 'Remove filter: Poland' });
+    chip.focus();
+
+    fireEvent.click(chip, { ctrlKey: true });
+
+    expect(document.activeElement).toBe(chip);
+  });
+
+  it('says the new result once the rows of the applied view are shown, not before', async () => {
+    const view = renderFilters(none, resultOf('Showing 1–25 of 100'));
+    openPanel();
+    choose('Sex', 'Female');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    await waitFor(() => expect(onApply).toHaveBeenCalled());
+    // The search changed; the old rows are still on screen.
+    view.showView(
+      { nationality: 'all', sex: 'female' },
+      resultOf('Showing 1–25 of 100', true),
+    );
+    expect(screen.getByRole('status').textContent).toBe('');
+
+    view.showView(
+      { nationality: 'all', sex: 'female' },
+      resultOf('Showing 1–25 of 40'),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe('Showing 1–25 of 40'),
+    );
+  });
+
+  it('says the new result after a chip is used, once the rows are shown', async () => {
+    const view = renderFilters(
+      { nationality: 'PL', sex: 'all' },
+      resultOf('Showing 1–10 of 10'),
+    );
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Remove filter: Poland' }),
+    );
+    view.showView(none, resultOf('Showing 1–25 of 100'));
+
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe(
+        'Showing 1–25 of 100',
+      ),
+    );
+  });
+});
+
+describe('ListFilters overlay', () => {
+  it('opens as a popover from the tablet breakpoint upward', () => {
+    renderFilters();
+
+    expect(openPanel().getAttribute('data-slot')).toBe('popover-content');
+  });
+
+  it('opens as a sheet from the bottom edge below it, that scrolls when it is tall', () => {
+    viewport.setMatches(false);
+    renderFilters();
+
+    const sheet = openPanel();
+
+    expect(sheet.getAttribute('data-slot')).toBe('sheet-content');
+    expect(sheet.getAttribute('data-side')).toBe('bottom');
+    expect(sheet.className).toContain('max-h-svh');
+    expect(sheet.className).toContain('overflow-y-auto');
+  });
+
+  it('still has a select for each filter and Apply in the sheet', () => {
+    viewport.setMatches(false);
+    renderFilters({ nationality: 'PL', sex: 'all' });
+
+    const sheet = openPanel();
+
+    expect(
+      within(sheet).getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Poland');
+    expect(within(sheet).getByRole('button', { name: 'Apply' })).toBeTruthy();
+  });
+
+  it('closes the panel and forgets the draft when the viewport crosses the breakpoint', () => {
+    renderFilters({ nationality: 'CZ', sex: 'all' });
+    openPanel();
+    choose('Nationality', 'Poland');
+
+    act(() => viewport.setMatches(false));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    openPanel();
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Czechia');
+  });
+
+  it("names the sheet's Close control in the UI language", async () => {
+    viewport.setMatches(false);
+    await i18n.changeLanguage('de');
+    renderFilters();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Filter/ }));
+    const sheet = screen.getByRole('dialog');
+
+    expect(
+      within(sheet).getByRole('button', { name: 'Schließen' }),
+    ).toBeTruthy();
+  });
+
+  it('discards the draft when the sheet is closed with Close, applying nothing', () => {
+    viewport.setMatches(false);
+    renderFilters({ nationality: 'CZ', sex: 'all' });
+    openPanel();
+    choose('Nationality', 'Poland');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onApply).not.toHaveBeenCalled();
+    openPanel();
+    expect(
+      screen.getByRole('combobox', { name: 'Nationality' }).textContent,
+    ).toContain('Czechia');
+  });
+});

@@ -12,6 +12,15 @@ const hu = {
     menuTitle: 'Menü',
     previewBadge: 'Preview',
   },
+  listFilters: {
+    title: 'Szűrők',
+    close: 'Bezárás',
+    description: 'Válasszon egy lehetőséget minden szűrőnél, majd alkalmazza.',
+    apply: 'Alkalmaz',
+    appliedFilters: 'Alkalmazott szűrők',
+    removeFilter: 'Szűrő eltávolítása: {{name}}',
+    clearAll: 'Összes szűrő törlése',
+  },
   players: {
     heading: 'Játékosok',
     caption: 'Játékosok listája',
@@ -32,7 +41,6 @@ const hu = {
     },
     noMatch: {
       message: 'Egy játékos sem felel meg a kiválasztott szűrőknek',
-      clearFilters: 'Szűrők törlése',
     },
     pagination: {
       label: 'Lapozás',
