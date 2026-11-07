@@ -10,6 +10,7 @@ const hu = {
     openMenu: 'Menü megnyitása',
     closeMenu: 'Menü bezárása',
     menuTitle: 'Menü',
+    previewBadge: 'Preview',
   },
   players: {
     heading: 'Játékosok',

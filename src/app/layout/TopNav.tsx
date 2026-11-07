@@ -4,6 +4,7 @@ import { MenuIcon, XIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from '@/assets/brand/ricochet-logo.svg';
 import { LanguageSelect } from './LanguageSelect';
+import { PreviewBadge } from './PreviewBadge';
 import {
   Sheet,
   SheetClose,
@@ -46,18 +47,21 @@ export function TopNav() {
   return (
     <header className="sticky top-0 z-50 h-nav-height w-full border-b border-hairline bg-canvas">
       <div className="mx-auto flex h-full w-full max-w-app-shell items-center justify-between px-base tablet:grid tablet:grid-cols-[1fr_auto_1fr]">
-        <Link
-          to="/"
-          aria-label={BRAND_NAME}
-          className="flex min-w-0 items-center justify-self-start no-underline"
-        >
-          <img
-            src={logo}
-            alt=""
-            aria-hidden="true"
-            className="h-xl w-auto shrink-0"
-          />
-        </Link>
+        <div className="flex min-w-0 items-center justify-self-start">
+          <Link
+            to="/"
+            aria-label={BRAND_NAME}
+            className="flex min-w-0 items-center no-underline"
+          >
+            <img
+              src={logo}
+              alt=""
+              aria-hidden="true"
+              className="h-xl w-auto shrink-0"
+            />
+          </Link>
+          <PreviewBadge />
+        </div>
 
         <nav className="hidden items-center justify-self-center gap-xl tablet:flex">
           <NavLink to="/players">{t('nav.players')}</NavLink>

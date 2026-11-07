@@ -10,6 +10,7 @@ const pl = {
     openMenu: 'Otwórz menu',
     closeMenu: 'Zamknij menu',
     menuTitle: 'Menu',
+    previewBadge: 'Preview',
   },
   players: {
     heading: 'Gracze',

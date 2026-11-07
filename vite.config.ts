@@ -10,6 +10,12 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  define: {
+    // Vercel sets VERCEL_ENV to production, preview or development at build time.
+    'import.meta.env.VITE_VERCEL_ENV': JSON.stringify(
+      process.env.VERCEL_ENV ?? '',
+    ),
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,

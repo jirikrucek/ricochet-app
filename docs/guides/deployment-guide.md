@@ -29,6 +29,8 @@ Set these in the Vercel project settings for both Preview and Production. Previe
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | The publishable key (`sb_publishable_…`) from the Supabase dashboard, under API keys. The app fails at start-up without it. |
 | `VITE_SENTRY_DSN` | Yes | The DSN of the environment's Sentry project. Without it, errors in that environment aren't reported (see `docs/standards/observability-standard.md`). |
 
+Preview deployments show a "Preview" badge next to the logo in the top nav. The build takes it from Vercel's own `VERCEL_ENV` (see `vite.config.ts`), so there is nothing to configure.
+
 ## Releasing a database change
 
 A migration, and the data the app needs in it, are not part of the Vercel deploy. They reach the Preview and Production Supabase projects by hand, so run them in this order. A frontend that is deployed first shows its error state until the table exists and holds rows.
