@@ -48,6 +48,7 @@
 - **testing**: when adding or editing a test (unit, integration, or E2E), or test configuration, read `docs/standards/testing-standard.md` first
 - **security**: when adding or editing a Supabase migration (tables, RLS policies), read `docs/standards/security-standard.md` first
 - **observability**: when adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability-standard.md` first
+- **list filters**: when adding or changing filters on a list, read `docs/standards/list-filters-standard.md` first
 
 ## General Rules
 

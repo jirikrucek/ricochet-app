@@ -24,3 +24,5 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0018 | [Trusted Business Rules Live in the Backend](ADR0018-trusted-business-rules-live-in-the-backend.md) | Accepted |
 | 0019 | [Render Tables Without a Table Library](ADR0019-render-tables-without-a-table-library.md) | Accepted |
 | 0020 | [Lists Are Filtered, Sorted and Paged in the Backend](ADR0020-lists-are-filtered-sorted-and-paged-in-the-backend.md) | Accepted |
+| 0021 | [Lists Show Filters in a Collapsible Panel Applied with One Button](ADR0021-lists-show-filters-in-a-collapsible-panel-applied-with-one-button.md) | Accepted |
+| 0022 | [List Filters Use Native Semantics First](ADR0022-list-filters-use-native-semantics-first.md) | Accepted |
