@@ -321,8 +321,10 @@ test.describe('The view is kept in the URL', () => {
     page,
     allowConsoleErrors,
   }) => {
-    // The backend answers the out-of-range page with 416 before the
+    // Intended: the backend answers the out-of-range page with 416 before the
     // overview falls back to page 1, and the browser logs that as an error.
+    // Only a hand-edited or stale link gets here, so one extra request on it
+    // beats fetching the total first on every page-2+ load.
     allowConsoleErrors(/status of 416 .*\/rest\/v1\/rpc\/players_sorted/);
     await openOverview(page, 'page=9');
 
