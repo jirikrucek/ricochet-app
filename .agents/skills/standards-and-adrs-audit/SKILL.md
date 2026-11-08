@@ -1,6 +1,6 @@
 ---
-name: audit
-description: "Audit the codebase for violations of the standards and accepted ADRs, fix the approved ones, and commit after review."
+name: standards-and-adrs-audit
+description: "Audit the code against the standards and accepted ADRs: find violations, fix the approved ones, and commit after review."
 disable-model-invocation: true
 ---
 
@@ -23,7 +23,7 @@ The default scope is the whole codebase: every file `git ls-files` lists, except
 
 4. Fix the approved violations. If the branch is `main`, first create a branch with Conventional Branch naming. Done when every approved violation is fixed and a re-run of its lens on the changed files reports it gone.
 
-5. Run the Definition of Done in `AGENTS.md`. Start any service the tests need and stop what you started afterwards. Done when every phase passes.
+5. Work through every phase of the Definition of Done in `AGENTS.md`. Start any service the tests need and stop what you started afterwards. Done when every phase passes.
 
 6. Hand over for review: the Definition of Done report, the `git diff --stat`, and each violation next to the change that fixed it. Done when the user approves the diff. Apply what they ask for in review, then repeat steps 5 and 6.
 
