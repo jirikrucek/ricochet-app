@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-10-28
-- Updated: 2026-10-28
+- Updated: 2026-11-08
 
 ## Context
 
@@ -17,7 +17,7 @@ Report client errors, traces and structured logs to Sentry through `@sentry/reac
 - One Sentry client, initialised once before render (`src/lib/sentry.ts`) with the TanStack Router tracing integration.
 - Failed queries and mutations reach Sentry through the shared TanStack Query cache handlers, and render errors through `AppErrorBoundary`.
 - Code logs with `Sentry.logger` instead of `console`.
-- Reporting is enabled only where `VITE_SENTRY_DSN` is set. Preview and Production deployments report to separate Sentry projects; local development and tests leave it unset.
+- Reporting is enabled only where `VITE_SENTRY_DSN` is set. Preview and Production deployments report to separate Sentry projects. Local development and unit and integration tests leave it unset. E2E tests point it at the local test server, which answers every report itself, so the tests can check what the app reports and nothing reaches a Sentry project.
 
 `docs/standards/observability-standard.md` holds the rules every change follows. This ADR records the choice of tool and why.
 
