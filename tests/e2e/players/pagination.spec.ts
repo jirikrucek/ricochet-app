@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '../fixtures';
 
 import {
   DESKTOP,
@@ -319,7 +319,11 @@ test.describe('The view is kept in the URL', () => {
 
   test('Invalid URL values fall back to the defaults: page=9', async ({
     page,
+    allowConsoleErrors,
   }) => {
+    // The backend answers the out-of-range page with 416 before the
+    // overview falls back to page 1, and the browser logs that as an error.
+    allowConsoleErrors(/status of 416 .*\/rest\/v1\/rpc\/players_sorted/);
     await openOverview(page, 'page=9');
 
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');

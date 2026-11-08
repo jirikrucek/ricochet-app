@@ -4,6 +4,14 @@ The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the de
 
 Which data each test level may use is set by `docs/standards/testing-standard.md` (see [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)).
 
+## A test fails with "The page logged errors"
+
+Every E2E test fails on a console error or an uncaught error in the page (see `docs/standards/testing-standard.md`). The failure lists each error, with the URL of the request or script behind it. Read it as one of three cases:
+
+- **A Content Security Policy violation** ("violates the following Content Security Policy directive"): the app reaches an origin `vercel.json` doesn't allow. Production would block it too, so add the origin to `connect-src` (see `docs/guides/deployment-guide.md`), or drop the request.
+- **A failed request the test causes on purpose**, such as an intercepted 500: allow it in that test with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path.
+- **Anything else**: a real error in the app. Fix the app, not the test.
+
 ## Local Supabase
 
 Integration and E2E tests run against a local Supabase loaded with the migrations and the fictional **seed data** in `supabase/seed.sql`. Unit tests don't need it. In every environment:

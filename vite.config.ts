@@ -1,9 +1,19 @@
-import { defineConfig } from 'vite';
+import { readFileSync } from 'node:fs';
+import { defineConfig, loadEnv } from 'vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-export default defineConfig({
+import {
+  previewHeaders,
+  type VercelConfig,
+} from './tests/support/previewHeaders';
+
+const vercelConfig = JSON.parse(
+  readFileSync(path.resolve(import.meta.dirname, 'vercel.json'), 'utf8'),
+) as VercelConfig;
+
+export default defineConfig(({ mode }) => ({
   plugins: [tanstackRouter(), tailwindcss()],
   resolve: {
     alias: {
@@ -19,6 +29,14 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+  },
+  preview: {
+    // The headers Vercel serves, so the E2E suite runs under the production
+    // Content Security Policy (tests/support/previewHeaders.ts).
+    headers: previewHeaders(
+      vercelConfig,
+      loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
+    ),
   },
   build: {
     rollupOptions: {
@@ -54,4 +72,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

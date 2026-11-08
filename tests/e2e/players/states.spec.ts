@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from '@playwright/test';
+import { expect, test, type Page, type Request } from '../fixtures';
 
 import {
   DESKTOP,
@@ -18,6 +18,10 @@ import {
 const ERROR_STATE_TIMEOUT = 20_000;
 
 test.use({ viewport: DESKTOP });
+
+// The browser logs each failed request as a console error.
+const FAILED_PLAYERS_REQUEST =
+  /status of 500 .*\/rest\/v1\/rpc\/players_sorted/;
 
 function failPlayersRequests(page: Page) {
   return page.route(PLAYERS_API, (route) =>
@@ -58,7 +62,8 @@ test.describe('Player overview shows loading, error, and empty states', () => {
     await expectPlayersListed(page);
   });
 
-  test('Fetching fails', async ({ page }) => {
+  test('Fetching fails', async ({ page, allowConsoleErrors }) => {
+    allowConsoleErrors(FAILED_PLAYERS_REQUEST);
     const envelopes = await sentryEnvelopes(page);
     await failPlayersRequests(page);
 
@@ -81,7 +86,8 @@ test.describe('Player overview shows loading, error, and empty states', () => {
       .toBe(true);
   });
 
-  test('Retry after a failure', async ({ page }) => {
+  test('Retry after a failure', async ({ page, allowConsoleErrors }) => {
+    allowConsoleErrors(FAILED_PLAYERS_REQUEST);
     await failPlayersRequests(page);
     await openOverview(page);
     const retry = page

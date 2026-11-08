@@ -35,6 +35,12 @@ Rules for what data each test level may use, how tests reach a database, and how
 - When a test relies on a count or an edge case in the seed, a seed integration test checks it, so a later edit to the seed fails there first.
 - Every new table that tests depend on gets fictional rows in `supabase/seed.sql`.
 
+## E2E page errors
+
+- Every E2E spec imports `test` and `expect` from `tests/e2e/fixtures.ts`, never from `@playwright/test`. ESLint rejects the direct import in `tests/e2e/**/*.spec.ts`.
+- The fixture fails a test on any console error or uncaught error in the page. The preview server sends the production headers from `vercel.json`, so a Content Security Policy violation, which the browser logs as a console error, fails the test too.
+- A test that causes an error on purpose, such as a request it makes fail, allows exactly that error with `allowConsoleErrors(pattern)` in its own body. The pattern names the status and the request path, so any other error still fails the test.
+
 ## E2E page loads
 
 - Page loads don't depend on the internet. The app bundles third-party assets (webfonts, CDN scripts) instead of loading them from another host, as it does with the Inter font and the flags ([ADR 0006](../adr/ADR0006-language-selector-uses-native-labels-and-flags.md)). Such a request holds up every `page.goto`, and a slow host fails the test.

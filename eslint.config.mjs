@@ -390,5 +390,25 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Specs take `test` from the shared fixture, which fails a test on a
+    // console error, an uncaught error or a CSP violation
+    // (docs/standards/testing-standard.md).
+    files: ['tests/e2e/**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@playwright/test',
+              message:
+                "Import from 'tests/e2e/fixtures.ts' instead, so console errors fail the test.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettierConfig,
 );
