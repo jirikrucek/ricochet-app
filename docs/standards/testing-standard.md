@@ -20,7 +20,7 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 - Every scenario in force has an E2E test: each scenario in `openspec/specs/`, and each scenario of an ADDED or MODIFIED requirement in an active change under `openspec/changes/`.
 - The test is titled with the scenario name, verbatim, and the innermost `test.describe` around it is titled with the requirement name, verbatim. The E2E report then reads like the spec, and the coverage is checkable.
-- Only a scenario with an Examples table may have one test per example instead, titled `<scenario name>: <example>`. A scenario tested in several ways without an Examples table gets one test that covers them all.
+- Only a scenario with an Examples table may instead have one or more tests per example, each titled `<scenario name>: <example>`. A scenario tested in several ways without an Examples table gets one test that covers them all.
 - `npm run spec:coverage` (also run by `npm run spec:validate`) fails on every scenario in force without such a test. Unit and integration tests may cover a scenario too, but don't count for it.
 
 ## Reaching the database

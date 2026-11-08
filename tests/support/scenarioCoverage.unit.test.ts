@@ -76,6 +76,22 @@ describe('applyDeltas', () => {
     ]);
   });
 
+  it('adds a MODIFIED requirement the spec lacks, so its scenarios still count', () => {
+    const specs = applyDeltas(mainSpecs, [
+      {
+        spec: 'app/branding',
+        operation: 'MODIFIED',
+        requirement: requirement('Favicon is shown', 'Favicon in the tab'),
+      },
+    ]);
+
+    expect(names(specs)).toEqual([
+      'app/branding › Logo is shown › Logo on the home page',
+      'app/branding › Logo links home › Returning home',
+      'app/branding › Favicon is shown › Favicon in the tab',
+    ]);
+  });
+
   it('drops a REMOVED requirement and its scenarios', () => {
     const specs = applyDeltas(mainSpecs, [
       {

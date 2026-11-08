@@ -54,4 +54,25 @@ describe('previewHeaders', () => {
       "default-src 'self'; connect-src 'self' https://*.supabase.co; object-src 'none'",
     );
   });
+
+  it('serves no headers when vercel.json sets none', () => {
+    expect(previewHeaders({}, 'http://127.0.0.1:54321')).toEqual({});
+  });
+
+  it('refuses a policy without connect-src, which it could not extend', () => {
+    const config: VercelConfig = {
+      headers: [
+        {
+          source: '/(.*)',
+          headers: [
+            { key: 'Content-Security-Policy', value: "default-src 'self'" },
+          ],
+        },
+      ],
+    };
+
+    expect(() => previewHeaders(config, 'http://127.0.0.1:54321')).toThrow(
+      /connect-src/,
+    );
+  });
 });

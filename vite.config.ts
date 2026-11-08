@@ -9,11 +9,20 @@ import {
   type VercelConfig,
 } from './tests/support/previewHeaders';
 
-const vercelConfig = JSON.parse(
-  readFileSync(path.resolve(import.meta.dirname, 'vercel.json'), 'utf8'),
-) as VercelConfig;
+// The headers Vercel serves, so the E2E suite runs under the production
+// Content Security Policy (tests/support/previewHeaders.ts). Read only for
+// `vite preview`, so a build never depends on them.
+function vercelHeaders(mode: string) {
+  const vercelConfig = JSON.parse(
+    readFileSync(path.resolve(import.meta.dirname, 'vercel.json'), 'utf8'),
+  ) as VercelConfig;
+  return previewHeaders(
+    vercelConfig,
+    loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
+  );
+}
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, isPreview }) => ({
   plugins: [tanstackRouter(), tailwindcss()],
   resolve: {
     alias: {
@@ -30,14 +39,7 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     port: 5173,
   },
-  preview: {
-    // The headers Vercel serves, so the E2E suite runs under the production
-    // Content Security Policy (tests/support/previewHeaders.ts).
-    headers: previewHeaders(
-      vercelConfig,
-      loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
-    ),
-  },
+  preview: isPreview ? { headers: vercelHeaders(mode) } : undefined,
   build: {
     rollupOptions: {
       // 'use client' directives in deps (e.g. @base-ui) only matter for RSC; this is a CSR SPA.

@@ -39,9 +39,7 @@ export function applyDeltas(
   specs: SpecRequirements,
   deltas: Delta[],
 ): SpecRequirements {
-  const result: SpecRequirements = new Map(
-    [...specs].map(([spec, requirements]) => [spec, [...requirements]]),
-  );
+  const result: SpecRequirements = new Map(specs);
 
   for (const operation of operationOrder) {
     for (const delta of deltas) {
@@ -54,28 +52,33 @@ export function applyDeltas(
   return result;
 }
 
-function applyDelta(requirements: Requirement[], delta: Delta) {
-  if (delta.operation === 'RENAMED') {
-    return requirements.map((requirement) =>
-      requirement.name === delta.rename.from
-        ? { ...requirement, name: delta.rename.to }
-        : requirement,
-    );
+function applyDelta(requirements: Requirement[], delta: Delta): Requirement[] {
+  switch (delta.operation) {
+    case 'RENAMED':
+      return requirements.map((requirement) =>
+        requirement.name === delta.rename.from
+          ? { ...requirement, name: delta.rename.to }
+          : requirement,
+      );
+    case 'REMOVED':
+      return requirements.filter(({ name }) => name !== delta.requirement.name);
+    case 'ADDED':
+      return [
+        ...requirements.filter(({ name }) => name !== delta.requirement.name),
+        delta.requirement,
+      ];
+    case 'MODIFIED': {
+      const index = requirements.findIndex(
+        ({ name }) => name === delta.requirement.name,
+      );
+      // A modified requirement the spec lacks still needs its tests.
+      return index === -1
+        ? [...requirements, delta.requirement]
+        : requirements.map((requirement, i) =>
+            i === index ? delta.requirement : requirement,
+          );
+    }
   }
-
-  const { name } = delta.requirement;
-  const others = requirements.filter(
-    (requirement) => requirement.name !== name,
-  );
-
-  if (delta.operation === 'REMOVED') return others;
-  if (delta.operation === 'ADDED') return [...others, delta.requirement];
-
-  return requirements.some((requirement) => requirement.name === name)
-    ? requirements.map((requirement) =>
-        requirement.name === name ? delta.requirement : requirement,
-      )
-    : [...requirements, delta.requirement];
 }
 
 export function listScenarios(specs: SpecRequirements): Scenario[] {

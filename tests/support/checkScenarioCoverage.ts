@@ -84,14 +84,17 @@ function e2eTitlePaths(): string[][] {
 
   const paths: string[][] = [];
   const walk = (suite: PlaywrightSuite, describes: string[]) => {
-    for (const test of suite.specs ?? [])
+    for (const test of suite.specs ?? []) {
       paths.push([...describes, test.title]);
+    }
     for (const child of suite.suites ?? []) {
       walk(child, [...describes, child.title]);
     }
   };
   // The top-level suites are the spec files; their titles are file paths.
-  for (const file of report.suites) walk(file, []);
+  for (const file of report.suites) {
+    walk(file, []);
+  }
   return paths;
 }
 
