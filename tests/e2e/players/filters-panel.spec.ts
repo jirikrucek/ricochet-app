@@ -80,20 +80,24 @@ test.describe('Apply commits the filter draft', () => {
       },
     ];
     for (const { viewport, close } of closings) {
-      await openOverview(page, 'nationality=DE', viewport);
-      await openFiltersPanel(page);
-      await filterSelect(page, 'Nationality').click();
-      await page.getByRole('option', { name: 'Poland', exact: true }).click();
+      await test.step(`${viewport.width}px`, async () => {
+        await openOverview(page, 'nationality=DE', viewport);
+        await openFiltersPanel(page);
+        await filterSelect(page, 'Nationality').click();
+        await page.getByRole('option', { name: 'Poland', exact: true }).click();
 
-      await close();
+        await close();
 
-      await expect(filtersPanel(page)).toHaveCount(0);
-      await expect(page).toHaveURL(/nationality=DE/);
-      await expect
-        .poll(async () => new Set(await shownNationalities(page)))
-        .toEqual(new Set(['DE']));
-      await openFiltersPanel(page);
-      await expect(filterSelect(page, 'Nationality')).toContainText('Germany');
+        await expect(filtersPanel(page)).toHaveCount(0);
+        await expect(page).toHaveURL(/nationality=DE/);
+        await expect
+          .poll(async () => new Set(await shownNationalities(page)))
+          .toEqual(new Set(['DE']));
+        await openFiltersPanel(page);
+        await expect(filterSelect(page, 'Nationality')).toContainText(
+          'Germany',
+        );
+      });
     }
   });
 });
@@ -137,15 +141,17 @@ test.describe('Filters panel adapts when the viewport changes', () => {
     // hides the page from the accessibility tree, so the table is found by its
     // element, not its role.
     for (const viewport of [DESKTOP, PHONE]) {
-      await openOverview(page, '', viewport);
-      const table = page.locator('table');
-      const before = await boxOf(table);
+      await test.step(`${viewport.width}px`, async () => {
+        await openOverview(page, '', viewport);
+        const table = page.locator('table');
+        const before = await boxOf(table);
 
-      await openFiltersPanel(page);
+        await openFiltersPanel(page);
 
-      await expect(filtersPanel(page)).toBeVisible();
-      const after = await boxOf(table);
-      expect(after.y).toBe(before.y);
+        await expect(filtersPanel(page)).toBeVisible();
+        const after = await boxOf(table);
+        expect(after.y).toBe(before.y);
+      });
     }
   });
 });

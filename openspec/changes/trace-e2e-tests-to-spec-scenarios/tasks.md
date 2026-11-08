@@ -48,5 +48,5 @@
 
 ## 6. Wrap-up
 
-- [ ] 6.1 Run `openspec validate trace-e2e-tests-to-spec-scenarios --type change --strict`.
-- [ ] 6.2 Run the branch check from `AGENTS.md`.
+- [x] 6.1 Run `openspec validate trace-e2e-tests-to-spec-scenarios --type change --strict`.
+- [x] 6.2 Run the branch check from `AGENTS.md`.

@@ -31,9 +31,9 @@ None.
 
 ## Impact
 
-- **Tests:** `tests/e2e/app/` (`language-selection`, `navigation`, `routes`), `tests/e2e/players/` (`filters-panel`, `filters-sheet`, `listing`, `pagination`, `pagination-phone`, `applied-filters`), and `tests/e2e/fixtures.spec.ts`. They move, merge, are retitled, or are deleted.
+- **Tests:** `tests/e2e/app/` (`language-selection`, `navigation`, `routes`, and the `shell.ts` helpers), `tests/e2e/players/` (`filters-panel`, `filters-sheet`, `filter-orientation`, `listing`, `pagination`, `pagination-phone`, `applied-filters`, and the `overview.ts` helpers), and `tests/e2e/fixtures.spec.ts`. They move, merge, are retitled, or are deleted.
 - **Tooling:** `tests/support/checkScenarioCoverage.ts`, `tests/support/scenarioCoverage.ts`, and its unit tests.
-- **Docs:** `docs/standards/testing-standard.md`, `glossary/technical.md`, and the three specs above.
+- **Docs:** `docs/standards/testing-standard.md`, `docs/standards/project-structure-standard.md`, `docs/guides/testing-guide.md`, `glossary/technical.md`, and the three specs above.
 - **App code:** none. Every new scenario describes behaviour the app already has and an existing test already checks.
 - **Dependencies:** none.
 

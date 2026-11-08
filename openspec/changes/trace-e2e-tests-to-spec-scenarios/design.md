@@ -46,7 +46,9 @@ flowchart LR
       deltas["applyDeltas, listScenarios"]
       covers["covers(scenario, test)"]
       fwd["uncoveredScenarios"]
-      rev["testsCoveringNoScenario<br/>skips internals/"]
+      rev["testsCoveringNoScenario"]
+      internals["isInternalsTest<br/>file starts with internals/"]
+      proposal["isProposalDone"]
     end
   end
   openspec -- "main specs, deltas of changes with a proposal" --> wrapper
@@ -54,8 +56,11 @@ flowchart LR
   wrapper --> deltas
   wrapper --> fwd
   wrapper --> rev
+  wrapper --> proposal
+  wrapper --> internals
   fwd --> covers
   rev --> covers
+  rev --> internals
 ```
 
 - The predicate inside `uncoveredScenarios` becomes a private `covers(scenario, test)`, shared by both directions: the innermost describe is the requirement name, and the title is the scenario name, or `<scenario name>: <example>` for a scenario with an Examples table. It isn't exported. Unit tests check that the two public functions agree, not the helper, so they survive a restructuring of the code.
@@ -86,7 +91,7 @@ flowchart LR
 | --- | --- |
 | `tests/e2e/fixtures.spec.ts` | `tests/e2e/internals/fixtures.spec.ts`, with its import changed to `../fixtures` and a top-of-file comment |
 | `navigation.spec.ts` › Sheet width at the sm breakpoint and wider (3 tests) | `tests/e2e/internals/sheet.spec.ts`, with a comment linking #92. `openAt`, `openMenu`, `menu`, and `boxOf` come from the existing helpers |
-| Phone repeats of 4 scenarios | Merged into each scenario's existing test, which checks the phone case as well |
+| Phone repeats of 4 scenarios | Merged into each scenario's existing test, which checks the phone case as well. For "View change resets the page", which has an Examples table, the `applies filters (sex)` row runs on a phone |
 | `routes.spec.ts`, and "Close is named in the UI language" | Deleted (duplicates) |
 | 6 tests behind the new scenarios | Retitled to the scenario names, in describes titled with their requirement names. The no-scroll test becomes 4 tests, one per Examples row. The menu test widens to 744px, not 1280px. The no-announcement test also checks that the filter result is announced once |
 

@@ -166,12 +166,15 @@ const scenarios = listScenarios(
   ]),
 );
 
+function e2eTest(file: string, ...titlePath: string[]): E2eTest {
+  return { file, titlePath };
+}
+
 describe('uncoveredScenarios', () => {
   function uncovered(...titlePaths: string[][]) {
-    const tests: E2eTest[] = titlePaths.map((titlePath) => ({
-      file: 'players/translations.spec.ts',
-      titlePath,
-    }));
+    const tests = titlePaths.map((titlePath) =>
+      e2eTest('players/translations.spec.ts', ...titlePath),
+    );
     return uncoveredScenarios(scenarios, tests).map(({ name }) => name);
   }
 
@@ -238,10 +241,6 @@ describe('uncoveredScenarios', () => {
 });
 
 describe('testsCoveringNoScenario', () => {
-  function e2eTest(file: string, ...titlePath: string[]): E2eTest {
-    return { file, titlePath };
-  }
-
   function orphans(...tests: E2eTest[]) {
     return testsCoveringNoScenario(scenarios, tests).map(
       ({ file, titlePath }) => [file, ...titlePath].join(' › '),

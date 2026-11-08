@@ -5,6 +5,7 @@ import {
   applyButton,
   chooseFilter,
   chooseFilters,
+  filterAnnouncement,
   filtersButton,
   filtersPanel,
   openFiltersPanel,
@@ -12,7 +13,6 @@ import {
   removeFilter,
   summary,
   useUiLanguage,
-  filterAnnouncement,
 } from './overview';
 
 test.use({ viewport: DESKTOP });
