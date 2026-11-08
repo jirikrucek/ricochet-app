@@ -34,9 +34,9 @@
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
   // Also puts ~/.local/bin, where the Claude Code installer puts `claude`, on PATH outside
-  // interactive shells too.
+  // interactive shells too. It goes last, so a user-writable folder can't shadow system commands.
   "remoteEnv": {
-    "PATH": "/home/vscode/.local/bin:${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}"
+    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}:/home/vscode/.local/bin"
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
@@ -48,16 +48,20 @@
   // resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
   // to /root by default, which breaks shim resolution ("unknown command: npx").
   // installClaude installs the latest Claude Code into ~/.local/bin, owned by vscode, so its
-  // own updater can keep it current.
+  // own updater can keep it current. It downloads the installer over HTTPS only, to a fresh temp
+  // file, before running it, so a failed or cut-off download fails the command instead of running
+  // a partial script. It trusts claude.ai as the source and doesn't pin a version, so rebuilds
+  // always get the latest.
   "postCreateCommand": {
     "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:setup",
-    "installClaude": "curl -fsSL https://claude.ai/install.sh | bash"
+    "installClaude": "f=$(mktemp) && curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh -o \"$f\" && bash \"$f\"; s=$?; rm -f \"$f\"; exit $s"
   },
 
   // Runs on every container start, including restarts that don't rebuild it, so Claude Code is
-  // on the latest version before the first session.
+  // on the latest version before the first session. A failed or timed-out update (e.g. offline)
+  // doesn't fail the start: Claude Code also updates itself in the background.
   "postStartCommand": {
-    "updateClaude": "/home/vscode/.local/bin/claude update"
+    "updateClaude": "if [ -x /home/vscode/.local/bin/claude ]; then timeout 120 /home/vscode/.local/bin/claude update || echo 'Claude Code update failed; it updates itself in the background'; else echo 'Claude Code is not installed; rebuild the container to install it'; fi"
   },
 
   // Configure tool-specific properties.
