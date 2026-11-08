@@ -12,17 +12,11 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "*.config.ts"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.unit.test.ts",
-    "src/**/*.unit.test.tsx",
-    "src/**/*.integration.test.ts",
-    "src/**/*.integration.test.tsx"
-  ]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

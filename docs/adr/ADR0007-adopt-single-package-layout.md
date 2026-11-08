@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Created: 2026-08-10
-- Updated: 2026-11-03
+- Updated: 2026-11-08
 - Supersedes: ADR 0004
 
 ## Context
@@ -19,7 +19,7 @@ ADR 0004 considered and rejected a single-package layout at the time, on the gro
 
 Collapse the repository to a single npm package at the root:
 
-- Remove the `apps/*` / `packages/*` npm workspaces. One `package.json`, one `tsconfig.json`, one `src/` at the repo root.
+- Remove the `apps/*` / `packages/*` npm workspaces. One `package.json`, one `src/` at the repo root, and no TypeScript project references. `tsconfig.json` type-checks the app; `tsconfig.node.json` extends it, adding Node types, for the tests, the test tooling and the config files, so app code can't use Node APIs. `npm run typecheck` runs both.
 - Fold `packages/shared`'s intended purpose (shared contracts) into `src/shared/domain/`.
 - Adopt the folder layout and import rules defined in [`docs/standards/project-structure-standard.md`](../standards/project-structure-standard.md), which supersedes the folder mapping previously in ADR 0004.
 - Enforce the folder boundaries with `eslint-plugin-boundaries` instead of npm workspace isolation — see `eslint.config.mjs` for the rule set.
