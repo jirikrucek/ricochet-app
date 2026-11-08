@@ -39,7 +39,7 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 - Every E2E spec imports `test` and `expect` from `tests/e2e/fixtures.ts`, never from `@playwright/test`. ESLint rejects the direct import in `tests/e2e/**/*.spec.ts`.
 - The fixture fails a test on any console error or uncaught error in the page. The preview server sends the production headers from `vercel.json`, so a Content Security Policy violation, which the browser logs as a console error, fails the test too.
-- A test that causes an error on purpose, such as a request it makes fail, allows exactly that error with `allowConsoleErrors(pattern)` in its own body. The pattern names the status and the request path, so any other error still fails the test.
+- A test that causes an error on purpose, such as a request it makes fail, allows exactly that error with `allowConsoleErrors(pattern)` in its own body. The pattern names the status and the request path, so any other error still fails the test. A Content Security Policy violation fails the test even when a pattern matches it.
 
 ## E2E page loads
 

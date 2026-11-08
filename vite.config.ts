@@ -1,28 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-import {
-  previewHeaders,
-  type VercelConfig,
-} from './tests/support/previewHeaders';
-
-// The headers Vercel serves, so the E2E suite runs under the production
-// Content Security Policy (tests/support/previewHeaders.ts). Read only for
-// `vite preview`, so a build never depends on them.
-function vercelHeaders(mode: string) {
-  const vercelConfig = JSON.parse(
-    readFileSync(path.resolve(import.meta.dirname, 'vercel.json'), 'utf8'),
-  ) as VercelConfig;
-  return previewHeaders(
-    vercelConfig,
-    loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
-  );
-}
-
-export default defineConfig(({ mode, isPreview }) => ({
+const config: UserConfig = {
   plugins: [tanstackRouter(), tailwindcss()],
   resolve: {
     alias: {
@@ -39,7 +20,6 @@ export default defineConfig(({ mode, isPreview }) => ({
     host: '0.0.0.0',
     port: 5173,
   },
-  preview: isPreview ? { headers: vercelHeaders(mode) } : undefined,
   build: {
     rollupOptions: {
       // 'use client' directives in deps (e.g. @base-ui) only matter for RSC; this is a CSR SPA.
@@ -74,4 +54,21 @@ export default defineConfig(({ mode, isPreview }) => ({
       },
     },
   },
+};
+
+// The headers Vercel serves, so the E2E suite runs under the production
+// Content Security Policy (tests/support/previewHeaders.ts). Loaded only for
+// `vite preview`, so a build never depends on them or on tests/.
+async function vercelHeaders(mode: string) {
+  const { previewHeaders, readVercelConfig } =
+    await import('./tests/support/previewHeaders');
+  return previewHeaders(
+    readVercelConfig(),
+    loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
+  );
+}
+
+export default defineConfig(async ({ mode, isPreview }) => ({
+  ...config,
+  preview: isPreview ? { headers: await vercelHeaders(mode) } : undefined,
 }));

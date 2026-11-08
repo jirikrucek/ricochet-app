@@ -72,11 +72,10 @@ function applyDelta(requirements: Requirement[], delta: Delta): Requirement[] {
         ({ name }) => name === delta.requirement.name,
       );
       // A modified requirement the spec lacks still needs its tests.
-      return index === -1
-        ? [...requirements, delta.requirement]
-        : requirements.map((requirement, i) =>
-            i === index ? delta.requirement : requirement,
-          );
+      if (index === -1) return [...requirements, delta.requirement];
+      const modified = [...requirements];
+      modified[index] = delta.requirement;
+      return modified;
     }
   }
 }

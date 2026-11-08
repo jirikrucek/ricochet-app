@@ -6,8 +6,8 @@ type Fixtures = {
   /**
    * Allows console errors the test causes on purpose, such as the browser's
    * log of a request the test makes fail. Each pattern is matched against
-   * the recorded error, which includes the request URL. A pattern that would
-   * also hide a Content Security Policy violation is refused.
+   * the recorded error, which includes the request URL. A Content Security
+   * Policy violation fails the test even when a pattern matches it.
    */
   allowConsoleErrors: (...patterns: RegExp[]) => void;
 };
@@ -18,16 +18,13 @@ type Internal = {
   failOnPageErrors: void;
 };
 
-// How Chromium logs a Content Security Policy violation.
-const CSP_VIOLATIONS = [
-  `console error: Connecting to 'https://example.com/' violates the following Content Security Policy directive: "connect-src 'self'". The action has been blocked. (http://127.0.0.1:4173/assets/index.js)`,
-  `console error: Fetch API cannot load https://example.com/. Refused to connect because it violates the document's Content Security Policy. (http://127.0.0.1:4173/assets/index.js)`,
-];
+// How Chromium words a Content Security Policy violation in the console.
+const CSP_VIOLATION = /Content Security Policy/;
 
 // Every E2E spec imports `test` from here (docs/standards/testing-standard.md).
-// A console error or an uncaught error in the page fails the test, so a
-// Content Security Policy violation, which the browser logs as a console
-// error, fails it too.
+// A console error or an uncaught error in the page fails the test, and so
+// does a Content Security Policy violation, which the browser logs as a
+// console error.
 export const test = base.extend<Fixtures & Internal>({
   // Playwright reads a fixture's dependencies from this object pattern, so it
   // must be there even when empty.
@@ -37,12 +34,13 @@ export const test = base.extend<Fixtures & Internal>({
   },
   allowConsoleErrors: async ({ allowedConsoleErrors }, provide) => {
     await provide((...patterns) => {
-      for (const pattern of patterns) {
-        if (CSP_VIOLATIONS.some((violation) => pattern.test(violation))) {
-          throw new Error(
-            `allowConsoleErrors(${pattern}) would also hide a Content Security Policy violation. Name the status and the request path instead.`,
-          );
-        }
+      // A global or sticky pattern remembers where it last matched, so it
+      // could match an error once and miss it the next time.
+      const stateful = patterns.find(({ flags }) => /[gy]/.test(flags));
+      if (stateful) {
+        throw new Error(
+          `allowConsoleErrors(${stateful}) uses the g or y flag; drop it.`,
+        );
       }
       allowedConsoleErrors.push(...patterns);
     });
@@ -52,8 +50,8 @@ export const test = base.extend<Fixtures & Internal>({
   // asserts on the envelopes routes them itself, and its page route takes
   // precedence over this one.
   acceptSentryEnvelopes: [
-    async ({ context }, provide) => {
-      await context.route('**/api/1/envelope/**', (route) =>
+    async ({ context, baseURL }, provide) => {
+      await context.route(`${baseURL}/api/1/envelope/**`, (route) =>
         route.fulfill({ status: 200, body: '{}' }),
       );
       await provide();
@@ -78,7 +76,9 @@ export const test = base.extend<Fixtures & Internal>({
       await provide();
 
       const unexpected = errors.filter(
-        (error) => !allowedConsoleErrors.some((allowed) => allowed.test(error)),
+        (error) =>
+          CSP_VIOLATION.test(error) ||
+          !allowedConsoleErrors.some((allowed) => allowed.test(error)),
       );
       expect(unexpected, 'The page logged errors').toEqual([]);
     },

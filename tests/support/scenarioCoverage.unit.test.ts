@@ -202,6 +202,12 @@ describe('uncoveredScenarios', () => {
     ).not.toContain('Page text follows the UI language');
   });
 
+  it('does not count a test per example without the colon', () => {
+    expect(
+      uncovered([translated, 'Page text follows the UI language in Czech']),
+    ).toContain('Page text follows the UI language');
+  });
+
   it('does not count a test per example of a scenario without examples', () => {
     expect(
       uncovered([translated, 'Sex labels are translated: Czech']),
