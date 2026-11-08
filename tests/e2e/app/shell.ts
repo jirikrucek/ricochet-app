@@ -36,6 +36,15 @@ export function menuButton(page: Page, name = 'Open menu') {
   return banner(page).getByRole('button', { name });
 }
 
+export function menu(page: Page) {
+  return page.getByRole('dialog');
+}
+
+export async function openMenu(page: Page) {
+  await menuButton(page).click();
+  await expect(menu(page)).toBeVisible();
+}
+
 export async function boxOf(locator: Locator): Promise<Box> {
   const box = await locator.boundingBox();
   expect(box, 'element should be rendered').not.toBeNull();

@@ -18,7 +18,7 @@ Every E2E test fails on a console error, an uncaught error, or a report to Sentr
 
 - **A Content Security Policy violation** ("violates the following Content Security Policy directive"): the app reaches an origin `vercel.json` doesn't allow. Production would block it too, so add the origin to `connect-src` (see `docs/guides/deployment-guide.md`), or drop the request.
 - **A failure the test causes on purpose**, such as an intercepted 500: allow the browser's log of it with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path. A failed query is reported to Sentry too, with its key after the message (`{"queryKey":["players_sorted",…]}`), so also allow it with `allowSentryReports(/"queryKey":\["players_sorted"/)`.
-- **"No Sentry client on … to flush"**: at teardown the fixture sends what Sentry still buffers, through the client the SDK keeps on `window.__SENTRY__`. If the app started fine, a `@sentry/react` upgrade moved that client; update `SentryCarrier` in `tests/e2e/fixtures.ts`, and the buffered-log case in `tests/e2e/fixtures.spec.ts`, to the SDK's new layout.
+- **"No Sentry client on … to flush"**: at teardown the fixture sends what Sentry still buffers, through the client the SDK keeps on `window.__SENTRY__`. If the app started fine, a `@sentry/react` upgrade moved that client; update `SentryCarrier` in `tests/e2e/fixtures.ts`, and the buffered-log case in `tests/e2e/internals/fixtures.spec.ts`, to the SDK's new layout.
 - **Anything else**: a real error in the app. Fix the app, not the test.
 
 ## Base UI and React Hook Form in tests

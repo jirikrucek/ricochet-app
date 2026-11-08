@@ -17,11 +17,11 @@
 
 ## 3. Slice: internals tests
 
-- [ ] 3.1 Move `tests/e2e/fixtures.spec.ts` to `tests/e2e/internals/fixtures.spec.ts`. Fix its import of the fixture, and add a top-of-file comment saying it tests the page error and Sentry fixture, not the app.
-- [ ] 3.2 Move the three tests of "Sheet width at the sm breakpoint and wider" from `tests/e2e/app/navigation.spec.ts` to `tests/e2e/internals/sheet.spec.ts`, importing the helpers they need from `tests/e2e/app/shell.ts` or exporting them there. Add a top-of-file comment saying it tests the shared `Sheet` component's width, not product behaviour, and linking #92.
-- [ ] 3.3 Update the `fixtures.spec.ts` path in `docs/guides/testing-guide.md`. In `docs/standards/project-structure-standard.md`, add `internals/` to the tree under `tests/e2e/`.
-- [ ] 3.4 Run the moved tests and confirm they pass. Confirm `npm run spec:coverage` no longer lists any of them.
-- [ ] 3.5 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
+- [x] 3.1 Move `tests/e2e/fixtures.spec.ts` to `tests/e2e/internals/fixtures.spec.ts`. Fix its import of the fixture, and add a top-of-file comment saying it tests the page error and Sentry fixture, not the app.
+- [x] 3.2 Move the three tests of "Sheet width at the sm breakpoint and wider" from `tests/e2e/app/navigation.spec.ts` to `tests/e2e/internals/sheet.spec.ts`, importing the helpers they need from `tests/e2e/app/shell.ts` or exporting them there. Add a top-of-file comment saying it tests the shared `Sheet` component's width, not product behaviour, and linking #92.
+- [x] 3.3 Update the `fixtures.spec.ts` path in `docs/guides/testing-guide.md`. In `docs/standards/project-structure-standard.md`, add `internals/` to the tree under `tests/e2e/`.
+- [x] 3.4 Run the moved tests and confirm they pass. Confirm `npm run spec:coverage` no longer lists any of them.
+- [x] 3.5 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
 
 ## 4. Slice: app shell scenarios
 

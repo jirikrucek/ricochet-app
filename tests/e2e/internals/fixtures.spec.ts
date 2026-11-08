@@ -1,5 +1,13 @@
-import { productionHeaders, readVercelConfig } from '../support/previewHeaders';
-import { expect, test, type Page, type SentryCarrier } from './fixtures';
+// An internals test (docs/standards/testing-standard.md): it checks the page
+// error fixture in tests/e2e/fixtures.ts and the preview server's headers,
+// which every E2E test relies on, not behaviour a visitor sees. No spec
+// scenario covers it.
+
+import {
+  productionHeaders,
+  readVercelConfig,
+} from '../../support/previewHeaders';
+import { expect, test, type Page, type SentryCarrier } from '../fixtures';
 
 type Directives = Map<string, string[]>;
 
