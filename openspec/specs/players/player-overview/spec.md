@@ -28,6 +28,12 @@ The system SHALL show the **player overview** at `/players` as a table with thre
 - **THEN** the players are shown in a table with the Surname, First name, and Nationality columns
 - **AND** the page does not scroll horizontally
 
+#### Scenario: Table kept on a phone with a long unbroken name
+- **GIVEN** a player whose first name and surname are each over 40 letters long, with no space or hyphen
+- **WHEN** a visitor opens the player overview with a viewport 320px wide
+- **THEN** the player is shown in the table
+- **AND** the page does not scroll horizontally
+
 ### Requirement: Nationality is shown as a flag with a localized country name
 The system SHALL show a **player**'s **nationality** as a flag only. Each flag SHALL have an accessible name and a tooltip, both giving the country name in the current UI language.
 
@@ -207,6 +213,20 @@ Opening or closing the **filters panel** SHALL NOT move the table. If the viewpo
 - **WHEN** the viewport becomes 600px wide
 - **THEN** the filters panel is closed
 - **AND** reopening it shows the filters that are applied
+
+#### Scenario: Page does not scroll horizontally on a phone
+- **GIVEN** the visitor has applied the nationality Czechia and the sex Female
+- **WHEN** the visitor views the player overview with a viewport <width> wide and the filters panel <panel>
+- **THEN** the page does not scroll horizontally
+
+Examples:
+
+| width | panel |
+| --- | --- |
+| 320px | closed |
+| 320px | open |
+| 375px | closed |
+| 375px | open |
 
 ### Requirement: Filters panel can be used with a keyboard
 The **filters button** SHALL be reachable and operable with the keyboard and SHALL tell assistive technology whether the **filters panel** is open. Escape SHALL close the **filters panel** and return focus to the **filters button**. The **sheet** SHALL keep Tab inside it while it is open. The **popover** SHALL NOT trap focus.
@@ -429,7 +449,7 @@ Examples:
 - **THEN** every player is listed again
 
 ### Requirement: Page changes keep the visitor oriented
-After the **visitor** changes the page, the system SHALL scroll to the top of the table, move focus to the table's caption, and announce the new summary in a polite live region.
+After the **visitor** changes the page, the system SHALL scroll to the top of the table, move focus to the table's caption, and announce the new summary in a polite live region. When the page returns to 1 because the **visitor** changed the view, the system SHALL NOT announce it as a page change.
 
 #### Scenario: Moving to the next page
 - **GIVEN** the visitor has scrolled to the pagination below the table on page 1
@@ -437,6 +457,12 @@ After the **visitor** changes the page, the system SHALL scroll to the top of th
 - **THEN** the top of the table is in view
 - **AND** focus is on the table's caption
 - **AND** the new summary, such as "Showing 26–50 of 100", is announced politely to screen readers
+
+#### Scenario: A filter change is not announced as a page change
+- **GIVEN** 100 players exist, 40 of them female
+- **AND** the visitor is on page 2 of the player overview
+- **WHEN** the visitor applies the sex Female
+- **THEN** "Showing 1–25 of 40" is announced politely to screen readers only once
 
 ### Requirement: The view is kept in the URL
 The system SHALL keep the sort direction, the filters, and the page (`page`) in the URL search params, so a view can be shared, reloaded, and walked through with back and forward. Default values SHALL be left out of the URL. Invalid values SHALL fall back to their defaults, unknown params SHALL be ignored, and a `page` beyond the last page SHALL fall back to page 1.
