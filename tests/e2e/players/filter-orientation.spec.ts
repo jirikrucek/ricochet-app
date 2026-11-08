@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '../fixtures';
 
 import {
   DESKTOP,
@@ -56,9 +56,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     );
   });
 
-  test('Applying without a change announces the current result', async ({
-    page,
-  }) => {
+  test('Applying without a change', async ({ page }) => {
     await openOverview(page, 'sex=female');
     await expect(summary(page)).toHaveText('Showing 1–25 of 40');
     await openFiltersPanel(page);

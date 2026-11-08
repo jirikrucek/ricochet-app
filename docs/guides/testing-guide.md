@@ -4,6 +4,31 @@ The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the de
 
 Which data each test level may use is set by `docs/standards/testing-standard.md` (see [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)).
 
+## Driving Playwright outside the suite
+
+For a screenshot or a quick look at a page outside the test suite, reuse the Chromium that `npm run test:e2e:setup` installed in `.playwright-browsers`. The `test:e2e*` scripts point Playwright at it; any other script or `npx playwright` command must do so itself, or it downloads another Chromium into `~/.cache`:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.playwright-browsers" npx playwright screenshot http://127.0.0.1:4173/players players.png
+```
+
+## A test fails with "The page logged errors"
+
+Every E2E test fails on a console error or an uncaught error in the page (see `docs/standards/testing-standard.md`). The failure lists each error, with the URL of the request or script behind it. Read it as one of three cases:
+
+- **A Content Security Policy violation** ("violates the following Content Security Policy directive"): the app reaches an origin `vercel.json` doesn't allow. Production would block it too, so add the origin to `connect-src` (see `docs/guides/deployment-guide.md`), or drop the request.
+- **A failed request the test causes on purpose**, such as an intercepted 500: allow it in that test with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path.
+- **Anything else**: a real error in the app. Fix the app, not the test.
+
+## Base UI and React Hook Form in tests
+
+The UI primitives come from Base UI ([ADR 0015](../adr/ADR0015-shadcn-components-use-base-ui-primitives.md)) and the forms from React Hook Form. Each behaves in a way that makes a straightforward test fail, or pass for the wrong reason:
+
+- **Focus moves after each Tab, not at once.** A dialog's focus guard needs a moment to wrap focus, and back-to-back `page.keyboard.press('Tab')` calls outrun it. Wait for focus to move before the next press, as the focus tests in `tests/e2e/players/filters-sheet.spec.ts` and `tests/e2e/app/navigation.spec.ts` do.
+- **An open modal hides the page from the accessibility tree.** While a modal sheet or menu is open, `getByRole('table')` or `getByRole('button', …)` finds nothing behind it. Find those elements with a CSS locator instead, as `tests/e2e/players/filters-sheet.spec.ts` does with `page.locator('table')`.
+- **A Select option needs a hover before its click in jsdom.** Base UI ignores a click on an option that was never hovered, so send `fireEvent.mouseMove(option)` before `fireEvent.click(option)`, as the `choose` helper in `src/modules/players/ui/list-filters/ListFilters.unit.test.tsx` does.
+- **A form submits asynchronously.** React Hook Form's `handleSubmit` validates before it calls the handler, so after clicking submit, `await waitFor(…)` for the handler's effect instead of asserting straight away.
+
 ## Local Supabase
 
 Integration and E2E tests run against a local Supabase loaded with the migrations and the fictional **seed data** in `supabase/seed.sql`. Unit tests don't need it. In every environment:

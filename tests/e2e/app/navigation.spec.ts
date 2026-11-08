@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '../fixtures';
 import {
   DESKTOP,
   PHONE,
@@ -34,35 +34,39 @@ async function expectCollapsedNav(page: Page) {
   await expect(bannerLanguage(page)).toBeHidden();
 }
 
-test('Tablet width shows the full nav', async ({ page }) => {
-  await openAt(page, { width: 744, height: 1024 });
+test.describe('Top nav bar shows the full single-row layout from 744px upward', () => {
+  test('Tablet width shows the full nav', async ({ page }) => {
+    await openAt(page, { width: 744, height: 1024 });
 
-  await expectFullNav(page);
+    await expectFullNav(page);
+  });
 });
 
-test('Phone width shows the collapsed nav', async ({ page }) => {
-  await openAt(page, PHONE);
+test.describe('Top nav bar collapses to the logo and a menu button below 744px', () => {
+  test('Phone width shows the collapsed nav', async ({ page }) => {
+    await openAt(page, PHONE);
 
-  await expectCollapsedNav(page);
-  await expectNoHorizontalOverflow(page);
-});
+    await expectCollapsedNav(page);
+    await expectNoHorizontalOverflow(page);
+  });
 
-test('Nav collapses just below the breakpoint', async ({ page }) => {
-  await openAt(page, { width: 743, height: 1024 });
+  test('Nav collapses just below the breakpoint', async ({ page }) => {
+    await openAt(page, { width: 743, height: 1024 });
 
-  await expect(logoLink(page)).toBeVisible();
-  await expect(menuButton(page)).toBeVisible();
-  await expect(bannerLink(page, 'Players')).toBeHidden();
-  await expect(bannerLink(page, 'Tournaments')).toBeHidden();
-});
+    await expect(logoLink(page)).toBeVisible();
+    await expect(menuButton(page)).toBeVisible();
+    await expect(bannerLink(page, 'Players')).toBeHidden();
+    await expect(bannerLink(page, 'Tournaments')).toBeHidden();
+  });
 
-test('Nav adapts when the viewport is resized', async ({ page }) => {
-  await openAt(page, DESKTOP);
-  await expectFullNav(page);
+  test('Nav adapts when the viewport is resized', async ({ page }) => {
+    await openAt(page, DESKTOP);
+    await expectFullNav(page);
 
-  await page.setViewportSize(PHONE);
+    await page.setViewportSize(PHONE);
 
-  await expectCollapsedNav(page);
+    await expectCollapsedNav(page);
+  });
 });
 
 function menu(page: Page) {
@@ -74,66 +78,74 @@ async function openMenu(page: Page) {
   await expect(menu(page)).toBeVisible();
 }
 
-test('Opening the menu', async ({ page }) => {
-  await openAt(page, PHONE);
+test.describe('Menu button opens a menu with the section links and language selector', () => {
+  test('Opening the menu', async ({ page }) => {
+    await openAt(page, PHONE);
 
-  await menuButton(page).click();
+    await menuButton(page).click();
 
-  const dialog = menu(page);
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole('link', { name: 'Players' })).toBeVisible();
-  await expect(dialog.getByRole('link', { name: 'Tournaments' })).toBeVisible();
-  await expect(
-    dialog.getByRole('combobox', { name: 'Language' }),
-  ).toBeVisible();
+    const dialog = menu(page);
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('link', { name: 'Players' })).toBeVisible();
+    await expect(
+      dialog.getByRole('link', { name: 'Tournaments' }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('combobox', { name: 'Language' }),
+    ).toBeVisible();
+  });
+
+  test('Active section is indicated in the menu', async ({ page }) => {
+    await openAt(page, PHONE, '/players');
+
+    await openMenu(page);
+
+    const players = menu(page).getByRole('link', { name: 'Players' });
+    const tournaments = menu(page).getByRole('link', { name: 'Tournaments' });
+    await expect(players).toHaveAttribute('aria-current', 'page');
+    await expect(tournaments).not.toHaveAttribute('aria-current', 'page');
+
+    // Sighted users see it too: the active link is underlined and recoloured.
+    const look = (link: Locator) =>
+      link.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { color: style.color, underline: style.borderBottomColor };
+      });
+    const active = await look(players);
+    const inactive = await look(tournaments);
+    expect(active.underline).not.toBe('rgba(0, 0, 0, 0)');
+    expect(inactive.underline).toBe('rgba(0, 0, 0, 0)');
+    expect(active.color).not.toBe(inactive.color);
+  });
 });
 
-test('Active section is indicated in the menu', async ({ page }) => {
-  await openAt(page, PHONE, '/players');
+test.describe('Navigating from the menu closes it', () => {
+  test('Going to Tournaments from the menu', async ({ page }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
 
-  await openMenu(page);
+    await menu(page).getByRole('link', { name: 'Tournaments' }).click();
 
-  const players = menu(page).getByRole('link', { name: 'Players' });
-  const tournaments = menu(page).getByRole('link', { name: 'Tournaments' });
-  await expect(players).toHaveAttribute('aria-current', 'page');
-  await expect(tournaments).not.toHaveAttribute('aria-current', 'page');
-
-  // Sighted users see it too: the active link is underlined and recoloured.
-  const look = (link: Locator) =>
-    link.evaluate((el) => {
-      const style = getComputedStyle(el);
-      return { color: style.color, underline: style.borderBottomColor };
-    });
-  const active = await look(players);
-  const inactive = await look(tournaments);
-  expect(active.underline).not.toBe('rgba(0, 0, 0, 0)');
-  expect(inactive.underline).toBe('rgba(0, 0, 0, 0)');
-  expect(active.color).not.toBe(inactive.color);
+    await expect(page).toHaveURL(/\/tournaments$/);
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Tournaments' }),
+    ).toBeVisible();
+    await expect(menu(page)).toBeHidden();
+  });
 });
 
-test('Going to Tournaments from the menu', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
+test.describe('Language can be changed from the menu', () => {
+  test('Switching to German on a phone', async ({ page }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
 
-  await menu(page).getByRole('link', { name: 'Tournaments' }).click();
+    await menu(page).getByRole('combobox', { name: 'Language' }).click();
+    await page.getByRole('option', { name: 'Deutsch' }).click();
 
-  await expect(page).toHaveURL(/\/tournaments$/);
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'Tournaments' }),
-  ).toBeVisible();
-  await expect(menu(page)).toBeHidden();
-});
-
-test('Switching to German on a phone', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
-
-  await menu(page).getByRole('combobox', { name: 'Language' }).click();
-  await page.getByRole('option', { name: 'Deutsch' }).click();
-
-  await expect(
-    page.getByText('Die Initialisierung des Workspaces ist bereit.'),
-  ).toBeVisible();
+    await expect(
+      page.getByText('Die Initialisierung des Workspaces ist bereit.'),
+    ).toBeVisible();
+  });
 });
 
 test('Mobile language selection stays in sync after resizing to desktop', async ({
@@ -198,103 +210,109 @@ test.describe('Sheet width at the sm breakpoint and wider', () => {
   }
 });
 
-test('Closing the menu with Escape', async ({ page }) => {
-  await openAt(page, PHONE, '/players');
-  await openMenu(page);
+test.describe('Menu can be dismissed without navigating', () => {
+  test('Closing the menu with Escape', async ({ page }) => {
+    await openAt(page, PHONE, '/players');
+    await openMenu(page);
 
-  await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
 
-  await expect(menu(page)).toBeHidden();
-  await expect(page).toHaveURL(/\/players$/);
-  await expect(menuButton(page)).toBeFocused();
+    await expect(menu(page)).toBeHidden();
+    await expect(page).toHaveURL(/\/players$/);
+    await expect(menuButton(page)).toBeFocused();
+  });
+
+  test('Closing the menu by tapping outside it', async ({ page }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
+
+    const dialogBox = await menu(page).boundingBox();
+    expect(dialogBox?.x).toBeGreaterThan(20);
+    await page.mouse.click(10, PHONE.height / 2);
+
+    await expect(menu(page)).toBeHidden();
+    await expect(menuButton(page)).toBeFocused();
+  });
+
+  test('Closing the menu with its close control', async ({ page }) => {
+    await openAt(page, PHONE, '/players');
+    await openMenu(page);
+
+    await menu(page).getByRole('button', { name: 'Close menu' }).click();
+
+    await expect(menu(page)).toBeHidden();
+    await expect(page).toHaveURL(/\/players$/);
+    await expect(menuButton(page)).toBeFocused();
+  });
 });
 
-test('Closing the menu by tapping outside it', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
+test.describe('Menu button is accessible and localized', () => {
+  test('Screen reader announces the menu button in English', async ({
+    page,
+  }) => {
+    await openAt(page, PHONE);
 
-  const dialogBox = await menu(page).boundingBox();
-  expect(dialogBox?.x).toBeGreaterThan(20);
-  await page.mouse.click(10, PHONE.height / 2);
+    const button = menuButton(page);
+    await expect(button).toHaveAccessibleName('Open menu');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
 
-  await expect(menu(page)).toBeHidden();
-  await expect(menuButton(page)).toBeFocused();
-});
+    await button.click();
+    await expect(menu(page)).toBeVisible();
 
-test('Closing the menu with its close control', async ({ page }) => {
-  await openAt(page, PHONE, '/players');
-  await openMenu(page);
+    // The open modal hides the page behind it from the accessibility tree,
+    // so read the trigger's state directly from the DOM.
+    await expect(
+      page.locator('header button[aria-label="Open menu"]'),
+    ).toHaveAttribute('aria-expanded', 'true');
+  });
 
-  await menu(page).getByRole('button', { name: 'Close menu' }).click();
+  test('Menu button name follows the active language', async ({ page }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
 
-  await expect(menu(page)).toBeHidden();
-  await expect(page).toHaveURL(/\/players$/);
-  await expect(menuButton(page)).toBeFocused();
-});
+    await menu(page).getByRole('combobox', { name: 'Language' }).click();
+    await page.getByRole('option', { name: 'Čeština' }).click();
+    await page.keyboard.press('Escape');
+    await expect(menu(page)).toBeHidden();
 
-test('Screen reader announces the menu button in English', async ({ page }) => {
-  await openAt(page, PHONE);
-
-  const button = menuButton(page);
-  await expect(button).toHaveAccessibleName('Open menu');
-  await expect(button).toHaveAttribute('aria-expanded', 'false');
-
-  await button.click();
-  await expect(menu(page)).toBeVisible();
-
-  // The open modal hides the page behind it from the accessibility tree,
-  // so read the trigger's state directly from the DOM.
-  await expect(
-    page.locator('header button[aria-label="Open menu"]'),
-  ).toHaveAttribute('aria-expanded', 'true');
-});
-
-test('Menu button name follows the active language', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
-
-  await menu(page).getByRole('combobox', { name: 'Language' }).click();
-  await page.getByRole('option', { name: 'Čeština' }).click();
-  await page.keyboard.press('Escape');
-  await expect(menu(page)).toBeHidden();
-
-  await expect(menuButton(page, 'Otevřít menu')).toBeVisible();
-  await expect(menuButton(page, 'Otevřít menu')).toHaveAccessibleName(
-    'Otevřít menu',
-  );
-});
-
-test('Keyboard focus stays in the open menu', async ({ page }) => {
-  await openAt(page, PHONE);
-
-  await menuButton(page).focus();
-  await page.keyboard.press('Enter');
-  await expect(menu(page)).toBeVisible();
-
-  const focusable = menu(page).locator(
-    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  );
-  const focusableCount = await focusable.count();
-  expect(focusableCount).toBeGreaterThanOrEqual(4);
-  await expect(focusable.first()).toBeFocused();
-
-  const focusInMenu = () =>
-    page.evaluate(
-      () =>
-        document
-          .querySelector('[role="dialog"]')
-          ?.contains(document.activeElement) ?? false,
+    await expect(menuButton(page, 'Otevřít menu')).toBeVisible();
+    await expect(menuButton(page, 'Otevřít menu')).toHaveAccessibleName(
+      'Otevřít menu',
     );
+  });
 
-  for (let i = 1; i < focusableCount; i++) {
+  test('Keyboard focus stays in the open menu', async ({ page }) => {
+    await openAt(page, PHONE);
+
+    await menuButton(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(menu(page)).toBeVisible();
+
+    const focusable = menu(page).locator(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    const focusableCount = await focusable.count();
+    expect(focusableCount).toBeGreaterThanOrEqual(4);
+    await expect(focusable.first()).toBeFocused();
+
+    const focusInMenu = () =>
+      page.evaluate(
+        () =>
+          document
+            .querySelector('[role="dialog"]')
+            ?.contains(document.activeElement) ?? false,
+      );
+
+    for (let i = 1; i < focusableCount; i++) {
+      await page.keyboard.press('Tab');
+      await expect.poll(focusInMenu).toBe(true);
+    }
+    await expect(focusable.last()).toBeFocused();
+
+    // One more Tab past the last item wraps to the first, not the page behind.
     await page.keyboard.press('Tab');
-    await expect.poll(focusInMenu).toBe(true);
-  }
-  await expect(focusable.last()).toBeFocused();
-
-  // One more Tab past the last item wraps to the first, not the page behind.
-  await page.keyboard.press('Tab');
-  await expect(focusable.first()).toBeFocused();
+    await expect(focusable.first()).toBeFocused();
+  });
 });
 
 test('Menu closes when the viewport widens to tablet', async ({ page }) => {

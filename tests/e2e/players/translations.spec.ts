@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures';
 
 import {
   DESKTOP,
@@ -170,11 +170,13 @@ test.describe('Player overview is translated into every supported UI language', 
 
 // The expected texts are written out here, not read from the locale files, so
 // an edit to a translation has to change a test too.
-test.describe('Filters panel text follows the UI language', () => {
+test.describe('Player overview is translated into every supported UI language', () => {
   for (const expected of languages) {
     const [, sexLabel] = expected.filters;
 
-    test(`The panel: ${expected.language}`, async ({ page }) => {
+    test(`Filters panel text follows the UI language: ${expected.language}, the panel`, async ({
+      page,
+    }) => {
       await useUiLanguage(page, expected.code);
       await openOverview(page);
 
@@ -198,7 +200,9 @@ test.describe('Filters panel text follows the UI language', () => {
       ).toBeVisible();
     });
 
-    test(`The applied filters: ${expected.language}`, async ({ page }) => {
+    test(`Filters panel text follows the UI language: ${expected.language}, the applied filters`, async ({
+      page,
+    }) => {
       await useUiLanguage(page, expected.code);
 
       await openOverview(page, 'nationality=GB&sex=female');
@@ -215,7 +219,9 @@ test.describe('Filters panel text follows the UI language', () => {
       await expect(page.getByText(expected.noMatch)).toBeVisible();
     });
 
-    test(`The sheet: ${expected.language}`, async ({ page }) => {
+    test(`Filters panel text follows the UI language: ${expected.language}, the sheet`, async ({
+      page,
+    }) => {
       await useUiLanguage(page, expected.code);
       await openOverview(page, '', PHONE);
 

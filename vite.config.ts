@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-export default defineConfig({
+const config: UserConfig = {
   plugins: [tanstackRouter(), tailwindcss()],
   resolve: {
     alias: {
@@ -54,4 +54,21 @@ export default defineConfig({
       },
     },
   },
-});
+};
+
+// The headers Vercel serves, so the E2E suite runs under the production
+// Content Security Policy (tests/support/previewHeaders.ts). Loaded only for
+// `vite preview`, so a build never depends on them or on tests/.
+async function vercelHeaders(mode: string) {
+  const { previewHeaders, readVercelConfig } =
+    await import('./tests/support/previewHeaders');
+  return previewHeaders(
+    readVercelConfig(),
+    loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL,
+  );
+}
+
+export default defineConfig(async ({ mode, isPreview }) => ({
+  ...config,
+  preview: isPreview ? { headers: await vercelHeaders(mode) } : undefined,
+}));

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Standards and ADRs Audit"
+  short_description: "Audit the code against the standards and accepted ADRs: find violations, fix the approved ones, and commit after review."
+policy:
+  allow_implicit_invocation: false

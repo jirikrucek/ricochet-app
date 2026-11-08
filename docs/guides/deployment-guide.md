@@ -17,7 +17,7 @@ Client-side routes are rewritten to `index.html` via `vercel.json`, so direct na
 
 ## Content Security Policy
 
-`vercel.json` sets a Content Security Policy whose `connect-src` allows only the app itself, Supabase and Sentry. A request to any other origin is blocked in production, so adding one means adding its origin to `connect-src`. Only Vercel serves these headers: local dev, `vite preview` and the E2E suite don't catch a missing origin.
+`vercel.json` sets a Content Security Policy whose `connect-src` allows only the app itself, Supabase and Sentry. A request to any other origin is blocked in production, so adding one means adding its origin to `connect-src`. `vite preview` serves the same headers (`tests/support/previewHeaders.ts`), adding only a local Supabase origin to `connect-src`, so the E2E suite runs under this policy and a request to a missing origin fails a test. Sentry's origins are the exception: in E2E the Sentry DSN points at the preview server itself, so a wrong Sentry entry in `connect-src` passes every test. After changing one, check on the Preview deployment that a reported error reaches Sentry. `vite dev` doesn't serve these headers.
 
 ## Environment variables
 

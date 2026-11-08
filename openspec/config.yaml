@@ -20,14 +20,15 @@ rules:
   tasks:
     - Must break the work into tracer bullets, small slices of functionality that get built end-to-end; each slice cuts a narrow but complete path through every layer (schema, API, UI, tests), vertical NOT horizontal; each slice is demoable/verifiable on its own and sized to fit in a single fresh context window; any prefactoring should be done first
     - Must ensure tests (unit, integration, and E2E) are always written before implementation; follow TDD
-    - Must cover each spec, its all requirement scenarios, by an E2E test
-    - Must end each slice with a task to run /code-health on the work so far and fix its critical findings
-    - Must end the tasks with a task to run /production-readiness and fix its critical findings, followed by a final task to run the Definition of Done from AGENTS.md
+    - Must cover every spec scenario by an E2E test named as docs/standards/testing-standard.md (Spec scenarios) requires
+    - Must end each slice with a task to run /code-health on that slice alone, with `HEAD` as the fixed point before the slice is committed, and fix its critical findings
+    - Must end the tasks with a task to run the branch check from AGENTS.md
 
 operations:
   apply:
     guidance:
       - Must use /tdd skill where possible, at pre-agreed seams
+      - Must commit each finished slice, its ticked tasks included, with a Conventional Commit on the feature branch as soon as its last task is ticked, so the next slice's /code-health sees that slice alone
   archive:
     guidance:
       - Must run OpenSpec Sync before archiving

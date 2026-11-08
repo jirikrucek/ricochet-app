@@ -1,6 +1,6 @@
 # Testing Standard
 
-Rules for what data each test level may use and how tests reach a database. The decision and its reasons are in [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md).
+Rules for what data each test level may use, how tests reach a database, and how E2E tests cover the spec scenarios. The decision and its reasons are in [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md).
 
 ## Test levels and their data
 
@@ -16,6 +16,13 @@ Rules for what data each test level may use and how tests reach a database. The 
 - **Production data is never used by any test.** It is never committed, never copied into the seed or a fixture, and never loaded into a local or CI database. Production data scripts live in the gitignored `supabase/data/`.
 - **Seed data and mock data are fictional.** Don't reuse real people's names from production data.
 
+## Spec scenarios
+
+- Every scenario in force has an E2E test: each scenario in `openspec/specs/`, and each scenario of an ADDED or MODIFIED requirement in an active change under `openspec/changes/`.
+- The test is titled with the scenario name, verbatim, and the innermost `test.describe` around it is titled with the requirement name, verbatim. The E2E report then reads like the spec, and the coverage is checkable.
+- Only a scenario with an Examples table may instead have one or more tests per example, each titled `<scenario name>: <example>`. A scenario tested in several ways without an Examples table gets one test that covers them all.
+- `npm run spec:coverage` (also run by `npm run spec:validate`) fails on every scenario in force without such a test. Unit and integration tests may cover a scenario too, but don't count for it.
+
 ## Reaching the database
 
 - Every test that reaches a database gets its URL and publishable key from `tests/support/localSupabaseEnv.ts`. It reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`.
@@ -27,6 +34,12 @@ Rules for what data each test level may use and how tests reach a database. The 
 - `supabase/seed.sql` holds the fictional rows that integration and E2E expectations depend on.
 - When a test relies on a count or an edge case in the seed, a seed integration test checks it, so a later edit to the seed fails there first.
 - Every new table that tests depend on gets fictional rows in `supabase/seed.sql`.
+
+## E2E page errors
+
+- Every E2E spec imports `test` and `expect` from `tests/e2e/fixtures.ts`, never from `@playwright/test`. ESLint rejects the direct import in `tests/e2e/**/*.spec.ts`.
+- The fixture fails a test on any console error or uncaught error in the page. The preview server sends the production headers from `vercel.json`, so a Content Security Policy violation, which the browser logs as a console error, fails the test too.
+- A test that causes an error on purpose, such as a request it makes fail, allows exactly that error with `allowConsoleErrors(pattern)` in its own body. The pattern names the status and the request path, so any other error still fails the test. A Content Security Policy violation fails the test even when a pattern matches it.
 
 ## E2E page loads
 
