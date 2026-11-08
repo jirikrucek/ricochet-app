@@ -145,8 +145,10 @@ test.describe('Surname column header toggles and announces the sort direction', 
   });
 });
 
-test.describe('Invalid URL values fall back to the defaults', () => {
-  test('an unknown sort direction sorts ascending', async ({ page }) => {
+test.describe('The view is kept in the URL', () => {
+  test('Invalid URL values fall back to the defaults: an unknown sort direction', async ({
+    page,
+  }) => {
     await openOverview(page, 'sort=sideways');
 
     await expect(surnameHeader(page)).toHaveAttribute('aria-sort', 'ascending');

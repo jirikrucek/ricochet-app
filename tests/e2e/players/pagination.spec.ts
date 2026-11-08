@@ -227,9 +227,7 @@ test.describe('Changing the view returns to the first page', () => {
   ];
 
   for (const { change, start, act, expected } of viewChanges) {
-    test(`View change resets the page when the visitor ${change}`, async ({
-      page,
-    }) => {
+    test(`View change resets the page: ${change}`, async ({ page }) => {
       await openOverview(page, start);
       await expect(summary(page)).toHaveText(/^Showing 26–/);
 
@@ -297,7 +295,9 @@ test.describe('The view is kept in the URL', () => {
     await otherContext.close();
   });
 
-  test('pageSize=50 shows 25 players per page', async ({ page }) => {
+  test('Invalid URL values fall back to the defaults: pageSize=50', async ({
+    page,
+  }) => {
     await openOverview(page, 'pageSize=50');
 
     await expect(bodyRows(page)).toHaveCount(25);
@@ -308,14 +308,16 @@ test.describe('The view is kept in the URL', () => {
     await expect(summary(page)).toHaveText('Showing 26–50 of 100');
   });
 
-  test('page=abc falls back to page 1', async ({ page }) => {
+  test('Invalid URL values fall back to the defaults: page=abc', async ({
+    page,
+  }) => {
     await openOverview(page, 'page=abc');
 
     await expect(summary(page)).toHaveText('Showing 1–25 of 100');
     await expect(page).not.toHaveURL(/[?&]page=/);
   });
 
-  test('page=9 falls back to page 1 and is removed from the URL', async ({
+  test('Invalid URL values fall back to the defaults: page=9', async ({
     page,
   }) => {
     await openOverview(page, 'page=9');

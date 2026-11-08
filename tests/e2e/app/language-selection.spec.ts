@@ -33,66 +33,70 @@ test('changes the app language from the selector', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('shows native names regardless of active locale', async ({ page }) => {
-  await page.goto('/');
+test.describe('Language options display native names', () => {
+  test('Native name shown regardless of active locale', async ({ page }) => {
+    await page.goto('/');
 
-  const trigger = page.locator('#language-trigger');
-  await trigger.click();
-  await page.getByRole('option', { name: 'Čeština' }).click();
+    const trigger = page.locator('#language-trigger');
+    await trigger.click();
+    await page.getByRole('option', { name: 'Čeština' }).click();
 
-  await trigger.click();
-  await expect(page.getByRole('option', { name: 'English' })).toBeVisible();
-  await expect(page.getByRole('option', { name: 'Deutsch' })).toBeVisible();
+    await trigger.click();
+    await expect(page.getByRole('option', { name: 'English' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Deutsch' })).toBeVisible();
+  });
+
+  test("Selected language's native name shown when collapsed", async ({
+    page,
+  }) => {
+    await page.goto('/');
+
+    const trigger = page.locator('#language-trigger');
+    await trigger.click();
+    await page.getByRole('option', { name: 'Polski' }).click();
+
+    await expect(trigger).toContainText('Polski');
+  });
 });
 
-test('shows the selected language native name when collapsed', async ({
-  page,
-}) => {
-  await page.goto('/');
+test.describe('Language options display a country flag icon', () => {
+  test('Flag shown for each supported language', async ({ page }) => {
+    await page.goto('/');
 
-  const trigger = page.locator('#language-trigger');
-  await trigger.click();
-  await page.getByRole('option', { name: 'Polski' }).click();
+    const trigger = page.locator('#language-trigger');
+    await trigger.click();
 
-  await expect(trigger).toContainText('Polski');
+    const options = page.getByRole('option');
+    await expect(options).toHaveCount(6);
+    for (const option of await options.all()) {
+      await expectImageToHaveLoaded(option.locator('img'));
+    }
+  });
+
+  test('Flag shown when collapsed', async ({ page }) => {
+    await page.goto('/');
+
+    const trigger = page.locator('#language-trigger');
+    await trigger.click();
+    await page.getByRole('option', { name: 'Polski' }).click();
+
+    await expectImageToHaveLoaded(trigger.locator('img'));
+  });
 });
 
-test('shows a flag icon for each language option', async ({ page }) => {
-  await page.goto('/');
+test.describe('Flag icon is decorative to assistive technology', () => {
+  test('Screen reader announces only the language name', async ({ page }) => {
+    await page.goto('/');
 
-  const trigger = page.locator('#language-trigger');
-  await trigger.click();
+    const trigger = page.locator('#language-trigger');
+    await trigger.click();
 
-  const options = page.getByRole('option');
-  await expect(options).toHaveCount(6);
-  for (const option of await options.all()) {
-    await expectImageToHaveLoaded(option.locator('img'));
-  }
-});
+    const option = page.getByRole('option', { name: 'Deutsch' });
+    await expect(option).toBeVisible();
+    await expect(option.locator('img')).toHaveAttribute('aria-hidden', 'true');
 
-test('shows a flag icon when collapsed', async ({ page }) => {
-  await page.goto('/');
-
-  const trigger = page.locator('#language-trigger');
-  await trigger.click();
-  await page.getByRole('option', { name: 'Polski' }).click();
-
-  await expectImageToHaveLoaded(trigger.locator('img'));
-});
-
-test('announces only the native language name to screen readers', async ({
-  page,
-}) => {
-  await page.goto('/');
-
-  const trigger = page.locator('#language-trigger');
-  await trigger.click();
-
-  const option = page.getByRole('option', { name: 'Deutsch' });
-  await expect(option).toBeVisible();
-  await expect(option.locator('img')).toHaveAttribute('aria-hidden', 'true');
-
-  await option.click();
-  await expect(trigger).toContainText('Deutsch');
-  await expect(trigger.locator('img')).toHaveAttribute('aria-hidden', 'true');
+    await option.click();
+    await expect(trigger).toContainText('Deutsch');
+    await expect(trigger.locator('img')).toHaveAttribute('aria-hidden', 'true');
+  });
 });

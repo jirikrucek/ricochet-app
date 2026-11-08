@@ -55,7 +55,7 @@ ricochet-app/
 ├── supabase/                   # Migrations, seed.sql, config.toml, and backend business logic
 ├── tests/
 │   ├── e2e/                    # Playwright specs
-│   └── support/                # Test tooling: local Supabase env helpers for Vitest and Playwright
+│   └── support/                # Test tooling: local Supabase env helpers for Vitest and Playwright, the spec scenario coverage check
 ├── glossary/                   # Domain and technical terms
 ├── docs/
 └── openspec/

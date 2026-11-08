@@ -74,8 +74,8 @@ test.describe('Visitor can filter players by nationality', () => {
   });
 });
 
-test.describe('Invalid URL values fall back to the defaults', () => {
-  test('an unknown nationality code lists every nationality', async ({
+test.describe('The view is kept in the URL', () => {
+  test('Invalid URL values fall back to the defaults: an unknown nationality code', async ({
     page,
   }) => {
     await openOverview(page, 'nationality=FR');

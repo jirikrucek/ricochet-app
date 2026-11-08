@@ -14,35 +14,27 @@ test.describe('Nationality is shown as a flag with a localized country name', ()
     ).toBeVisible();
   });
 
-  test('Tooltip shows the country name on hover', async ({ page }) => {
-    await useUiLanguage(page, 'en');
-    await openOverview(page, 'nationality=HU');
-
-    await page
-      .getByRole('img', { name: 'Hungary', exact: true })
-      .first()
-      .hover();
-
-    const tooltip = page.getByRole('tooltip');
-    await expect(tooltip).toHaveText('Hungary');
-
-    // The name stays on one line, not wrapped letter by letter.
-    const box = await tooltip.boundingBox();
-    expect(box?.width).toBeGreaterThan(40);
-    expect(box?.height).toBeLessThan(60);
-  });
-
-  test('Tooltip shows the country name on keyboard focus', async ({ page }) => {
+  test('Tooltip shows the country name', async ({ page }) => {
     await useUiLanguage(page, 'en');
     await openOverview(page, 'nationality=HU');
     const flag = page
       .getByRole('img', { name: 'Hungary', exact: true })
       .first();
-    await expect(flag).toBeVisible();
+    const tooltip = page.getByRole('tooltip');
 
+    await flag.hover();
+
+    await expect(tooltip).toHaveText('Hungary');
+    // The name stays on one line, not wrapped letter by letter.
+    const box = await tooltip.boundingBox();
+    expect(box?.width).toBeGreaterThan(40);
+    expect(box?.height).toBeLessThan(60);
+
+    await page.mouse.move(0, 0);
+    await expect(tooltip).toBeHidden();
     await flag.focus();
 
     await expect(flag).toBeFocused();
-    await expect(page.getByRole('tooltip')).toHaveText('Hungary');
+    await expect(tooltip).toHaveText('Hungary');
   });
 });

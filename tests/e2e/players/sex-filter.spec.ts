@@ -71,7 +71,7 @@ test.describe('Filters combine with AND', () => {
   });
 });
 
-test.describe('No players match the filters', () => {
+test.describe('Player overview shows loading, error, and empty states', () => {
   test('No players match the filters', async ({ page }) => {
     await openOverview(page);
 
@@ -119,7 +119,9 @@ test.describe('The view is kept in the URL', () => {
     await expect(page).toHaveURL(/\/players$/);
   });
 
-  test('an unknown sex lists players of both sexes', async ({ page }) => {
+  test('Invalid URL values fall back to the defaults: an unknown sex', async ({
+    page,
+  }) => {
     await openOverview(page, 'sex=unknown');
     await expectFilterValue(page, 'Sex', 'All');
 
