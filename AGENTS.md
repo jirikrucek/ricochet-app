@@ -36,7 +36,7 @@
 - **issue tracker**: when creating, reading, updating, or triaging an issue or PR, read `docs/guides/issue-tracker-guide.md` first
 - **triage labels**: when applying a triage label, read `docs/guides/triage-labels-guide.md` first
 - **ADRs**: when deciding whether a decision needs an ADR, or writing, editing, or superseding one, read `docs/guides/adrs-guide.md` first
-- **testings**: when running or debugging tests, read `docs/guides/testing-guide.md` first
+- **testing**: when writing, running, or debugging tests, or driving Playwright outside a test (screenshots, checking a page), read `docs/guides/testing-guide.md` first
 - **observability**: when verifying instrumentation or setting up Sentry alerts, read `docs/guides/observability-guide.md` first
 - **deployment**: when touching `vercel.json`, build/deploy config, or debugging a deploy, read `docs/guides/deployment-guide.md` first
 

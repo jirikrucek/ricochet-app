@@ -4,6 +4,14 @@ The Playwright suite in `tests/e2e` runs the same way on a macOS host, in the de
 
 Which data each test level may use is set by `docs/standards/testing-standard.md` (see [ADR 0011](../adr/ADR0011-tests-reach-only-a-local-supabase-with-seed-data.md)).
 
+## Driving Playwright outside the suite
+
+For a screenshot or a quick look at a page outside the test suite, reuse the Chromium that `npm run test:e2e:setup` installed in `.playwright-browsers`. The `test:e2e*` scripts point Playwright at it; any other script or `npx playwright` command must do so itself, or it downloads another Chromium into `~/.cache`:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.playwright-browsers" npx playwright screenshot http://127.0.0.1:4173/players players.png
+```
+
 ## A test fails with "The page logged errors"
 
 Every E2E test fails on a console error or an uncaught error in the page (see `docs/standards/testing-standard.md`). The failure lists each error, with the URL of the request or script behind it. Read it as one of three cases:
