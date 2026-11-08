@@ -11,6 +11,9 @@ import {
   openMenu,
 } from './shell';
 
+// The narrowest width with the full nav bar.
+const TABLET = { width: 744, height: 1024 };
+
 function bannerLink(page: Page, name: string) {
   return banner(page).getByRole('link', { name });
 }
@@ -37,9 +40,32 @@ async function expectCollapsedNav(page: Page) {
 
 test.describe('Top nav bar shows the full single-row layout from 744px upward', () => {
   test('Tablet width shows the full nav', async ({ page }) => {
-    await openAt(page, { width: 744, height: 1024 });
+    await openAt(page, TABLET);
 
     await expectFullNav(page);
+  });
+
+  test('Menu closes when the viewport widens to tablet width', async ({
+    page,
+  }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
+
+    await page.setViewportSize(TABLET);
+
+    await expect(menu(page)).toBeHidden();
+    await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
+    await expectFullNav(page);
+    // The open menu locks scrolling with `overflow: hidden`; it must be released.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          [document.documentElement, document.body].map(
+            (el) => getComputedStyle(el).overflow,
+          ),
+        ),
+      )
+      .toEqual(['visible', 'visible']);
   });
 });
 
@@ -138,29 +164,30 @@ test.describe('Language can be changed from the menu', () => {
       page.getByText('Die Initialisierung des Workspaces ist bereit.'),
     ).toBeVisible();
   });
-});
 
-test('Mobile language selection stays in sync after resizing to desktop', async ({
-  page,
-}) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
+  test('Language chosen in the menu stays chosen on a wider screen', async ({
+    page,
+  }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
 
-  await menu(page).getByRole('combobox', { name: 'Language' }).click();
-  await page.getByRole('option', { name: 'Deutsch' }).click();
-  await expect(
-    page.getByText('Die Initialisierung des Workspaces ist bereit.'),
-  ).toBeVisible();
+    await menu(page).getByRole('combobox', { name: 'Language' }).click();
+    await page.getByRole('option', { name: 'Deutsch' }).click();
+    await expect(
+      page.getByText('Die Initialisierung des Workspaces ist bereit.'),
+    ).toBeVisible();
 
-  await page.setViewportSize(DESKTOP);
+    await page.setViewportSize(DESKTOP);
 
-  const desktopLanguage = banner(page).getByRole('combobox');
-  await expect(desktopLanguage).toContainText('Deutsch');
-  await desktopLanguage.click();
-  await page.getByRole('option', { name: 'English' }).click();
+    // Not bannerLanguage(): in German the selector is named "Sprache".
+    const desktopLanguage = banner(page).getByRole('combobox');
+    await expect(desktopLanguage).toContainText('Deutsch');
+    await desktopLanguage.click();
+    await page.getByRole('option', { name: 'English' }).click();
 
-  await expect(bannerLink(page, 'Players')).toBeVisible();
-  await expect(desktopLanguage).toContainText('English');
+    await expect(bannerLink(page, 'Players')).toBeVisible();
+    await expect(desktopLanguage).toContainText('English');
+  });
 });
 
 test.describe('Menu can be dismissed without navigating', () => {
@@ -266,27 +293,4 @@ test.describe('Menu button is accessible and localized', () => {
     await page.keyboard.press('Tab');
     await expect(focusable.first()).toBeFocused();
   });
-});
-
-test('Menu closes when the viewport widens to tablet', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
-
-  await page.setViewportSize(DESKTOP);
-
-  await expect(menu(page)).toBeHidden();
-  await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
-  await expect(
-    banner(page).getByRole('link', { name: 'Players' }),
-  ).toBeVisible();
-  // The open menu locks scrolling with `overflow: hidden`; it must be released.
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        [document.documentElement, document.body].map(
-          (el) => getComputedStyle(el).overflow,
-        ),
-      ),
-    )
-    .toEqual(['visible', 'visible']);
 });

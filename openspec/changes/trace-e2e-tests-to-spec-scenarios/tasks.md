@@ -25,12 +25,12 @@
 
 ## 4. Slice: app shell scenarios
 
-- [ ] 4.1 In `tests/e2e/app/language-selection.spec.ts`, retitle "changes the app language from the selector" to "Switching to German on a wide screen", inside a describe "Choosing a language translates the interface", at a viewport 1280px wide.
-- [ ] 4.2 In `tests/e2e/app/navigation.spec.ts`, retitle "Menu closes when the viewport widens to tablet" to "Menu closes when the viewport widens to tablet width", inside the describe "Top nav bar shows the full single-row layout from 744px upward", and widen to 744px, not 1280px. Keep its checks that the overlay is gone and the scroll lock is released.
-- [ ] 4.3 In `tests/e2e/app/navigation.spec.ts`, retitle "Mobile language selection stays in sync after resizing to desktop" to "Language chosen in the menu stays chosen on a wider screen", inside the describe "Language can be changed from the menu". Keep its switch back to English in the nav bar's selector.
-- [ ] 4.4 Delete `tests/e2e/app/routes.spec.ts`. First confirm that "Going to Tournaments from the menu" checks the Tournaments `h1`, and that `translations.spec.ts` checks the Players `h1`.
-- [ ] 4.5 Run the app shell E2E tests and confirm they pass. Confirm `npm run spec:coverage` no longer lists the 3 app shell scenarios or these tests.
-- [ ] 4.6 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
+- [x] 4.1 In `tests/e2e/app/language-selection.spec.ts`, retitle "changes the app language from the selector" to "Switching to German on a wide screen", inside a describe "Choosing a language translates the interface", at a viewport 1280px wide.
+- [x] 4.2 In `tests/e2e/app/navigation.spec.ts`, retitle "Menu closes when the viewport widens to tablet" to "Menu closes when the viewport widens to tablet width", inside the describe "Top nav bar shows the full single-row layout from 744px upward", and widen to 744px, not 1280px. Keep its checks that the overlay is gone and the scroll lock is released.
+- [x] 4.3 In `tests/e2e/app/navigation.spec.ts`, retitle "Mobile language selection stays in sync after resizing to desktop" to "Language chosen in the menu stays chosen on a wider screen", inside the describe "Language can be changed from the menu". Keep its switch back to English in the nav bar's selector.
+- [x] 4.4 Delete `tests/e2e/app/routes.spec.ts`. First confirm that "Going to Tournaments from the menu" checks the Tournaments `h1`, and that `translations.spec.ts` checks the Players `h1`.
+- [x] 4.5 Run the app shell E2E tests and confirm they pass. Confirm `npm run spec:coverage` no longer lists the 3 app shell scenarios or these tests.
+- [x] 4.6 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
 
 ## 5. Slice: player overview scenarios
 
