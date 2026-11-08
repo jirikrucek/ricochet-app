@@ -62,7 +62,7 @@ ricochet-app/
 └── openspec/
 ```
 
-Config files (ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root.
+Config files (TypeScript, ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root. `tsconfig.json` covers the app; `tsconfig.node.json` covers what runs in Node: tests, `tests/support/` and the `*.config.ts` files.
 
 Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`). Only Playwright e2e specs live under a separate `tests/e2e/` folder.
 

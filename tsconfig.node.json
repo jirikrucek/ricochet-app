@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "*.config.ts",
+    "tests",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    // Global declarations that tests reach only through the app code they
+    // import: ImportMetaEnv, and the router's Register augmentation.
+    "src/vite-env.d.ts",
+    "src/router.tsx"
+  ],
+  "exclude": []
+}
