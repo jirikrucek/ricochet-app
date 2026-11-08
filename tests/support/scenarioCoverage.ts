@@ -93,29 +93,80 @@ export function listScenarios(specs: SpecRequirements): Scenario[] {
   );
 }
 
+/** One E2E test, as Playwright lists it. */
+export type E2eTest = {
+  /** The spec file's path relative to `tests/e2e`, e.g. `players/listing.spec.ts`. */
+  file: string;
+  /** Its describe titles, then its own title. */
+  titlePath: string[];
+};
+
 /**
- * Scenarios with no E2E test. A test covers a scenario when its innermost
- * describe block is titled with the scenario's requirement name and its own
- * title is the scenario name. A scenario with an Examples table may instead
- * have one test per example, titled `<scenario name>: <example>`.
- *
- * @param titlePaths one entry per test: its describe titles, then its own title
+ * Whether a test covers a scenario: its innermost describe block is titled
+ * with the scenario's requirement name and its own title is the scenario
+ * name. A scenario with an Examples table may instead have one test per
+ * example, titled `<scenario name>: <example>`.
  */
+function covers(scenario: Scenario, { titlePath }: E2eTest): boolean {
+  const describe = titlePath.at(-2);
+  const title = titlePath.at(-1) ?? '';
+  return (
+    describe === scenario.requirement &&
+    (title === scenario.name ||
+      (scenario.hasExamples && title.startsWith(`${scenario.name}: `)))
+  );
+}
+
+/** Scenarios that no E2E test covers. */
 export function uncoveredScenarios(
   scenarios: Scenario[],
-  titlePaths: string[][],
+  tests: E2eTest[],
 ): Scenario[] {
-  const tests = titlePaths.map((titlePath) => ({
-    describe: titlePath.at(-2),
-    title: titlePath.at(-1) ?? '',
-  }));
-  const covers = (scenario: Scenario) =>
-    tests.some(
-      ({ describe, title }) =>
-        describe === scenario.requirement &&
-        (title === scenario.name ||
-          (scenario.hasExamples && title.startsWith(`${scenario.name}: `))),
-    );
+  return scenarios.filter(
+    (scenario) => !tests.some((test) => covers(scenario, test)),
+  );
+}
 
-  return scenarios.filter((scenario) => !covers(scenario));
+/**
+ * Where internals tests live, relative to `tests/e2e`: tests of how the app or
+ * its test setup is built, which cover no spec scenario
+ * (docs/standards/testing-standard.md).
+ */
+export const INTERNALS_DIR = 'internals/';
+
+/** Whether a test is an internals test, so covers no scenario by design. */
+export function isInternalsTest({ file }: E2eTest): boolean {
+  return file.startsWith(INTERNALS_DIR);
+}
+
+/** E2E tests outside `tests/e2e/internals/` that cover no scenario. */
+export function testsCoveringNoScenario(
+  scenarios: Scenario[],
+  tests: E2eTest[],
+): E2eTest[] {
+  return tests.filter(
+    (test) =>
+      !isInternalsTest(test) &&
+      !scenarios.some((scenario) => covers(scenario, test)),
+  );
+}
+
+/** The part of `openspec status --change <name> --json` this check reads. */
+export type ChangeStatus = { artifacts: { id: string; status: string }[] };
+
+/**
+ * Whether a change's proposal is written. `openspec show` fails on a change
+ * without one, and such a change has no delta specs yet. A status with no
+ * proposal artifact at all throws: the OpenSpec CLI or schema has changed,
+ * and skipping the change would leave its scenarios unchecked.
+ */
+export function isProposalDone({ artifacts }: ChangeStatus): boolean {
+  const proposal = artifacts.find(({ id }) => id === 'proposal');
+  if (!proposal) {
+    const found = artifacts.map(({ id }) => id).join(', ') || 'none';
+    throw new Error(
+      `openspec status lists no proposal artifact (found: ${found}). Update isProposalDone in tests/support/scenarioCoverage.ts to the new schema.`,
+    );
+  }
+  return proposal.status === 'done';
 }

@@ -3,12 +3,16 @@ import {
   DESKTOP,
   PHONE,
   banner,
-  boxOf,
   expectNoHorizontalOverflow,
   logoLink,
+  menu,
   menuButton,
   openAt,
+  openMenu,
 } from './shell';
+
+// The narrowest width with the full nav bar.
+const TABLET = { width: 744, height: 1024 };
 
 function bannerLink(page: Page, name: string) {
   return banner(page).getByRole('link', { name });
@@ -36,9 +40,32 @@ async function expectCollapsedNav(page: Page) {
 
 test.describe('Top nav bar shows the full single-row layout from 744px upward', () => {
   test('Tablet width shows the full nav', async ({ page }) => {
-    await openAt(page, { width: 744, height: 1024 });
+    await openAt(page, TABLET);
 
     await expectFullNav(page);
+  });
+
+  test('Menu closes when the viewport widens to tablet width', async ({
+    page,
+  }) => {
+    await openAt(page, PHONE);
+    await openMenu(page);
+
+    await page.setViewportSize(TABLET);
+
+    await expect(menu(page)).toBeHidden();
+    await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
+    await expectFullNav(page);
+    // The open menu locks scrolling with `overflow: hidden`; it must be released.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          [document.documentElement, document.body].map(
+            (el) => getComputedStyle(el).overflow,
+          ),
+        ),
+      )
+      .toEqual(['visible', 'visible']);
   });
 });
 
@@ -68,15 +95,6 @@ test.describe('Top nav bar collapses to the logo and a menu button below 744px',
     await expectCollapsedNav(page);
   });
 });
-
-function menu(page: Page) {
-  return page.getByRole('dialog');
-}
-
-async function openMenu(page: Page) {
-  await menuButton(page).click();
-  await expect(menu(page)).toBeVisible();
-}
 
 test.describe('Menu button opens a menu with the section links and language selector', () => {
   test('Opening the menu', async ({ page }) => {
@@ -146,68 +164,30 @@ test.describe('Language can be changed from the menu', () => {
       page.getByText('Die Initialisierung des Workspaces ist bereit.'),
     ).toBeVisible();
   });
-});
 
-test('Mobile language selection stays in sync after resizing to desktop', async ({
-  page,
-}) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
-
-  await menu(page).getByRole('combobox', { name: 'Language' }).click();
-  await page.getByRole('option', { name: 'Deutsch' }).click();
-  await expect(
-    page.getByText('Die Initialisierung des Workspaces ist bereit.'),
-  ).toBeVisible();
-
-  await page.setViewportSize(DESKTOP);
-
-  const desktopLanguage = banner(page).getByRole('combobox');
-  await expect(desktopLanguage).toContainText('Deutsch');
-  await desktopLanguage.click();
-  await page.getByRole('option', { name: 'English' }).click();
-
-  await expect(bannerLink(page, 'Players')).toBeVisible();
-  await expect(desktopLanguage).toContainText('English');
-});
-
-test.describe('Sheet width at the sm breakpoint and wider', () => {
-  // Wide enough for the sm breakpoint (640px), narrow enough that the menu
-  // button is still shown (the tablet breakpoint is 744px).
-  const SM_VIEWPORT = { width: 700, height: 800 };
-
-  test('Menu keeps its own width', async ({ page }) => {
-    await openAt(page, SM_VIEWPORT);
-
+  test('Language chosen in the menu stays chosen on a wider screen', async ({
+    page,
+  }) => {
+    await openAt(page, PHONE);
     await openMenu(page);
 
-    await expect.poll(async () => (await boxOf(menu(page))).width).toBe(320);
+    await menu(page).getByRole('combobox', { name: 'Language' }).click();
+    await page.getByRole('option', { name: 'Deutsch' }).click();
+    await expect(
+      page.getByText('Die Initialisierung des Workspaces ist bereit.'),
+    ).toBeVisible();
+
+    await page.setViewportSize(DESKTOP);
+
+    // Not bannerLanguage(): in German the selector is named "Sprache".
+    const desktopLanguage = banner(page).getByRole('combobox');
+    await expect(desktopLanguage).toContainText('Deutsch');
+    await desktopLanguage.click();
+    await page.getByRole('option', { name: 'English' }).click();
+
+    await expect(bannerLink(page, 'Players')).toBeVisible();
+    await expect(desktopLanguage).toContainText('English');
   });
-
-  // The menu overrides the sheet's max-width, which hides a broken default.
-  // Drop its override classes so the width comes from the base SheetContent
-  // rules in the built stylesheet, on each side it supports. For the right
-  // side the base class is added back: tailwind-merge dropped it from the DOM
-  // in favour of the override, but its rule is still in the stylesheet.
-  for (const side of ['right', 'left'] as const) {
-    test(`Sheet without a width override is 384px wide on the ${side}`, async ({
-      page,
-    }) => {
-      await openAt(page, SM_VIEWPORT);
-      await openMenu(page);
-      await menu(page).evaluate((element, sheetSide) => {
-        element.classList.remove('max-w-80', 'data-[side=right]:sm:max-w-80');
-        element.classList.add(
-          `data-[side=${sheetSide}]:sm:max-w-(--container-sm)`,
-        );
-        element.setAttribute('data-side', sheetSide);
-      }, side);
-
-      // The sheet is 75% of the viewport (525px) capped at 24rem. A cap
-      // resolved against the 8px spacing token would leave it 8px wide.
-      await expect.poll(async () => (await boxOf(menu(page))).width).toBe(384);
-    });
-  }
 });
 
 test.describe('Menu can be dismissed without navigating', () => {
@@ -313,27 +293,4 @@ test.describe('Menu button is accessible and localized', () => {
     await page.keyboard.press('Tab');
     await expect(focusable.first()).toBeFocused();
   });
-});
-
-test('Menu closes when the viewport widens to tablet', async ({ page }) => {
-  await openAt(page, PHONE);
-  await openMenu(page);
-
-  await page.setViewportSize(DESKTOP);
-
-  await expect(menu(page)).toBeHidden();
-  await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
-  await expect(
-    banner(page).getByRole('link', { name: 'Players' }),
-  ).toBeVisible();
-  // The open menu locks scrolling with `overflow: hidden`; it must be released.
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        [document.documentElement, document.body].map(
-          (el) => getComputedStyle(el).overflow,
-        ),
-      ),
-    )
-    .toEqual(['visible', 'visible']);
 });

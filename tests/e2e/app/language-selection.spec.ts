@@ -1,4 +1,5 @@
 import { expect, test, type Locator } from '../fixtures';
+import { DESKTOP, banner, openAt } from './shell';
 
 async function expectImageToHaveLoaded(image: Locator) {
   await expect(image).toBeVisible();
@@ -8,29 +9,28 @@ async function expectImageToHaveLoaded(image: Locator) {
   expect(loaded).toBe(true);
 }
 
-test('changes the app language from the selector', async ({ page }) => {
-  await page.goto('/');
+test.describe('Choosing a language translates the interface', () => {
+  test('Switching to German on a wide screen', async ({ page }) => {
+    await openAt(page, DESKTOP);
 
-  await expect(
-    page.getByRole('heading', { name: 'Ricochet App' }),
-  ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Ricochet App' }),
+    ).toBeVisible();
 
-  // The language selector is a Shadcn Select (combobox button + listbox popup)
-  const trigger = page.getByRole('combobox', { name: 'Language' });
-  await expect(trigger).toBeVisible();
+    // The language selector is a Shadcn Select (combobox button + listbox popup)
+    const trigger = banner(page).getByRole('combobox', { name: 'Language' });
+    await expect(trigger).toBeVisible();
 
-  // Open the dropdown and choose German (shown by its native name)
-  await trigger.click();
-  await page.getByRole('option', { name: 'Deutsch' }).click();
+    // Open the dropdown and choose German (shown by its native name)
+    await trigger.click();
+    await page.getByRole('option', { name: 'Deutsch' }).click();
 
-  // UI should now render in German
-  await expect(
-    page.getByRole('heading', { name: 'Ricochet App' }),
-  ).toBeVisible();
-  await expect(page.getByText('Sprache')).toBeVisible();
-  await expect(
-    page.getByText('Die Initialisierung des Workspaces ist bereit.'),
-  ).toBeVisible();
+    // UI should now render in German
+    await expect(page.getByText('Sprache')).toBeVisible();
+    await expect(
+      page.getByText('Die Initialisierung des Workspaces ist bereit.'),
+    ).toBeVisible();
+  });
 });
 
 test.describe('Language options display native names', () => {

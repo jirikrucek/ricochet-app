@@ -1,10 +1,11 @@
-import { expect, test, type Page } from '../fixtures';
+import { expect, test } from '../fixtures';
 
 import {
   DESKTOP,
   applyButton,
   chooseFilter,
   chooseFilters,
+  filterAnnouncement,
   filtersButton,
   filtersPanel,
   openFiltersPanel,
@@ -20,11 +21,6 @@ test.beforeEach(async ({ page }) => {
   await useUiLanguage(page, 'en');
 });
 
-// What a screen reader is told about the result of a filter change.
-function announcement(page: Page) {
-  return page.getByRole('status');
-}
-
 test.describe('Filter changes keep the visitor oriented', () => {
   test('Applying filters announces the result', async ({ page }) => {
     await openOverview(page);
@@ -32,7 +28,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     await chooseFilter(page, 'Sex', 'Female');
 
     await expect(filtersButton(page)).toBeFocused();
-    await expect(announcement(page)).toHaveText('Showing 1–25 of 40');
+    await expect(filterAnnouncement(page)).toHaveText('Showing 1–25 of 40');
   });
 
   test('Removing a chip announces the result', async ({ page }) => {
@@ -42,7 +38,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     await removeFilter(page, 'Female').click();
 
     await expect(filtersButton(page)).toBeFocused();
-    await expect(announcement(page)).toHaveText('Showing 1–25 of 100');
+    await expect(filterAnnouncement(page)).toHaveText('Showing 1–25 of 100');
   });
 
   test('No match announced', async ({ page }) => {
@@ -51,7 +47,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     await chooseFilters(page, { Nationality: 'United Kingdom', Sex: 'Female' });
 
     await expect(filtersButton(page)).toBeFocused();
-    await expect(announcement(page)).toHaveText(
+    await expect(filterAnnouncement(page)).toHaveText(
       'No players match the selected filters',
     );
   });
@@ -64,7 +60,7 @@ test.describe('Filter changes keep the visitor oriented', () => {
     await applyButton(page).click();
 
     await expect(filtersButton(page)).toBeFocused();
-    await expect(announcement(page)).toHaveText('Showing 1–25 of 40');
+    await expect(filterAnnouncement(page)).toHaveText('Showing 1–25 of 40');
   });
 });
 

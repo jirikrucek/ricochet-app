@@ -171,6 +171,17 @@ export function clearAllFilters(page: Page) {
   return page.getByRole('link', { name: 'Clear all filters', exact: true });
 }
 
+// What a screen reader is told about the result of a filter change. The
+// loading skeleton is a status region too, so wait for the players first.
+export function filterAnnouncement(page: Page) {
+  return page.getByRole('status');
+}
+
+// What a screen reader is told after a page change.
+export function pageChangeAnnouncement(page: Page) {
+  return page.locator('[aria-live="polite"]');
+}
+
 // The panel the Filters button opens: a popover or a sheet, both a dialog.
 export function filtersPanel(page: Page) {
   return page.getByRole('dialog', { name: 'Filters' });

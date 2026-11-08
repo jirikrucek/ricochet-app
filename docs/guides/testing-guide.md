@@ -18,15 +18,23 @@ Every E2E test fails on a console error, an uncaught error, or a report to Sentr
 
 - **A Content Security Policy violation** ("violates the following Content Security Policy directive"): the app reaches an origin `vercel.json` doesn't allow. Production would block it too, so add the origin to `connect-src` (see `docs/guides/deployment-guide.md`), or drop the request.
 - **A failure the test causes on purpose**, such as an intercepted 500: allow the browser's log of it with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path. A failed query is reported to Sentry too, with its key after the message (`{"queryKey":["players_sorted",…]}`), so also allow it with `allowSentryReports(/"queryKey":\["players_sorted"/)`.
-- **"No Sentry client on … to flush"**: at teardown the fixture sends what Sentry still buffers, through the client the SDK keeps on `window.__SENTRY__`. If the app started fine, a `@sentry/react` upgrade moved that client; update `SentryCarrier` in `tests/e2e/fixtures.ts`, and the buffered-log case in `tests/e2e/fixtures.spec.ts`, to the SDK's new layout.
+- **"No Sentry client on … to flush"**: at teardown the fixture sends what Sentry still buffers, through the client the SDK keeps on `window.__SENTRY__`. If the app started fine, a `@sentry/react` upgrade moved that client; update `SentryCarrier` in `tests/e2e/fixtures.ts`, and the buffered-log case in `tests/e2e/internals/fixtures.spec.ts`, to the SDK's new layout.
 - **Anything else**: a real error in the app. Fix the app, not the test.
+
+## `npm run spec:coverage` fails
+
+The check (`tests/support/checkScenarioCoverage.ts`, also run by `npm run spec:validate`) reads the specs with the OpenSpec CLI and the tests with `playwright test --list`, and fails in one of these ways:
+
+- **A scenario has no E2E test, or an E2E test covers no scenario**: follow the **Spec scenarios** rules in `docs/standards/testing-standard.md`. The failure lists each scenario as `spec › requirement › scenario` and each test as `file › describe › title`.
+- **Every test in `tests/e2e/internals/` is listed as covering no scenario**: the check reads each test's file from the title Playwright gives the file's suite in its JSON report, a path relative to `tests/e2e`. If a Playwright upgrade changed that title, update `isInternalsTest` in `tests/support/scenarioCoverage.ts`. The check fails closed, so no test goes unchecked meanwhile.
+- **"openspec status lists no proposal artifact"**: the OpenSpec CLI or the change schema no longer names the proposal `proposal`. Update `isProposalDone` in `tests/support/scenarioCoverage.ts` to the new schema.
 
 ## Base UI and React Hook Form in tests
 
 The UI primitives come from Base UI ([ADR 0015](../adr/ADR0015-shadcn-components-use-base-ui-primitives.md)) and the forms from React Hook Form. Each behaves in a way that makes a straightforward test fail, or pass for the wrong reason:
 
 - **Focus moves after each Tab, not at once.** A dialog's focus guard needs a moment to wrap focus, and back-to-back `page.keyboard.press('Tab')` calls outrun it. Wait for focus to move before the next press, as the focus tests in `tests/e2e/players/filters-sheet.spec.ts` and `tests/e2e/app/navigation.spec.ts` do.
-- **An open modal hides the page from the accessibility tree.** While a modal sheet or menu is open, `getByRole('table')` or `getByRole('button', …)` finds nothing behind it. Find those elements with a CSS locator instead, as `tests/e2e/players/filters-sheet.spec.ts` does with `page.locator('table')`.
+- **An open modal hides the page from the accessibility tree.** While a modal sheet or menu is open, `getByRole('table')` or `getByRole('button', …)` finds nothing behind it. Find those elements with a CSS locator instead, as `tests/e2e/players/filters-panel.spec.ts` does with `page.locator('table')`.
 - **A Select option needs a hover before its click in jsdom.** Base UI ignores a click on an option that was never hovered, so send `fireEvent.mouseMove(option)` before `fireEvent.click(option)`, as the `choose` helper in `src/modules/players/ui/list-filters/ListFilters.unit.test.tsx` does.
 - **A form submits asynchronously.** React Hook Form's `handleSubmit` validates before it calls the handler, so after clicking submit, `await waitFor(…)` for the handler's effect instead of asserting straight away.
 
