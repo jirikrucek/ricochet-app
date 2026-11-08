@@ -99,6 +99,14 @@ describe('sentryErrorReports', () => {
     expect(sentryErrorReports(`${envelope()}\n`)).toEqual([]);
   });
 
+  it('throws on an item with a byte length, such as an attachment', () => {
+    expect(() =>
+      sentryErrorReports(
+        envelope([{ type: 'attachment', length: 2 }, { a: 1 }]),
+      ),
+    ).toThrow(/attachment item has a byte length/);
+  });
+
   it('throws on a body that is not an envelope of JSON items', () => {
     expect(() => sentryErrorReports('{}\nnot json\n{}')).toThrow();
   });

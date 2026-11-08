@@ -60,33 +60,63 @@ export type SentryCarrier = { version: string } & Record<
 // sends them when the page is hidden. Teardown flushes each open page of the
 // app through the client the SDK keeps on its global carrier. The flush
 // resolves once every envelope got its response, so the fixture has seen them
-// all.
-async function flushSentry(page: Page, appOrigin: string) {
+// all. Returns what went wrong, if anything, so the failure lists it next to
+// the errors the test collected.
+async function flushSentry(
+  page: Page,
+  appOrigin: string,
+): Promise<string | undefined> {
   if (!isFromApp(page.url(), appOrigin)) {
     return;
   }
-  // A test can end on a click that is still navigating, and evaluating then
-  // would fail on the page being replaced.
-  await page.waitForLoadState();
-  const flushed = await page.evaluate(async (timeout) => {
-    const carrier = (window as { __SENTRY__?: SentryCarrier }).__SENTRY__;
-    const client = carrier?.[carrier.version]?.defaultCurrentScope?.getClient();
-    return client ? client.flush(timeout) : undefined;
-  }, SENTRY_FLUSH_TIMEOUT);
+  let flushed: boolean | undefined;
+  try {
+    // A test can end on a click that is still navigating, and evaluating then
+    // would fail on the page being replaced. The navigation may leave the app.
+    await page.waitForLoadState();
+    if (!isFromApp(page.url(), appOrigin)) {
+      return;
+    }
+    flushed = await page.evaluate(async (timeout) => {
+      const carrier = (window as { __SENTRY__?: SentryCarrier }).__SENTRY__;
+      const client =
+        carrier?.[carrier.version]?.defaultCurrentScope?.getClient();
+      return client ? client.flush(timeout) : undefined;
+    }, SENTRY_FLUSH_TIMEOUT);
+  } catch (error) {
+    return `Sentry flush failed on ${page.url()}: ${(error as Error).message}`;
+  }
   if (flushed === undefined) {
-    throw new Error(
-      `No Sentry client on ${page.url()} to flush: the app didn't start Sentry, or a Sentry SDK upgrade moved its global carrier.`,
-    );
+    return `No Sentry client on ${page.url()} to flush: the app didn't start Sentry, or a Sentry SDK upgrade moved its global carrier.`;
   }
   if (!flushed) {
-    throw new Error(
-      `Sentry didn't send its buffered reports within ${SENTRY_FLUSH_TIMEOUT} ms on ${page.url()}.`,
-    );
+    return `Sentry didn't send its buffered reports within ${SENTRY_FLUSH_TIMEOUT} ms on ${page.url()}.`;
   }
 }
 
 function isFromApp(url: string, appOrigin: string) {
   return URL.canParse(url) && new URL(url).origin === appOrigin;
+}
+
+function isSentryEnvelope(url: string, appOrigin: string) {
+  return (
+    isFromApp(url, appOrigin) &&
+    new URL(url).pathname.startsWith('/api/1/envelope/')
+  );
+}
+
+// The error reports in the envelopes, as failure lines, minus the allowed
+// ones. An envelope that can't be read is a failure line too.
+function unexpectedSentryReports(envelopes: string[], allowed: RegExp[]) {
+  return envelopes.flatMap((envelope) => {
+    try {
+      return sentryErrorReports(envelope)
+        .filter(({ json }) => !allowed.some((pattern) => pattern.test(json)))
+        .map(({ summary }) => summary);
+    } catch (error) {
+      return [`Unreadable Sentry envelope: ${(error as Error).message}`];
+    }
+  });
 }
 
 // Every E2E spec imports `test` from here (docs/standards/testing-standard.md).
@@ -139,16 +169,22 @@ export const test = base.extend<Fixtures & Internal>({
       }
       const appOrigin = new URL(baseURL).origin;
       const errors: string[] = [];
+      // What kept the fixture from checking the reports. No pattern allows it.
+      const problems: string[] = [];
       // Watching requests, not routing them, sees the envelopes a test
       // routes itself too.
-      const envelopes: (string | null)[] = [];
+      const envelopes: string[] = [];
       context.on('request', (request) => {
         if (
           request.method() === 'POST' &&
-          isFromApp(request.url(), appOrigin) &&
-          new URL(request.url()).pathname.startsWith('/api/1/envelope/')
+          isSentryEnvelope(request.url(), appOrigin)
         ) {
-          envelopes.push(request.postData());
+          const body = request.postData();
+          if (body === null) {
+            problems.push(`Sentry envelope without a body (${request.url()})`);
+          } else {
+            envelopes.push(body);
+          }
         }
       });
       context.on('console', (message) => {
@@ -166,27 +202,22 @@ export const test = base.extend<Fixtures & Internal>({
       await provide();
 
       for (const page of context.pages()) {
-        await flushSentry(page, appOrigin);
+        const problem = await flushSentry(page, appOrigin);
+        if (problem) {
+          problems.push(problem);
+        }
       }
       const unexpectedErrors = errors.filter(
         (error) =>
           CSP_VIOLATION.test(error) ||
           !allowedConsoleErrors.some((allowed) => allowed.test(error)),
       );
-      const unexpectedReports = envelopes
-        .flatMap((envelope) => {
-          if (envelope === null) {
-            throw new Error('A Sentry envelope had no readable body.');
-          }
-          return sentryErrorReports(envelope);
-        })
-        .filter(
-          ({ json }) =>
-            !allowedSentryReports.some((allowed) => allowed.test(json)),
-        )
-        .map(({ summary }) => summary);
+      const unexpectedReports = unexpectedSentryReports(
+        envelopes,
+        allowedSentryReports,
+      );
       expect(
-        [...unexpectedErrors, ...unexpectedReports],
+        [...problems, ...unexpectedErrors, ...unexpectedReports],
         'The page logged or reported errors',
       ).toEqual([]);
     },

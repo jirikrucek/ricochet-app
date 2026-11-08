@@ -30,7 +30,9 @@ const ERROR_LOG_LEVELS = new Set(['error', 'fatal']);
 /**
  * Returns every event in the envelope, and every log entry at level error or
  * fatal. Other items (transactions, sessions, client reports) are skipped.
- * Throws on a body that isn't an envelope of JSON items.
+ * Throws on a body that isn't an envelope of JSON items, and on an item with
+ * a byte length, such as an attachment or a replay recording, which this
+ * reader doesn't support.
  */
 export function sentryErrorReports(envelope: string): SentryReport[] {
   const [, ...lines] = envelope.split('\n');
@@ -40,7 +42,15 @@ export function sentryErrorReports(envelope: string): SentryReport[] {
     if (!lines[index]) {
       continue;
     }
-    const header = JSON.parse(lines[index]) as { type?: string };
+    const header = JSON.parse(lines[index]) as {
+      type?: string;
+      length?: number;
+    };
+    if (header.length !== undefined) {
+      throw new Error(
+        `The ${header.type} item has a byte length, which this reader doesn't support.`,
+      );
+    }
     const payload = lines[index + 1] ?? '';
     if (header.type === 'event') {
       reports.push(eventReport(JSON.parse(payload) as Event));
