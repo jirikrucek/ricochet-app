@@ -81,7 +81,7 @@ flowchart LR
 
 ### 4. Skip a change whose proposal isn't done yet
 
-- Before `openspec show`, the wrapper runs `openspec status --change <name> --json`. If the `proposal` artifact isn't `done`, the change contributes no deltas.
+- Before `openspec show`, the wrapper runs `openspec status --change <name> --json`. If the `proposal` artifact isn't `done`, the change contributes no deltas, and the run names it. If the status lists no `proposal` artifact at all, the check fails: the OpenSpec CLI or schema has changed, and skipping would leave the change's scenarios unchecked.
 - *Alternative:* catch the failure of `openspec show`. Rejected: it would also hide a broken delta spec, which should fail loudly.
 - *Alternative:* look for `proposal.md` on disk. Rejected: the CLI knows where a change lives, and the wrapper already gets everything else through the CLI.
 

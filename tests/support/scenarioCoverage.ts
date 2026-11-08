@@ -156,10 +156,17 @@ export type ChangeStatus = { artifacts: { id: string; status: string }[] };
 
 /**
  * Whether a change's proposal is written. `openspec show` fails on a change
- * without one, and such a change has no delta specs yet.
+ * without one, and such a change has no delta specs yet. A status with no
+ * proposal artifact at all throws: the OpenSpec CLI or schema has changed,
+ * and skipping the change would leave its scenarios unchecked.
  */
 export function isProposalDone({ artifacts }: ChangeStatus): boolean {
-  return artifacts.some(
-    ({ id, status }) => id === 'proposal' && status === 'done',
-  );
+  const proposal = artifacts.find(({ id }) => id === 'proposal');
+  if (!proposal) {
+    const found = artifacts.map(({ id }) => id).join(', ') || 'none';
+    throw new Error(
+      `openspec status lists no proposal artifact (found: ${found}). Update isProposalDone in tests/support/scenarioCoverage.ts to the new schema.`,
+    );
+  }
+  return proposal.status === 'done';
 }

@@ -23,7 +23,7 @@ import {
 // (docs/standards/testing-standard.md). Lists the tests with
 // `playwright test --list`, so it needs neither Supabase nor a browser.
 // An active change whose proposal isn't written yet has no delta specs, so
-// it is skipped, with a note on stderr.
+// it is skipped, and the run names it.
 
 const root = path.resolve(import.meta.dirname, '../..');
 
@@ -58,32 +58,35 @@ function mainSpecs(): SpecRequirements {
   );
 }
 
-function activeDeltas(): Delta[] {
+/**
+ * The delta specs of the active changes, and the names of the changes
+ * skipped because their proposal isn't written yet.
+ */
+function activeDeltas(): { deltas: Delta[]; skipped: string[] } {
   const { changes } = openspec<{ changes: { name: string }[] }>(
     'list',
     '--json',
   );
-  return changes
-    .filter(({ name }) => {
-      const done = isProposalDone(
-        openspec<ChangeStatus>('status', '--change', name, '--json'),
-      );
-      if (!done) {
-        console.error(`Skipping change ${name}: its proposal is not done yet.`);
-      }
-      return done;
-    })
-    .flatMap(
-      ({ name }) =>
-        openspec<{ deltas: Delta[] }>(
-          'show',
-          name,
-          '--type',
-          'change',
-          '--json',
-          '--deltas-only',
-        ).deltas,
+  const deltas: Delta[] = [];
+  const skipped: string[] = [];
+  for (const { name } of changes) {
+    const status = openspec<ChangeStatus>('status', '--change', name, '--json');
+    if (!isProposalDone(status)) {
+      skipped.push(name);
+      continue;
+    }
+    deltas.push(
+      ...openspec<{ deltas: Delta[] }>(
+        'show',
+        name,
+        '--type',
+        'change',
+        '--json',
+        '--deltas-only',
+      ).deltas,
     );
+  }
+  return { deltas, skipped };
 }
 
 type PlaywrightSuite = {
@@ -118,7 +121,8 @@ function e2eTests(): E2eTest[] {
   return tests;
 }
 
-const scenarios = listScenarios(applyDeltas(mainSpecs(), activeDeltas()));
+const { deltas, skipped } = activeDeltas();
+const scenarios = listScenarios(applyDeltas(mainSpecs(), deltas));
 const tests = e2eTests();
 const uncovered = uncoveredScenarios(scenarios, tests);
 const orphans = testsCoveringNoScenario(scenarios, tests);
@@ -141,6 +145,12 @@ if (orphans.length > 0) {
   for (const { file, titlePath } of orphans) {
     console.error(`  ${[file, ...titlePath].join(' › ')}`);
   }
+}
+
+if (skipped.length > 0) {
+  console.error(
+    `Skipped ${skipped.length} active change(s) whose proposal is not written yet, so they have no delta specs: ${skipped.join(', ')}`,
+  );
 }
 
 if (uncovered.length > 0 || orphans.length > 0) process.exit(1);

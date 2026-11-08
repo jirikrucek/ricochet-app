@@ -2,7 +2,7 @@
 
 - [x] 1.1 Move the existing `uncoveredScenarios` unit tests in `tests/support/scenarioCoverage.unit.test.ts` to tests given as `{ file, titlePath }`, keeping today's matching rule, and confirm they fail.
 - [x] 1.2 Change `uncoveredScenarios` in `tests/support/scenarioCoverage.ts` to take `{ file, titlePath }` tests, with its matching rule in a private `covers(scenario, test)`. Make 1.1 pass with no change in which scenarios are reported.
-- [x] 1.3 Write a failing unit test for a pure `isProposalDone(status)` helper that reads the JSON of `openspec status --change <name> --json`: true only when the `proposal` artifact is `done`.
+- [x] 1.3 Write a failing unit test for a pure `isProposalDone(status)` helper that reads the JSON of `openspec status --change <name> --json`: true only when the `proposal` artifact is `done`, and throws when the status has no `proposal` artifact.
 - [x] 1.4 Add `isProposalDone`, and make `checkScenarioCoverage.ts` skip an active change whose proposal isn't done before it calls `openspec show`. Make the wrapper keep each test's file (the title of its top-level suite in the Playwright JSON report). Verify with a scratch change that has no `proposal.md`: `npm run spec:coverage` reports the 6 scenarios of this change and doesn't crash. Then delete the scratch change.
 - [x] 1.5 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
 

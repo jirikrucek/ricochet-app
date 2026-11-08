@@ -345,7 +345,10 @@ describe('isProposalDone', () => {
     expect(isProposalDone(status('ready', 'done'))).toBe(false);
   });
 
-  it('is false for a change with no proposal artifact', () => {
-    expect(isProposalDone({ artifacts: [] })).toBe(false);
+  it('throws for a status with no proposal artifact, rather than skip the change', () => {
+    expect(() =>
+      isProposalDone({ artifacts: [{ id: 'specs', status: 'done' }] }),
+    ).toThrow(/no proposal artifact \(found: specs\)/);
+    expect(() => isProposalDone({ artifacts: [] })).toThrow(/found: none/);
   });
 });
