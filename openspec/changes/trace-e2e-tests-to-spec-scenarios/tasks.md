@@ -8,12 +8,12 @@
 
 ## 2. Slice: the reverse check, failing on today's 27 tests
 
-- [ ] 2.1 Write failing unit tests for `testsCoveringNoScenario(scenarios, tests)`: it reports a test that covers no scenario, doesn't report a test that `covers` one (also through an example of an Examples scenario), skips every test whose file starts with `internals/` even if it covers nothing, and doesn't skip a file that only contains `internals` elsewhere in its path. One test gives the same scenarios and tests to both functions and checks that they agree.
-- [ ] 2.2 Add `testsCoveringNoScenario` and the exported `internals/` prefix constant to `scenarioCoverage.ts`. Make 2.1 pass.
-- [ ] 2.3 Make `checkScenarioCoverage.ts` print the uncovered scenarios, then the tests that cover no scenario as `file › describe › … › title` under a heading that names `docs/standards/testing-standard.md` and `tests/e2e/internals/`, and exit 1 if either list is non-empty. On success it prints both counts.
-- [ ] 2.4 Update the **Spec scenarios** section of `docs/standards/testing-standard.md`: every E2E test outside `tests/e2e/internals/` covers a scenario in force, with the reason (the specs describe everything the E2E suite protects) and a link to #98. Say what may be an **internals test** (a test of how the app or its test setup is built, never of what a visitor sees), that each starts with a comment saying why no scenario covers it and links the bug issue it guards, if any, and that `npm run spec:coverage` checks both directions.
-- [ ] 2.5 Run `npm run spec:coverage`. Confirm it fails and lists the 6 new scenarios and the 27 tests found while planning (17 named in #98 and the 10 in `fixtures.spec.ts`). The next slices burn that list down.
-- [ ] 2.6 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
+- [x] 2.1 Write failing unit tests for `testsCoveringNoScenario(scenarios, tests)`: it reports a test that covers no scenario, doesn't report a test that `covers` one (also through an example of an Examples scenario), skips every test whose file starts with `internals/` even if it covers nothing, and doesn't skip a file that only contains `internals` elsewhere in its path. One test gives the same scenarios and tests to both functions and checks that they agree.
+- [x] 2.2 Add `testsCoveringNoScenario` and the exported `internals/` prefix constant to `scenarioCoverage.ts`. Make 2.1 pass.
+- [x] 2.3 Make `checkScenarioCoverage.ts` print the uncovered scenarios, then the tests that cover no scenario as `file › describe › … › title` under a heading that names `docs/standards/testing-standard.md` and `tests/e2e/internals/`, and exit 1 if either list is non-empty. On success it prints both counts.
+- [x] 2.4 Update the **Spec scenarios** section of `docs/standards/testing-standard.md`: every E2E test outside `tests/e2e/internals/` covers a scenario in force, with the reason (the specs describe everything the E2E suite protects) and a link to #98. Say what may be an **internals test** (a test of how the app or its test setup is built, never of what a visitor sees), that each starts with a comment saying why no scenario covers it and links the bug issue it guards, if any, and that `npm run spec:coverage` checks both directions.
+- [x] 2.5 Run `npm run spec:coverage`. Confirm it fails and lists the 6 new scenarios and the 27 tests found while planning (17 named in #98 and the 10 in `fixtures.spec.ts`). The next slices burn that list down.
+- [x] 2.6 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
 
 ## 3. Slice: internals tests
 

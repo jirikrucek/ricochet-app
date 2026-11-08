@@ -127,6 +127,30 @@ export function uncoveredScenarios(
   );
 }
 
+/**
+ * Where internals tests live, relative to `tests/e2e`: tests of how the app or
+ * its test setup is built, which cover no spec scenario
+ * (docs/standards/testing-standard.md).
+ */
+export const INTERNALS_DIR = 'internals/';
+
+/** Whether a test is an internals test, so covers no scenario by design. */
+export function isInternalsTest({ file }: E2eTest): boolean {
+  return file.startsWith(INTERNALS_DIR);
+}
+
+/** E2E tests outside `tests/e2e/internals/` that cover no scenario. */
+export function testsCoveringNoScenario(
+  scenarios: Scenario[],
+  tests: E2eTest[],
+): E2eTest[] {
+  return tests.filter(
+    (test) =>
+      !isInternalsTest(test) &&
+      !scenarios.some((scenario) => covers(scenario, test)),
+  );
+}
+
 /** The part of `openspec status --change <name> --json` this check reads. */
 export type ChangeStatus = { artifacts: { id: string; status: string }[] };
 

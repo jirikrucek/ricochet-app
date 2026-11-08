@@ -4,7 +4,10 @@ import path from 'node:path';
 import {
   applyDeltas,
   isProposalDone,
+  INTERNALS_DIR,
+  isInternalsTest,
   listScenarios,
+  testsCoveringNoScenario,
   uncoveredScenarios,
   type ChangeStatus,
   type Delta,
@@ -15,7 +18,8 @@ import {
 
 // Fails when a spec scenario in force (the main specs with every active
 // change applied) has no E2E test titled with its name, in a describe
-// block titled with its requirement name
+// block titled with its requirement name, or when an E2E test outside
+// tests/e2e/internals/ covers no such scenario
 // (docs/standards/testing-standard.md). Lists the tests with
 // `playwright test --list`, so it needs neither Supabase nor a browser.
 // An active change whose proposal isn't written yet has no delta specs, so
@@ -115,7 +119,10 @@ function e2eTests(): E2eTest[] {
 }
 
 const scenarios = listScenarios(applyDeltas(mainSpecs(), activeDeltas()));
-const uncovered = uncoveredScenarios(scenarios, e2eTests());
+const tests = e2eTests();
+const uncovered = uncoveredScenarios(scenarios, tests);
+const orphans = testsCoveringNoScenario(scenarios, tests);
+const checked = tests.filter((test) => !isInternalsTest(test));
 
 if (uncovered.length > 0) {
   console.error(
@@ -124,7 +131,20 @@ if (uncovered.length > 0) {
   for (const { spec, requirement, name } of uncovered) {
     console.error(`  ${spec} › ${requirement} › ${name}`);
   }
-  process.exit(1);
 }
 
-console.log(`All ${scenarios.length} spec scenarios have an E2E test.`);
+if (orphans.length > 0) {
+  if (uncovered.length > 0) console.error('');
+  console.error(
+    `${orphans.length} of ${checked.length} E2E tests outside tests/e2e/${INTERNALS_DIR} cover no spec scenario. Add a scenario, fold the test into a scenario's test, delete it, or, if it tests how the app or its test setup is built, move it to tests/e2e/${INTERNALS_DIR} (see docs/standards/testing-standard.md):`,
+  );
+  for (const { file, titlePath } of orphans) {
+    console.error(`  ${[file, ...titlePath].join(' › ')}`);
+  }
+}
+
+if (uncovered.length > 0 || orphans.length > 0) process.exit(1);
+
+console.log(
+  `All ${scenarios.length} spec scenarios have an E2E test, and all ${checked.length} E2E tests outside tests/e2e/${INTERNALS_DIR} cover a scenario.`,
+);

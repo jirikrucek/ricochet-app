@@ -4,6 +4,7 @@ import {
   applyDeltas,
   isProposalDone,
   listScenarios,
+  testsCoveringNoScenario,
   uncoveredScenarios,
   type ChangeStatus,
   type E2eTest,
@@ -142,28 +143,30 @@ describe('applyDeltas', () => {
   });
 });
 
-describe('uncoveredScenarios', () => {
-  const translated = 'Player overview is translated';
-  const scenarios = listScenarios(
-    new Map([
+// One requirement with a plain scenario and one with an Examples table,
+// shared by both directions so they can be compared.
+const translated = 'Player overview is translated';
+const scenarios = listScenarios(
+  new Map([
+    [
+      'players/player-overview',
       [
-        'players/player-overview',
-        [
-          {
-            name: translated,
-            scenarios: [
-              { name: 'Sex labels are translated', rawText: '- **THEN** …' },
-              {
-                name: 'Page text follows the UI language',
-                rawText: '- **THEN** …\n\nExamples:\n\n| language |',
-              },
-            ],
-          },
-        ],
+        {
+          name: translated,
+          scenarios: [
+            { name: 'Sex labels are translated', rawText: '- **THEN** …' },
+            {
+              name: 'Page text follows the UI language',
+              rawText: '- **THEN** …\n\nExamples:\n\n| language |',
+            },
+          ],
+        },
       ],
-    ]),
-  );
+    ],
+  ]),
+);
 
+describe('uncoveredScenarios', () => {
   function uncovered(...titlePaths: string[][]) {
     const tests: E2eTest[] = titlePaths.map((titlePath) => ({
       file: 'players/translations.spec.ts',
@@ -231,6 +234,93 @@ describe('uncoveredScenarios', () => {
     expect(
       uncovered([translated, 'Sex labels are translated on a phone']),
     ).toContain('Sex labels are translated');
+  });
+});
+
+describe('testsCoveringNoScenario', () => {
+  function e2eTest(file: string, ...titlePath: string[]): E2eTest {
+    return { file, titlePath };
+  }
+
+  function orphans(...tests: E2eTest[]) {
+    return testsCoveringNoScenario(scenarios, tests).map(
+      ({ file, titlePath }) => [file, ...titlePath].join(' › '),
+    );
+  }
+
+  it('reports a test that covers no scenario', () => {
+    expect(
+      orphans(e2eTest('app/routes.spec.ts', 'shows the Players page heading')),
+    ).toEqual(['app/routes.spec.ts › shows the Players page heading']);
+  });
+
+  it('does not report a test that covers a scenario', () => {
+    expect(
+      orphans(
+        e2eTest(
+          'players/translations.spec.ts',
+          translated,
+          'Sex labels are translated',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('does not report a test for one example of a scenario with examples', () => {
+    expect(
+      orphans(
+        e2eTest(
+          'players/translations.spec.ts',
+          translated,
+          'Page text follows the UI language: Czech',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('skips a test in tests/e2e/internals/, even though it covers no scenario', () => {
+    expect(
+      orphans(
+        e2eTest(
+          'internals/sheet.spec.ts',
+          'Sheet width',
+          'Menu keeps its own width',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('does not skip a folder whose name only starts with internals', () => {
+    expect(
+      orphans(e2eTest('internals-legacy/listing.spec.ts', 'lists players')),
+    ).toEqual(['internals-legacy/listing.spec.ts › lists players']);
+  });
+
+  it('does not skip a file that only has internals elsewhere in its path', () => {
+    expect(
+      orphans(e2eTest('players/internals/listing.spec.ts', 'lists players')),
+    ).toEqual(['players/internals/listing.spec.ts › lists players']);
+  });
+
+  it('agrees with uncoveredScenarios on which test covers which scenario', () => {
+    const tests = [
+      e2eTest(
+        'players/translations.spec.ts',
+        translated,
+        'Sex labels are translated',
+      ),
+      e2eTest(
+        'players/translations.spec.ts',
+        'Page text follows the UI language',
+      ),
+    ];
+
+    expect(
+      uncoveredScenarios(scenarios, tests).map(({ name }) => name),
+    ).toEqual(['Page text follows the UI language']);
+    expect(orphans(...tests)).toEqual([
+      'players/translations.spec.ts › Page text follows the UI language',
+    ]);
   });
 });
 
