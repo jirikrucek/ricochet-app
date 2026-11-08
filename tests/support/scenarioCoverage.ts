@@ -93,29 +93,49 @@ export function listScenarios(specs: SpecRequirements): Scenario[] {
   );
 }
 
+/** One E2E test, as Playwright lists it. */
+export type E2eTest = {
+  /** The spec file's path relative to `tests/e2e`, e.g. `players/listing.spec.ts`. */
+  file: string;
+  /** Its describe titles, then its own title. */
+  titlePath: string[];
+};
+
 /**
- * Scenarios with no E2E test. A test covers a scenario when its innermost
- * describe block is titled with the scenario's requirement name and its own
- * title is the scenario name. A scenario with an Examples table may instead
- * have one test per example, titled `<scenario name>: <example>`.
- *
- * @param titlePaths one entry per test: its describe titles, then its own title
+ * Whether a test covers a scenario: its innermost describe block is titled
+ * with the scenario's requirement name and its own title is the scenario
+ * name. A scenario with an Examples table may instead have one test per
+ * example, titled `<scenario name>: <example>`.
  */
+function covers(scenario: Scenario, { titlePath }: E2eTest): boolean {
+  const describe = titlePath.at(-2);
+  const title = titlePath.at(-1) ?? '';
+  return (
+    describe === scenario.requirement &&
+    (title === scenario.name ||
+      (scenario.hasExamples && title.startsWith(`${scenario.name}: `)))
+  );
+}
+
+/** Scenarios that no E2E test covers. */
 export function uncoveredScenarios(
   scenarios: Scenario[],
-  titlePaths: string[][],
+  tests: E2eTest[],
 ): Scenario[] {
-  const tests = titlePaths.map((titlePath) => ({
-    describe: titlePath.at(-2),
-    title: titlePath.at(-1) ?? '',
-  }));
-  const covers = (scenario: Scenario) =>
-    tests.some(
-      ({ describe, title }) =>
-        describe === scenario.requirement &&
-        (title === scenario.name ||
-          (scenario.hasExamples && title.startsWith(`${scenario.name}: `))),
-    );
+  return scenarios.filter(
+    (scenario) => !tests.some((test) => covers(scenario, test)),
+  );
+}
 
-  return scenarios.filter((scenario) => !covers(scenario));
+/** The part of `openspec status --change <name> --json` this check reads. */
+export type ChangeStatus = { artifacts: { id: string; status: string }[] };
+
+/**
+ * Whether a change's proposal is written. `openspec show` fails on a change
+ * without one, and such a change has no delta specs yet.
+ */
+export function isProposalDone({ artifacts }: ChangeStatus): boolean {
+  return artifacts.some(
+    ({ id, status }) => id === 'proposal' && status === 'done',
+  );
 }

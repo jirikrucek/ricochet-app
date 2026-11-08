@@ -3,9 +3,12 @@ import path from 'node:path';
 
 import {
   applyDeltas,
+  isProposalDone,
   listScenarios,
   uncoveredScenarios,
+  type ChangeStatus,
   type Delta,
+  type E2eTest,
   type Requirement,
   type SpecRequirements,
 } from './scenarioCoverage.ts';
@@ -15,6 +18,8 @@ import {
 // block titled with its requirement name
 // (docs/standards/testing-standard.md). Lists the tests with
 // `playwright test --list`, so it needs neither Supabase nor a browser.
+// An active change whose proposal isn't written yet has no delta specs, so
+// it is skipped, with a note on stderr.
 
 const root = path.resolve(import.meta.dirname, '../..');
 
@@ -54,17 +59,27 @@ function activeDeltas(): Delta[] {
     'list',
     '--json',
   );
-  return changes.flatMap(
-    ({ name }) =>
-      openspec<{ deltas: Delta[] }>(
-        'show',
-        name,
-        '--type',
-        'change',
-        '--json',
-        '--deltas-only',
-      ).deltas,
-  );
+  return changes
+    .filter(({ name }) => {
+      const done = isProposalDone(
+        openspec<ChangeStatus>('status', '--change', name, '--json'),
+      );
+      if (!done) {
+        console.error(`Skipping change ${name}: its proposal is not done yet.`);
+      }
+      return done;
+    })
+    .flatMap(
+      ({ name }) =>
+        openspec<{ deltas: Delta[] }>(
+          'show',
+          name,
+          '--type',
+          'change',
+          '--json',
+          '--deltas-only',
+        ).deltas,
+    );
 }
 
 type PlaywrightSuite = {
@@ -73,7 +88,7 @@ type PlaywrightSuite = {
   suites?: PlaywrightSuite[];
 };
 
-function e2eTitlePaths(): string[][] {
+function e2eTests(): E2eTest[] {
   const report = runJson<{
     suites: PlaywrightSuite[];
     errors: { message: string }[];
@@ -82,24 +97,25 @@ function e2eTitlePaths(): string[][] {
     throw new Error(report.errors.map(({ message }) => message).join('\n'));
   }
 
-  const paths: string[][] = [];
-  const walk = (suite: PlaywrightSuite, describes: string[]) => {
+  const tests: E2eTest[] = [];
+  const walk = (suite: PlaywrightSuite, file: string, describes: string[]) => {
     for (const test of suite.specs ?? []) {
-      paths.push([...describes, test.title]);
+      tests.push({ file, titlePath: [...describes, test.title] });
     }
     for (const child of suite.suites ?? []) {
-      walk(child, [...describes, child.title]);
+      walk(child, file, [...describes, child.title]);
     }
   };
-  // The top-level suites are the spec files; their titles are file paths.
-  for (const file of report.suites) {
-    walk(file, []);
+  // The top-level suites are the spec files; their titles are file paths
+  // relative to tests/e2e.
+  for (const specFile of report.suites) {
+    walk(specFile, specFile.title, []);
   }
-  return paths;
+  return tests;
 }
 
 const scenarios = listScenarios(applyDeltas(mainSpecs(), activeDeltas()));
-const uncovered = uncoveredScenarios(scenarios, e2eTitlePaths());
+const uncovered = uncoveredScenarios(scenarios, e2eTests());
 
 if (uncovered.length > 0) {
   console.error(

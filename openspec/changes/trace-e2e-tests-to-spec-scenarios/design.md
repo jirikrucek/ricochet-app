@@ -58,7 +58,7 @@ flowchart LR
   rev --> covers
 ```
 
-- The predicate inside `uncoveredScenarios` becomes an exported `covers(scenario, test)`: the innermost describe is the requirement name, and the title is the scenario name, or `<scenario name>: <example>` for a scenario with an Examples table.
+- The predicate inside `uncoveredScenarios` becomes a private `covers(scenario, test)`, shared by both directions: the innermost describe is the requirement name, and the title is the scenario name, or `<scenario name>: <example>` for a scenario with an Examples table. It isn't exported. Unit tests check that the two public functions agree, not the helper, so they survive a restructuring of the code.
 - A new `testsCoveringNoScenario(scenarios, tests)` returns every test outside `internals/` that `covers` no scenario.
 - A test becomes `{ file, titlePath }`, not just a title path, so the report can name the file and the exemption can use it. `uncoveredScenarios` takes the same shape.
 - *Alternative:* a second, separate matcher for the reverse direction. Rejected, because two matchers can drift apart, and a test could then count in one direction but not the other.

@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyDeltas,
+  isProposalDone,
   listScenarios,
   uncoveredScenarios,
+  type ChangeStatus,
+  type E2eTest,
   type Requirement,
   type SpecRequirements,
 } from './scenarioCoverage';
@@ -162,7 +165,11 @@ describe('uncoveredScenarios', () => {
   );
 
   function uncovered(...titlePaths: string[][]) {
-    return uncoveredScenarios(scenarios, titlePaths).map(({ name }) => name);
+    const tests: E2eTest[] = titlePaths.map((titlePath) => ({
+      file: 'players/translations.spec.ts',
+      titlePath,
+    }));
+    return uncoveredScenarios(scenarios, tests).map(({ name }) => name);
   }
 
   it('reports every scenario when there are no tests', () => {
@@ -224,5 +231,32 @@ describe('uncoveredScenarios', () => {
     expect(
       uncovered([translated, 'Sex labels are translated on a phone']),
     ).toContain('Sex labels are translated');
+  });
+});
+
+describe('isProposalDone', () => {
+  function status(proposalStatus: string, specsStatus = 'ready'): ChangeStatus {
+    return {
+      artifacts: [
+        { id: 'proposal', status: proposalStatus },
+        { id: 'specs', status: specsStatus },
+      ],
+    };
+  }
+
+  it('is true once the proposal is done', () => {
+    expect(isProposalDone(status('done'))).toBe(true);
+  });
+
+  it('is false while the proposal is still to be written', () => {
+    expect(isProposalDone(status('ready'))).toBe(false);
+  });
+
+  it('is false while the proposal is not done, even if another artifact is', () => {
+    expect(isProposalDone(status('ready', 'done'))).toBe(false);
+  });
+
+  it('is false for a change with no proposal artifact', () => {
+    expect(isProposalDone({ artifacts: [] })).toBe(false);
   });
 });
