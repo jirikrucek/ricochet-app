@@ -12,12 +12,12 @@ For a screenshot or a quick look at a page outside the test suite, reuse the Chr
 PLAYWRIGHT_BROWSERS_PATH="$PWD/.playwright-browsers" npx playwright screenshot http://127.0.0.1:4173/players players.png
 ```
 
-## A test fails with "The page logged errors"
+## A test fails with "The page logged or reported errors"
 
-Every E2E test fails on a console error or an uncaught error in the page (see `docs/standards/testing-standard.md`). The failure lists each error, with the URL of the request or script behind it. Read it as one of three cases:
+Every E2E test fails on a console error, an uncaught error, or a report to Sentry (see `docs/standards/testing-standard.md`). The failure lists each error, with the URL of the request or script behind it, and each report as a `Sentry event:` or `Sentry log (error):` line. Read it as one of three cases:
 
 - **A Content Security Policy violation** ("violates the following Content Security Policy directive"): the app reaches an origin `vercel.json` doesn't allow. Production would block it too, so add the origin to `connect-src` (see `docs/guides/deployment-guide.md`), or drop the request.
-- **A failed request the test causes on purpose**, such as an intercepted 500: allow it in that test with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path.
+- **A failure the test causes on purpose**, such as an intercepted 500: allow the browser's log of it with `allowConsoleErrors(/status of 500 .*\/rest\/v1\/rpc\/players_sorted/)`, naming the status and the path. A failed query is reported to Sentry too, with its key after the message (`{"queryKey":["players_sorted",…]}`), so also allow it with `allowSentryReports(/"queryKey":\["players_sorted"/)`.
 - **Anything else**: a real error in the app. Fix the app, not the test.
 
 ## Base UI and React Hook Form in tests

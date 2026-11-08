@@ -39,7 +39,9 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 - Every E2E spec imports `test` and `expect` from `tests/e2e/fixtures.ts`, never from `@playwright/test`. ESLint rejects the direct import in `tests/e2e/**/*.spec.ts`.
 - The fixture fails a test on any console error or uncaught error in the page. The preview server sends the production headers from `vercel.json`, so a Content Security Policy violation, which the browser logs as a console error, fails the test too.
+- The fixture also fails a test on any report to Sentry: an event, or a log at level `error` or `fatal`. The E2E Sentry DSN points at the preview server, so the fixture sees every report and none leaves the machine. A test's own route for the envelopes doesn't hide them from it.
 - A test that causes an error on purpose, such as a request it makes fail, allows exactly that error with `allowConsoleErrors(pattern)` in its own body. The pattern names the status and the request path, so any other error still fails the test. A Content Security Policy violation fails the test even when a pattern matches it.
+- A test that causes a report to Sentry on purpose, such as the event for a query it makes fail, allows exactly that report with `allowSentryReports(pattern)` in its own body. The pattern is matched against the report as JSON (an event without its breadcrumbs, or one log entry) and names what failed, such as the query key: `/"queryKey":\["players_sorted"/`.
 
 ## E2E page loads
 
