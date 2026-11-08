@@ -10,7 +10,7 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0004 | [Adopt Monorepo Layout for App and Shared Contracts](ADR0004-adopt-monorepo-layout-for-app-and-shared-contracts.md) | Superseded by ADR 0007 |
 | 0005 | [Adopt Frontend Localization with i18next](ADR0005-adopt-frontend-localization-with-i18next.md) | Accepted |
 | 0006 | [Language Selector Uses Native-Language Labels and Country Flags](ADR0006-language-selector-uses-native-labels-and-flags.md) | Accepted |
-| 0007 | [Adopt Single-Package Layout](ADR0007-adopt-single-package-layout.md) | Accepted |
+| 0007 | [Adopt Single-Package Layout](ADR0007-adopt-single-package-layout.md) | Superseded by ADR 0023, ADR 0024 and ADR 0025 |
 | 0008 | [Vendored Brand Artwork Keeps Its Own Colours](ADR0008-vendored-brand-artwork-keeps-its-own-colours.md) | Accepted |
 | 0009 | [E2E Tests Do Not Use Pixel Snapshots](ADR0009-e2e-tests-do-not-use-pixel-snapshots.md) | Accepted |
 | 0010 | [Render Tables Without a Table Library](ADR0010-render-tables-without-a-table-library.md) | Superseded by ADR 0019 and ADR 0020 |
@@ -26,3 +26,6 @@ Every architectural decision record, with its current status. Only `Accepted` AD
 | 0020 | [Lists Are Filtered, Sorted and Paged in the Backend](ADR0020-lists-are-filtered-sorted-and-paged-in-the-backend.md) | Accepted |
 | 0021 | [Lists Show Filters in a Collapsible Panel Applied with One Button](ADR0021-lists-show-filters-in-a-collapsible-panel-applied-with-one-button.md) | Accepted |
 | 0022 | [List Filters Use Native Semantics First](ADR0022-list-filters-use-native-semantics-first.md) | Accepted |
+| 0023 | [Adopt Single-Package Layout](ADR0023-adopt-single-package-layout.md) | Accepted |
+| 0024 | [Folder Boundaries Are Enforced by ESLint](ADR0024-folder-boundaries-are-enforced-by-eslint.md) | Accepted |
+| 0025 | [Type-Check App and Node Code with Separate Configs](ADR0025-type-check-app-and-node-code-with-separate-configs.md) | Accepted |

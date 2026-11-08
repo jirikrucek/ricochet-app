@@ -1,6 +1,6 @@
 # ADR 0007: Adopt Single-Package Layout
 
-- Status: Accepted
+- Status: Superseded by ADR 0023, ADR 0024 and ADR 0025
 - Created: 2026-08-10
 - Updated: 2026-11-08
 - Supersedes: ADR 0004

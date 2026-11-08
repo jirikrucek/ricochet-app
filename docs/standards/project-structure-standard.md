@@ -1,6 +1,6 @@
 # Project Structure Standard
 
-This project is a single npm package (see [ADR 0007](../adr/ADR0007-adopt-single-package-layout.md)). There is one `package.json`, one `src/`, at the repository root — no `apps/*` or `packages/*` workspaces.
+This project is a single npm package (see [ADR 0023](../adr/ADR0023-adopt-single-package-layout.md)). There is one `package.json`, one `src/`, at the repository root — no `apps/*` or `packages/*` workspaces.
 
 Place every file in the folder its scope below allows, and respect the import rules. They are enforced by `eslint-plugin-boundaries` (see [Enforcement](#enforcement)) — a violation fails `npm run lint`.
 
@@ -62,7 +62,7 @@ ricochet-app/
 └── openspec/
 ```
 
-Config files (TypeScript, ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root. `tsconfig.json` covers the app; `tsconfig.node.json` covers what runs in Node: tests, `tests/support/` and the `*.config.ts` files.
+Config files (TypeScript, ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root. `tsconfig.app.json` covers the app; `tsconfig.node.json` covers what runs in Node: tests, `tests/support/` and the `*.config.ts` files. `tsconfig.json` references the two and repeats the `@/` path for the shadcn CLI ([ADR 0025](../adr/ADR0025-type-check-app-and-node-code-with-separate-configs.md)).
 
 Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`). Only Playwright e2e specs live under a separate `tests/e2e/` folder.
 
@@ -142,7 +142,7 @@ Rules of thumb:
 
 ## Enforcement
 
-The import rules are enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) through the `boundaries/dependencies` policy in `eslint.config.mjs`, which is the source of truth for what is allowed. Change the rules and the policy together, and update the table above to match.
+The import rules are enforced by [`eslint-plugin-boundaries`](https://github.com/javierbrea/eslint-plugin-boundaries) ([ADR 0024](../adr/ADR0024-folder-boundaries-are-enforced-by-eslint.md)) through the `boundaries/dependencies` policy in `eslint.config.mjs`, which is the source of truth for what is allowed. Change the rules and the policy together, and update the table above to match.
 
 - Each module layer is its own element (`module-features`, `module-ui`, ...), captured per module, so another module's files match no policy. `module-features` is also captured per feature.
 - `boundaries/no-unknown-files` rejects a TypeScript file outside every element, so a new top-level folder, a new folder in a module or in `src/shared/`, or a loose file in a module root fails until it is added to this standard and the policy. Only `src/main.tsx`, `src/router.tsx`, `src/routeTree.gen.ts` and `src/vite-env.d.ts` are exempt.
