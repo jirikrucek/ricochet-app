@@ -3,9 +3,11 @@ import { expect, test } from '../fixtures';
 import {
   DESKTOP,
   NATIONALITIES_API,
+  PHONE,
   appliedFilters,
   clearAllFilters,
   filtersButton,
+  filtersPanel,
   openOverview,
   removeFilter,
   shownNationalities,
@@ -40,18 +42,23 @@ test.describe('Applied filters are shown beside the filters button', () => {
   });
 
   test('Removing one applied filter', async ({ page }) => {
-    await openOverview(page, 'nationality=CZ&sex=female');
+    // On a phone the chips sit outside the sheet, so removing one must work
+    // without opening it.
+    for (const viewport of [DESKTOP, PHONE]) {
+      await openOverview(page, 'nationality=CZ&sex=female', viewport);
 
-    await removeFilter(page, 'Female').click();
+      await removeFilter(page, 'Female').click();
 
-    await expect(page).toHaveURL(/nationality=CZ/);
-    await expect(page).not.toHaveURL(/sex=/);
-    await expect(filtersButton(page)).toHaveAccessibleName('Filters 1');
-    await expect(appliedFilters(page).getByRole('link')).toHaveCount(1);
-    await expect(removeFilter(page, 'Czechia')).toBeVisible();
-    await expect
-      .poll(async () => new Set(await shownNationalities(page)))
-      .toEqual(new Set(['CZ']));
+      await expect(page).toHaveURL(/nationality=CZ/);
+      await expect(page).not.toHaveURL(/sex=/);
+      await expect(filtersButton(page)).toHaveAccessibleName('Filters 1');
+      await expect(appliedFilters(page).getByRole('link')).toHaveCount(1);
+      await expect(removeFilter(page, 'Czechia')).toBeVisible();
+      await expect(filtersPanel(page)).toHaveCount(0);
+      await expect
+        .poll(async () => new Set(await shownNationalities(page)))
+        .toEqual(new Set(['CZ']));
+    }
   });
 });
 

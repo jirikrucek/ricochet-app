@@ -11,6 +11,7 @@ import {
   filtersPanel,
   openFiltersPanel,
   openOverview,
+  removeFilter,
   useUiLanguage,
 } from './overview';
 
@@ -42,53 +43,7 @@ test.describe('Filters panel is a sheet on narrow screens', () => {
   });
 });
 
-test.describe('Closing the sheet', () => {
-  test.use({ viewport: PHONE });
-
-  test('Close discards the draft', async ({ page }) => {
-    await openOverview(page, 'nationality=DE');
-    await openFiltersPanel(page);
-    await filterSelect(page, 'Nationality').click();
-    await page.getByRole('option', { name: 'Poland', exact: true }).click();
-
-    await filtersPanel(page).getByRole('button', { name: 'Close' }).click();
-
-    await expect(filtersPanel(page)).toHaveCount(0);
-    await expect(page).toHaveURL(/nationality=DE/);
-    await openFiltersPanel(page);
-    await expect(filterSelect(page, 'Nationality')).toContainText('Germany');
-  });
-
-  test('Close is named in the UI language', async ({ page }) => {
-    await useUiLanguage(page, 'de');
-    await openOverview(page);
-
-    await openFiltersPanel(page, 'Filter');
-
-    await expect(
-      page.getByRole('dialog').getByRole('button', { name: 'Schließen' }),
-    ).toBeVisible();
-  });
-});
-
 test.describe('Filters panel adapts when the viewport changes', () => {
-  test('Opening the panel does not move the table on a phone', async ({
-    page,
-  }) => {
-    await page.setViewportSize(PHONE);
-    await openOverview(page);
-    // The modal sheet hides the page from the accessibility tree, so the table
-    // is found by its element, not its role.
-    const table = page.locator('table');
-    const before = await boxOf(table);
-
-    await openFiltersPanel(page);
-
-    await expect(filtersPanel(page)).toBeVisible();
-    const after = await boxOf(table);
-    expect(after.y).toBe(before.y);
-  });
-
   test('Crossing the breakpoint closes the panel', async ({ page }) => {
     await page.setViewportSize(DESKTOP);
     await openOverview(page);
@@ -104,22 +59,24 @@ test.describe('Filters panel adapts when the viewport changes', () => {
     await expect(filterSelect(page, 'Nationality')).toContainText('All');
   });
 
-  for (const [name, viewport] of [
-    ['a small phone', SMALL_PHONE],
-    ['a phone', PHONE],
-  ] as const) {
-    test(`The page does not scroll horizontally on ${name}, with the panel closed or open`, async ({
-      page,
-    }) => {
-      await page.setViewportSize(viewport);
-      await openOverview(page, 'nationality=CZ&sex=female');
-      await expectNoHorizontalOverflow(page);
+  // One test per row of the scenario's Examples table. The two applied filters
+  // put their chips beside the Filters button, the widest row of the page.
+  for (const viewport of [SMALL_PHONE, PHONE]) {
+    for (const panel of ['closed', 'open'] as const) {
+      test(`Page does not scroll horizontally on a phone: ${viewport.width}px, panel ${panel}`, async ({
+        page,
+      }) => {
+        await openOverview(page, 'nationality=CZ&sex=female', viewport);
+        await expect(removeFilter(page, 'Female')).toBeVisible();
 
-      await openFiltersPanel(page);
+        if (panel === 'open') {
+          await openFiltersPanel(page);
+          await expect(filtersPanel(page)).toBeVisible();
+        }
 
-      await expect(filtersPanel(page)).toBeVisible();
-      await expectNoHorizontalOverflow(page);
-    });
+        await expectNoHorizontalOverflow(page);
+      });
+    }
   }
 });
 

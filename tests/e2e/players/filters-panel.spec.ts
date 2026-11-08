@@ -3,7 +3,7 @@ import { expect, test } from '../fixtures';
 import { boxOf } from '../app/shell';
 import {
   DESKTOP,
-  applyButton,
+  PHONE,
   asNameSet,
   chooseFilters,
   filterSelect,
@@ -12,7 +12,6 @@ import {
   openFiltersPanel,
   openOverview,
   playersAcrossPages,
-  playersTable,
   seededPlayers,
   shownNationalities,
   useUiLanguage,
@@ -70,20 +69,32 @@ test.describe('Apply commits the filter draft', () => {
   });
 
   test('Closing without Apply discards the draft', async ({ page }) => {
-    await openOverview(page, 'nationality=DE');
-    await openFiltersPanel(page);
-    await filterSelect(page, 'Nationality').click();
-    await page.getByRole('option', { name: 'Poland', exact: true }).click();
+    // Escape closes the popover on a wide screen. The sheet on a phone also
+    // has a Close button.
+    const closings = [
+      { viewport: DESKTOP, close: () => page.keyboard.press('Escape') },
+      {
+        viewport: PHONE,
+        close: () =>
+          filtersPanel(page).getByRole('button', { name: 'Close' }).click(),
+      },
+    ];
+    for (const { viewport, close } of closings) {
+      await openOverview(page, 'nationality=DE', viewport);
+      await openFiltersPanel(page);
+      await filterSelect(page, 'Nationality').click();
+      await page.getByRole('option', { name: 'Poland', exact: true }).click();
 
-    await page.keyboard.press('Escape');
+      await close();
 
-    await expect(filtersPanel(page)).toHaveCount(0);
-    await expect(page).toHaveURL(/nationality=DE/);
-    await expect
-      .poll(async () => new Set(await shownNationalities(page)))
-      .toEqual(new Set(['DE']));
-    await openFiltersPanel(page);
-    await expect(filterSelect(page, 'Nationality')).toContainText('Germany');
+      await expect(filtersPanel(page)).toHaveCount(0);
+      await expect(page).toHaveURL(/nationality=DE/);
+      await expect
+        .poll(async () => new Set(await shownNationalities(page)))
+        .toEqual(new Set(['DE']));
+      await openFiltersPanel(page);
+      await expect(filterSelect(page, 'Nationality')).toContainText('Germany');
+    }
   });
 });
 
@@ -122,13 +133,19 @@ test.describe('Filters panel is a popover on wide screens', () => {
 
 test.describe('Filters panel adapts when the viewport changes', () => {
   test('Opening the panel does not move the table', async ({ page }) => {
-    await openOverview(page);
-    const before = await boxOf(playersTable(page));
+    // The popover on a wide screen, then the sheet on a phone. The modal sheet
+    // hides the page from the accessibility tree, so the table is found by its
+    // element, not its role.
+    for (const viewport of [DESKTOP, PHONE]) {
+      await openOverview(page, '', viewport);
+      const table = page.locator('table');
+      const before = await boxOf(table);
 
-    await openFiltersPanel(page);
+      await openFiltersPanel(page);
 
-    await expect(applyButton(page)).toBeVisible();
-    const after = await boxOf(playersTable(page));
-    expect(after.y).toBe(before.y);
+      await expect(filtersPanel(page)).toBeVisible();
+      const after = await boxOf(table);
+      expect(after.y).toBe(before.y);
+    }
   });
 });

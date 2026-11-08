@@ -5,12 +5,12 @@ import {
   PHONE,
   chooseFilter,
   expectNoHorizontalOverflow,
-  filtersPanel,
+  filterAnnouncement,
   openOverview,
+  pageChangeAnnouncement,
   pagination,
   paginationText,
   playersTable,
-  removeFilter,
   summary,
   useUiLanguage,
 } from './overview';
@@ -57,26 +57,12 @@ test.describe('Page changes keep the visitor oriented', () => {
       .toBeGreaterThanOrEqual(banner.y + banner.height - 1);
     const tableTop = (await playersTable(page).boundingBox())!.y;
     expect(tableTop).toBeLessThan(DESKTOP.height);
-    await expect(page.locator('[aria-live="polite"]')).toHaveText(
+    await expect(pageChangeAnnouncement(page)).toHaveText(
       'Showing 26–50 of 100',
     );
   });
 
-  test('a filter change does not announce a page change', async ({ page }) => {
-    await openOverview(page, 'page=2');
-    await expect(summary(page)).toHaveText('Showing 26–50 of 100');
-
-    await chooseFilter(page, 'Sex', 'Female');
-
-    await expect(summary(page)).toHaveText('Showing 1–25 of 40');
-    await expect(page.locator('[aria-live="polite"]')).toHaveText('');
-  });
-});
-
-test.describe('Filters work through the sheet on a phone', () => {
-  test.use({ viewport: PHONE });
-
-  test('Applying a filter in the sheet shows the first page of the result', async ({
+  test('A filter change is not announced as a page change', async ({
     page,
   }) => {
     await openOverview(page, 'page=2');
@@ -84,21 +70,10 @@ test.describe('Filters work through the sheet on a phone', () => {
 
     await chooseFilter(page, 'Sex', 'Female');
 
-    await expect(filtersPanel(page)).toHaveCount(0);
     await expect(summary(page)).toHaveText('Showing 1–25 of 40');
-    await expect(page).not.toHaveURL(/[?&]page=/);
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test('A chip removes the filter without opening the sheet', async ({
-    page,
-  }) => {
-    await openOverview(page, 'sex=female');
-    await expect(summary(page)).toHaveText('Showing 1–25 of 40');
-
-    await removeFilter(page, 'Female').click();
-
-    await expect(summary(page)).toHaveText('Showing 1–25 of 100');
-    await expect(filtersPanel(page)).toHaveCount(0);
+    // The filters announce the result once; the page-change region stays
+    // silent, so a screen reader does not hear it twice.
+    await expect(filterAnnouncement(page)).toHaveText('Showing 1–25 of 40');
+    await expect(pageChangeAnnouncement(page)).toHaveText('');
   });
 });

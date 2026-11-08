@@ -2,6 +2,7 @@ import { expect, test, type Page } from '../fixtures';
 
 import {
   DESKTOP,
+  PHONE,
   bodyRows,
   chooseFilter,
   filterSelect,
@@ -237,6 +238,20 @@ test.describe('Changing the view returns to the first page', () => {
       await expect(page).not.toHaveURL(/[?&]page=/);
     });
   }
+
+  // The sheet on a phone applies through the same form as the popover.
+  test('View change resets the page: applies filters (sex), on a phone', async ({
+    page,
+  }) => {
+    await openOverview(page, 'page=2', PHONE);
+    await expect(summary(page)).toHaveText(/^Showing 26–/);
+
+    await chooseFilter(page, 'Sex', 'Female');
+
+    await expect(filtersPanel(page)).toHaveCount(0);
+    await expect(summary(page)).toHaveText('Showing 1–25 of 40');
+    await expect(page).not.toHaveURL(/[?&]page=/);
+  });
 
   test('Applying two filters is one history step', async ({ page }) => {
     await openOverview(page);

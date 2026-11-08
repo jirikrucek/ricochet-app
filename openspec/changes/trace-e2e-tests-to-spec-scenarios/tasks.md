@@ -34,17 +34,17 @@
 
 ## 5. Slice: player overview scenarios
 
-- [ ] 5.1 Merge each phone repeat into its scenario's existing test, then delete the separate test:
+- [x] 5.1 Merge each phone repeat into its scenario's existing test, then delete the separate test:
   - "Opening the panel does not move the table on a phone" into "Opening the panel does not move the table"
   - "Close discards the draft" (the **sheet**'s Close button) into "Closing without Apply discards the draft"
   - "Applying a filter in the sheet shows the first page of the result" into "View change resets the page: applies filters"
   - "A chip removes the filter without opening the sheet" into "Removing one applied filter"
-- [ ] 5.2 Delete "Close is named in the UI language" from `tests/e2e/players/filters-sheet.spec.ts`. First confirm that each "Filters panel text follows the UI language: <language>, the sheet" test checks the close button.
-- [ ] 5.3 In `tests/e2e/players/listing.spec.ts`, retitle "Table kept on a phone with an unbroken long name" to "Table kept on a phone with a long unbroken name".
-- [ ] 5.4 In `tests/e2e/players/filters-sheet.spec.ts`, replace the two "The page does not scroll horizontally on …" tests with four tests, one per Examples row: "Page does not scroll horizontally on a phone: 320px, panel closed", then "…: 320px, panel open", "…: 375px, panel closed", and "…: 375px, panel open". Each opens the overview with the nationality Czechia and the sex Female applied.
-- [ ] 5.5 In `tests/e2e/players/pagination-phone.spec.ts`, retitle "a filter change does not announce a page change" to "A filter change is not announced as a page change", inside the describe "Page changes keep the visitor oriented". Extend it to check that the filter result "Showing 1–25 of 40" is announced once. Delete the now-empty describe "Filters work through the sheet on a phone" if 5.1 emptied it.
-- [ ] 5.6 Run the player overview E2E tests and confirm they pass. Confirm `npm run spec:coverage` passes in both directions.
-- [ ] 5.7 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
+- [x] 5.2 Delete "Close is named in the UI language" from `tests/e2e/players/filters-sheet.spec.ts`. First confirm that each "Filters panel text follows the UI language: <language>, the sheet" test checks the close button.
+- [x] 5.3 In `tests/e2e/players/listing.spec.ts`, retitle "Table kept on a phone with an unbroken long name" to "Table kept on a phone with a long unbroken name".
+- [x] 5.4 In `tests/e2e/players/filters-sheet.spec.ts`, replace the two "The page does not scroll horizontally on …" tests with four tests, one per Examples row: "Page does not scroll horizontally on a phone: 320px, panel closed", then "…: 320px, panel open", "…: 375px, panel closed", and "…: 375px, panel open". Each opens the overview with the nationality Czechia and the sex Female applied.
+- [x] 5.5 In `tests/e2e/players/pagination-phone.spec.ts`, retitle "a filter change does not announce a page change" to "A filter change is not announced as a page change", inside the describe "Page changes keep the visitor oriented". Extend it to check that the filter result "Showing 1–25 of 40" is announced once. Delete the now-empty describe "Filters work through the sheet on a phone" if 5.1 emptied it.
+- [x] 5.6 Run the player overview E2E tests and confirm they pass. Confirm `npm run spec:coverage` passes in both directions.
+- [x] 5.7 Run `/code-health` on this slice alone, with `HEAD` as the fixed point, and fix its critical findings before the slice is committed.
 
 ## 6. Wrap-up
 

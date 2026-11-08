@@ -55,7 +55,7 @@ test.describe('Player overview lists every player in a table', () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test('Table kept on a phone with an unbroken long name', async ({ page }) => {
+  test('Table kept on a phone with a long unbroken name', async ({ page }) => {
     // The seed has no names this long, so intercept the players request
     // (docs/standards/testing-standard.md).
     await page.route(PLAYERS_API, (route) =>
