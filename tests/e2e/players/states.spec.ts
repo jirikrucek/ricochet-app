@@ -23,6 +23,9 @@ test.use({ viewport: DESKTOP });
 const FAILED_PLAYERS_REQUEST =
   /status of 500 .*\/rest\/v1\/rpc\/players_sorted/;
 
+// The shared query cache reports the failed query to Sentry, with its key.
+const FAILED_PLAYERS_QUERY = /"queryKey":\["players_sorted"/;
+
 function failPlayersRequests(page: Page) {
   return page.route(PLAYERS_API, (route) =>
     route.fulfill({
@@ -62,8 +65,13 @@ test.describe('Player overview shows loading, error, and empty states', () => {
     await expectPlayersListed(page);
   });
 
-  test('Fetching fails', async ({ page, allowConsoleErrors }) => {
+  test('Fetching fails', async ({
+    page,
+    allowConsoleErrors,
+    allowSentryReports,
+  }) => {
     allowConsoleErrors(FAILED_PLAYERS_REQUEST);
+    allowSentryReports(FAILED_PLAYERS_QUERY);
     const envelopes = await sentryEnvelopes(page);
     await failPlayersRequests(page);
 
@@ -86,8 +94,13 @@ test.describe('Player overview shows loading, error, and empty states', () => {
       .toBe(true);
   });
 
-  test('Retry after a failure', async ({ page, allowConsoleErrors }) => {
+  test('Retry after a failure', async ({
+    page,
+    allowConsoleErrors,
+    allowSentryReports,
+  }) => {
     allowConsoleErrors(FAILED_PLAYERS_REQUEST);
+    allowSentryReports(FAILED_PLAYERS_QUERY);
     await failPlayersRequests(page);
     await openOverview(page);
     const retry = page
