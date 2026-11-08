@@ -287,7 +287,7 @@ Every deployment needs a rollback plan before it happens:
 - For the project-wide Definition of Done that every change must clear before this checklist, see `docs/references/definition-of-done.md`
 - For security pre-launch checks, see `docs/references/security-checklist.md`
 - For performance pre-launch checklist, see `docs/references/performance-checklist.md`
-- For accessibility verification before launch, see `../../references/accessibility-checklist.md`
+- For accessibility verification before launch, see `docs/references/accessibility-checklist.md`
 - For the alerting rules and SLO-tied thresholds, see `observability-and-instrumentation`
 
 ## Common Rationalizations
