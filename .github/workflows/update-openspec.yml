@@ -2,7 +2,7 @@ name: Update OpenSpec
 
 on:
   schedule:
-    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+    - cron: '17 3 * * 6' # Saturdays 03:17 UTC (04:17 CET / 05:17 CEST)
   workflow_dispatch:
 
 permissions:

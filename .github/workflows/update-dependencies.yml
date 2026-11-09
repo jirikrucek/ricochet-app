@@ -2,7 +2,7 @@ name: Update dependencies
 
 on:
   schedule:
-    - cron: '0 6 * * 1' # Mondays 06:00 UTC  
+    - cron: '43 3 * * 0' # Sundays 03:43 UTC (04:43 CET / 05:43 CEST)
   workflow_dispatch:
 
 permissions:
