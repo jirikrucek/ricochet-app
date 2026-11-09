@@ -1,14 +1,11 @@
 # Triage Labels Guide
 
-Labels fall into three groups. The tables below are the source of truth for the repo's GitHub labels: name, meaning (the GitHub description) and color.
+Labels fall into two groups. The tables below are the source of truth for the repo's GitHub labels: name, meaning (the GitHub description) and color.
 
 | Group | Question it answers         | Labels per issue                                      |
 | ----- | --------------------------- | ----------------------------------------------------- |
 | Type  | What does the issue change? | One or more, since one change can touch several areas |
-| Mode  | Who works on it?            | At most one                                           |
-| State | Where does it stand?        | At most one                                           |
-
-Work on an issue starts when it has the `ready` state and a mode label. The mode label says who starts: `agent` means an agent can start AFK, `human` means a human does.
+| State | Whose turn is it?           | Exactly one on an open issue                          |
 
 ## Type
 
@@ -23,24 +20,17 @@ Pick the label whose **Covers** column names the files the issue touches.
 | `config`        | Configuration of tooling, CI, build, dev container, deployment | Tool configs (`vite`, `vitest`, `playwright`, `eslint`, `prettier`, `tailwind`, `tsconfig`), `.github/workflows/`, `.devcontainer/`, `vercel.json` | `c5def5` |
 | `harness`       | Agent setup: AGENTS.md, CLAUDE.md, agent skills                | `AGENTS.md`, `CLAUDE.md`, `.agents/`, `.claude/`                                                                                                    | `5319e7` |
 
-## Mode
-
-Who works on the issue. Triage sets it, even while the issue still waits on `needs-info`.
-
-| Label   | Meaning                                                   | Color    |
-| ------- | --------------------------------------------------------- | -------- |
-| `agent` | An agent works on it unattended (AFK, away from keyboard) | `f9d0c4` |
-| `human` | A human works on it, in the loop (HITL)                   | `006b75` |
-
 ## State
 
-Where an open issue stands. A new issue starts at `needs-triage`; triage replaces it with the label that fits.
+The state names who acts next on an open issue. A workflow starts work on an issue when it carries `ready-for-agent`.
 
-| Label          | Meaning                                  | Color    |
-| -------------- | ---------------------------------------- | -------- |
-| `needs-triage` | Maintainer needs to evaluate this issue  | `fbca04` |
-| `needs-info`   | Waiting on reporter for more information | `d876e3` |
-| `ready`        | Fully specified; work can start          | `0e8a16` |
+| Label             | Meaning                                                                | Color    |
+| ----------------- | ---------------------------------------------------------------------- | -------- |
+| `needs-triage`    | Maintainer needs to evaluate this issue                                | `fbca04` |
+| `ready-for-human` | A human acts next (HITL): implement, give information, decide or review | `006b75` |
+| `ready-for-agent` | Fully specified; an agent can work on it AFK (away from keyboard)     | `0e8a16` |
+
+A new issue starts at `needs-triage`. Triage replaces it with `ready-for-agent` or `ready-for-human`. Whoever finishes their turn hands the issue over by swapping the label. For example, an agent that opens a PR sets `ready-for-human`, and a human who requests changes sets `ready-for-agent`.
 
 ## Closing
 
