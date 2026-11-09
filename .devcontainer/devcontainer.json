@@ -69,10 +69,11 @@
 
   // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
   // Claude Code are on the latest release before the first session. A failed or timed-out update
-  // (e.g. offline) doesn't fail the start: the next start tries again. apt installs don't
-  // update themselves, so this is the only place they are upgraded.
+  // (e.g. offline) doesn't fail the start: it prints the exit code (124 is a timeout) and the
+  // next start tries again. It ends by printing the installed versions. apt installs don't update
+  // themselves, so this is the only place they are upgraded.
   "postStartCommand": {
-    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo 'Could not update GitHub CLI and Claude Code; trying again on the next start'"
+    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq --error-on=any || echo \"apt update failed or timed out (exit $?); GitHub CLI and Claude Code may be out of date\"; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo \"apt upgrade failed or timed out (exit $?)\"; gh --version | head -1; claude --version || true"
   },
 
   // Configure tool-specific properties.

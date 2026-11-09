@@ -22,4 +22,6 @@ RUN set -eux; \
         > /etc/apt/sources.list.d/claude-code.list; \
     apt-get update; \
     apt-get install -y --no-install-recommends gh claude-code; \
+    gh --version; \
+    claude --version; \
     rm -rf /var/lib/apt/lists/*
