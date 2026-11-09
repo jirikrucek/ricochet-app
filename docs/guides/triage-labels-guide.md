@@ -22,12 +22,12 @@ Pick the label whose **Covers** column names the files the issue touches.
 
 ## State
 
-The state names who acts next on an open issue. A workflow starts work on an issue when it carries `ready-for-agent`.
+The state names who acts next on an open issue.
 
 | Label             | Meaning                                                                | Color    |
 | ----------------- | ---------------------------------------------------------------------- | -------- |
 | `needs-triage`    | Maintainer needs to evaluate this issue                                | `fbca04` |
-| `ready-for-human` | A human acts next (HITL): implement, give information, decide or review | `006b75` |
+| `ready-for-human` | A human acts next (HITL, human in the loop): implement, give information, decide or review | `006b75` |
 | `ready-for-agent` | An agent acts next (AFK, away from keyboard): work on it unattended    | `0e8a16` |
 
 A new issue starts at `needs-triage`. Triage replaces it with `ready-for-agent` or `ready-for-human`. Set `ready-for-agent` only on a fully specified issue, so the agent needs no input to finish. Whoever finishes their turn hands the issue over by swapping the label. For example, an agent that opens a PR sets `ready-for-human`, and a human who requests changes sets `ready-for-agent`.
