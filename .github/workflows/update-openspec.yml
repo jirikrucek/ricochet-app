@@ -31,6 +31,12 @@ jobs:
         run: |
           latest=$(gh release view --repo Fission-AI/OpenSpec --json tagName --jq .tagName)
           latest="${latest#v}"
+          # The tag name comes from another repository: accept only a plain
+          # x.y.z version before it reaches logs, outputs, branch names or PRs.
+          if ! [[ "$latest" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected OpenSpec release tag, expected x.y.z"
+            exit 1
+          fi
           current=$(node -p "require('./package.json').devDependencies?.['@fission-ai/openspec'] ?? require('./package.json').dependencies['@fission-ai/openspec']")
           current="${current#^}"
           echo "latest=$latest current=$current"
@@ -44,7 +50,9 @@ jobs:
 
       - name: Update @fission-ai/openspec
         if: steps.detect.outputs.changed == 'true'
-        run: npm install "@fission-ai/openspec@^${{ steps.detect.outputs.latest }}"
+        env:
+          VERSION: ${{ steps.detect.outputs.latest }}
+        run: npm install "@fission-ai/openspec@^${VERSION}"
 
       - name: Update OpenSpec skills
         if: steps.detect.outputs.changed == 'true'
@@ -62,7 +70,7 @@ jobs:
           git add -A
           git commit -m "chore(deps): update OpenSpec to ${VERSION}"
           git push --force origin "$branch"
-          gh pr create \
+          if ! gh pr create \
             --base "${{ github.event.repository.default_branch }}" \
             --head "$branch" \
             --title "chore(deps): update OpenSpec to ${VERSION}" \
@@ -71,5 +79,13 @@ jobs:
           - Bumps \`@fission-ai/openspec\` in \`package.json\`
           - Refreshes OpenSpec skills via \`npx openspec update\`
 
-          Review the skill diffs and run the Definition of Done checks before merging." \
-            || echo "PR already exists for $branch"
+          Review the skill diffs and run the Definition of Done checks before merging."; then
+            # Tolerate only a re-run that finds its PR already open.
+            open=$(gh pr list --head "$branch" --state open --json number --jq length || echo 0)
+            if [ "${open:-0}" -gt 0 ]; then
+              echo "PR already exists for $branch"
+            else
+              echo "::error::gh pr create failed and no open PR exists for $branch"
+              exit 1
+            fi
+          fi
