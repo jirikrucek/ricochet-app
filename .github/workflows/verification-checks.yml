@@ -15,8 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Two independent jobs run side by side, so a PR shows every failure at once
+  # and the run lasts as long as the slower job, not the sum of both.
   checks:
-    name: Typecheck, Lint, Build, Tests
+    name: Typecheck, Lint, Build, Unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -59,31 +61,66 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run test:unit
 
+  integration-e2e:
+    name: Integration and E2E tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # The Supabase CLI binary comes from its own action, at the version the
+      # lockfile resolves (the one `npx supabase` runs in the tests), so the
+      # Docker image pull in the next step needs no `npm ci` first and can
+      # overlap it.
+      - name: Read Supabase CLI version
+        id: supabase-version
+        run: |
+          version=$(node -p "require('./package-lock.json').packages['node_modules/supabase']?.version ?? ''")
+          test -n "$version" || { echo "::error::package-lock.json has no supabase entry"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ steps.supabase-version.outputs.version }}
+
       # Integration and E2E tests read the local URL and publishable key
       # through tests/support/localSupabaseEnv.ts, so no secrets are needed.
-      # Unused services are excluded to cut start-up time.
-      - name: Start local Supabase
-        id: supabase
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: npx supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime
-
-      - name: Integration tests
-        if: ${{ !cancelled() && steps.supabase.outcome == 'success' }}
-        run: npm run test:integration
-
-      - name: Install Playwright browser
-        id: playwright
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+      # Unused services are excluded to cut start-up time. The image pull
+      # (the slowest part) runs in the background while dependencies and the
+      # Playwright browser install, which do not need Supabase, finish.
+      - name: Install dependencies and browser, start local Supabase
+        id: setup
         run: |
+          trap 'echo "::group::supabase start log"; cat supabase-start.log; echo "::endgroup::"' EXIT
+          supabase start -x studio,imgproxy,storage-api,edge-runtime,logflare,vector,mailpit,realtime > supabase-start.log 2>&1 &
+          supabase_pid=$!
+
+          echo "::group::npm ci"
+          npm ci
+          echo "::endgroup::"
+
+          echo "::group::Playwright browser"
           npm run test:e2e:setup
           npx playwright install-deps chromium
+          echo "::endgroup::"
+
+          wait "$supabase_pid" || { echo "::error::supabase start failed"; exit 1; }
+
+      - name: Integration tests
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: npm run test:integration
 
       - name: E2E tests
-        if: ${{ !cancelled() && steps.playwright.outcome == 'success' && steps.supabase.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: npm run test:e2e
 
       - name: Upload Playwright report
-        if: ${{ failure() && steps.playwright.outcome == 'success' }}
+        if: ${{ failure() && steps.setup.outcome == 'success' }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
