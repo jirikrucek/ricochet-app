@@ -63,7 +63,7 @@ If `.playwright-browsers` was filled by an older dev container (Linux build), de
 
 ## Dev container (Ubuntu)
 
-Rebuild the container once. `postCreateCommand` installs the system libraries Chromium needs and runs `npm run test:e2e:setup`. `node_modules` and `.playwright-browsers` live in named volumes, so the host and the container never share binaries. The container runs its own Docker engine (the `docker-in-docker` feature), so start Supabase inside it with `npx supabase start`, then run `npm run test:e2e`.
+Rebuild the container once. The container setup runs in three steps: `onCreateCommand` hands `node_modules` and `.playwright-browsers` to the `vscode` user, `updateContentCommand` runs `npm ci` (VS Code waits for it before starting the extensions), and `postCreateCommand` installs the system libraries Chromium needs and runs `npm run test:e2e:setup` (VS Code does not wait for it, so Playwright tests can fail with a missing-browser error until it finishes). If `npm ci` fails, the container opens in recovery mode: read the creation log, fix the cause, and rebuild. `node_modules` and `.playwright-browsers` live in named volumes, so the host and the container never share binaries. The container runs its own Docker engine (the `docker-in-docker` feature), so start Supabase inside it with `npx supabase start`, then run `npm run test:e2e`.
 
 ## GitHub Actions
 
