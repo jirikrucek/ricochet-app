@@ -2,15 +2,18 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
   "name": "ricochet-app",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/base:resolute",
+  // The Dockerfile builds on the Ubuntu base image and installs GitHub CLI and Claude Code from
+  // their apt repositories. They aren't features: a feature bakes a fixed version into the cached
+  // image layer, which only a no-cache rebuild refreshes, while apt can upgrade them on every
+  // start (postStartCommand).
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1.1.3": {},
     "ghcr.io/devcontainers/features/node:2.1.1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {},
-    "ghcr.io/devcontainers-extra/features/claude-code:2.0.3": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -61,6 +64,14 @@
   "postCreateCommand": {
     "persistShellHistory": "grep -qF 'history -a' ~/.bashrc || echo 'PROMPT_COMMAND=\"history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}\"' >> ~/.bashrc",
     "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:setup"
+  },
+
+  // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
+  // Claude Code are on the latest release before the first session. A failed or timed-out update
+  // (e.g. offline) doesn't fail the start: the next start tries again. apt installs don't
+  // update themselves, so this is the only place they are upgraded.
+  "postStartCommand": {
+    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo 'Could not update GitHub CLI and Claude Code; trying again on the next start'"
   },
 
   // Configure tool-specific properties.
