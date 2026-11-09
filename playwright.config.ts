@@ -19,8 +19,10 @@ export default defineConfig({
   globalSetup: './tests/support/playwrightLocalSupabase.ts',
   fullyParallel: true,
   // Playwright's default of half the CPU cores overloads a dev container:
-  // tests time out at random, while 7 workers pass and finish sooner.
-  workers: 7,
+  // tests time out at random, while 7 workers pass and finish sooner. CI runs
+  // on a 4-vCPU GitHub runner that also hosts Supabase and the web server, so
+  // it gets one worker per vCPU.
+  workers: process.env.CI ? 4 : 7,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     channel: undefined,
