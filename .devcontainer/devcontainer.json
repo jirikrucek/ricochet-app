@@ -86,7 +86,13 @@
         "redhat.vscode-yaml",
         "github.vscode-github-actions",
         "anthropic.claude-code"
-      ]
+      ],
+      "settings": {
+        // vitest.unit.config.ts and vitest.integration.config.ts each declare `projects`, so the
+        // Vitest extension would load each one as its own root next to vitest.config.ts and fail.
+        // vitest.config.ts already holds every project.
+        "vitest.rootConfig": "vitest.config.ts"
+      }
     }
   },
 
