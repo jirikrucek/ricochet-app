@@ -2,11 +2,11 @@
 
 Labels fall into three groups. The tables below are the source of truth for the repo's GitHub labels: name, meaning (the GitHub description) and color.
 
-| Group | Question it answers          | Labels per issue                                              |
-| ----- | ---------------------------- | ------------------------------------------------------------- |
-| Type  | What does the issue change?  | One or more, since one change can touch several areas         |
-| Mode  | Who works on it?             | At most one                                                   |
-| State | Where does the issue stand?  | At most one                                                   |
+| Group | Question it answers         | Labels per issue                                      |
+| ----- | --------------------------- | ----------------------------------------------------- |
+| Type  | What does the issue change? | One or more, since one change can touch several areas |
+| Mode  | Who works on it?            | At most one                                           |
+| State | Where does it stand?        | At most one                                           |
 
 Work on an issue starts when it has the `ready` state and a mode label. The mode label says who starts: `agent` means an agent can start AFK, `human` means a human does.
 
@@ -25,24 +25,30 @@ Pick the label whose **Covers** column names the files the issue touches.
 
 ## Mode
 
-Who works on the issue. Triage sets it, even while the issue still waits on `needs-info`. `duplicate` and `wontfix` issues need none.
+Who works on the issue. Triage sets it, even while the issue still waits on `needs-info`.
 
-| Label    | Meaning                                                   | Color    |
-| -------- | --------------------------------------------------------- | -------- |
-| `agent`  | An agent works on it unattended (AFK, away from keyboard) | `f9d0c4` |
-| `human`  | A human works on it, in the loop (HITL)                   | `006b75` |
+| Label   | Meaning                                                   | Color    |
+| ------- | --------------------------------------------------------- | -------- |
+| `agent` | An agent works on it unattended (AFK, away from keyboard) | `f9d0c4` |
+| `human` | A human works on it, in the loop (HITL)                   | `006b75` |
 
 ## State
 
-Where the issue stands. A new issue starts at `needs-triage`; triage replaces it with the label that fits.
+Where an open issue stands. A new issue starts at `needs-triage`; triage replaces it with the label that fits.
 
-| Label          | Meaning                                              | Color    |
-| -------------- | ---------------------------------------------------- | -------- |
-| `needs-triage` | Maintainer needs to evaluate this issue              | `fbca04` |
-| `needs-info`   | Waiting on reporter for more information             | `d876e3` |
-| `ready`        | Fully specified; work can start                      | `0e8a16` |
-| `duplicate`    | Already exists; close it with a link to the original | `cfd3d7` |
-| `wontfix`      | Will not be worked on; close it with the reason      | `ffffff` |
+| Label          | Meaning                                  | Color    |
+| -------------- | ---------------------------------------- | -------- |
+| `needs-triage` | Maintainer needs to evaluate this issue  | `fbca04` |
+| `needs-info`   | Waiting on reporter for more information | `d876e3` |
+| `ready`        | Fully specified; work can start          | `0e8a16` |
+
+## Closing
+
+GitHub's close reason records how an issue ended, so no label does. Close with the reason that fits:
+
+- **Completed**: the work is done. A merged PR with `Closes #<number>` does this.
+- **Not planned**: the issue will not be worked on. Comment the reason.
+- **Duplicate**: the issue already exists. Comment a link to the original.
 
 ## Keeping GitHub in sync
 
