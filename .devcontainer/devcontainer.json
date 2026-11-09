@@ -13,7 +13,9 @@
   "features": {
     // Same major version as the Node used in CI (node-version in .github/workflows).
     "ghcr.io/devcontainers/features/node:2.1.1": { "version": "24" },
-    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {}
+    // Compose isn't used. Skipping it also skips the feature's download from GitHub releases,
+    // which fails the whole image build whenever GitHub returns a 5xx.
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": { "dockerDashComposeVersion": "none" }
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -32,24 +34,22 @@
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
     "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume",
     "source=${localWorkspaceFolderBasename}-claude-config,target=/home/vscode/.claude,type=volume",
-    "source=${localWorkspaceFolderBasename}-gh-config,target=/home/vscode/.config/gh,type=volume",
-    "source=${localWorkspaceFolderBasename}-shell-history,target=/home/vscode/.shell-history,type=volume"
+    "source=${localWorkspaceFolderBasename}-gh-config,target=/home/vscode/.config/gh,type=volume"
   ],
 
   // Docker creates a new volume, and any missing parent folder of its mount point (here
   // ~/.config), owned by root. Hand them to vscode before anything writes to them. It runs
-  // once, before postCreateCommand, whose parallel commands (such as Claude Code's installer) would
-  // otherwise race the chown.
-  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude /home/vscode/.shell-history",
+  // once, before postCreateCommand, so nothing there races the chown.
+  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude",
 
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
   // CLAUDE_CONFIG_DIR keeps Claude Code's ~/.claude.json inside the ~/.claude volume too, so
-  // login and onboarding state survive a rebuild. HISTFILE puts bash history in its own volume.
+  // login and onboarding state survive a rebuild. Bash history is deliberately not persisted: a
+  // secret typed or pasted into a terminal (an API key) must not outlive the container.
   "remoteEnv": {
     "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}",
-    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
-    "HISTFILE": "/home/vscode/.shell-history/.bash_history"
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
 
   // Runs once after the container is created.
@@ -59,13 +59,7 @@
   // warning on every fresh build.
   // It passes PATH through sudo: sudo resets PATH, and Node (installed by nvm) isn't on the
   // default one, so a bare `sudo npx` fails with "command not found".
-  // persistShellHistory makes bash append each command to HISTFILE as it runs instead of on exit,
-  // so closing a VS Code terminal doesn't lose the session's history. The grep keeps it from
-  // adding the line twice.
-  "postCreateCommand": {
-    "persistShellHistory": "grep -qF 'history -a' ~/.bashrc || echo 'PROMPT_COMMAND=\"history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}\"' >> ~/.bashrc",
-    "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup"
-  },
+  "postCreateCommand": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup",
 
   // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
   // Claude Code are on the latest release before the first session. A failed or timed-out update
