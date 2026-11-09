@@ -1,22 +1,26 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+// For format details, see https://aka.ms/devcontainer.json.
 {
   "name": "ricochet-app",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/base:resolute",
+  // The Dockerfile builds on the Ubuntu base image and installs GitHub CLI and Claude Code from
+  // their apt repositories. They aren't features: a feature bakes a fixed version into the cached
+  // image layer, which only a no-cache rebuild refreshes, while apt can upgrade them on every
+  // start (postStartCommand).
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1.1.3": {},
-    "ghcr.io/devcontainers/features/copilot-cli:1.1.3": {},
-    "ghcr.io/devcontainers/features/node:2.1.1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {},
-    "ghcr.io/devcontainers-extra/features/claude-code:2.0.3": {}
+    // Same major version as the Node used in CI (node-version in .github/workflows).
+    "ghcr.io/devcontainers/features/node:2.1.1": { "version": "24" },
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // 5173 is the default port for Vite
-  "forwardPorts": [5173],
+  // 5173 is the default port for Vite. 54321-54324 are the local Supabase API, database, Studio
+  // and Inbucket (email) ports from supabase/config.toml: `supabase start` runs inside the
+  // container's own Docker, and forwarding them keeps the URLs the same on the host.
+  "forwardPorts": [5173, 54321, 54322, 54323, 54324],
 
   // Keep node_modules and .playwright-browsers in container-only named volumes. The repo is bind-mounted from the
   // host, and npm only installs native optional deps (e.g. @rolldown/binding-*) for the OS it
@@ -26,25 +30,50 @@
   // into the shared folder.
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume"
+    "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume",
+    "source=${localWorkspaceFolderBasename}-claude-config,target=/home/vscode/.claude,type=volume",
+    "source=${localWorkspaceFolderBasename}-gh-config,target=/home/vscode/.config/gh,type=volume",
+    "source=${localWorkspaceFolderBasename}-shell-history,target=/home/vscode/.shell-history,type=volume"
   ],
+
+  // Docker creates a new volume, and any missing parent folder of its mount point (here
+  // ~/.config), owned by root. Hand them to vscode before anything writes to them. It runs
+  // once, before postCreateCommand, whose parallel commands (such as Claude Code's installer) would
+  // otherwise race the chown.
+  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude /home/vscode/.shell-history",
 
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
+  // CLAUDE_CONFIG_DIR keeps Claude Code's ~/.claude.json inside the ~/.claude volume too, so
+  // login and onboarding state survive a rebuild. HISTFILE puts bash history in its own volume.
   "remoteEnv": {
-    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}"
+    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}",
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    "HISTFILE": "/home/vscode/.shell-history/.bash_history"
   },
 
-  // Use 'postCreateCommand' to run commands after the container is created.
-  // Installs the OS-level libraries Chromium needs to launch (apt packages aren't in
-  // the base image) before downloading Playwright's browser binaries, so Playwright's
+  // Runs once after the container is created.
+  // installPlaywright installs the OS-level libraries Chromium needs to launch (apt packages
+  // aren't in the base image) before downloading Playwright's browser binaries, so Playwright's
   // post-download host-requirements check doesn't fail with a "missing dependencies"
   // warning on every fresh build.
-  // Also preserves HOME (in addition to PATH) when sudo'ing: node-asdf's `npx` shim
-  // resolves the active Node version via $HOME/.tool-versions, and sudo resets HOME
-  // to /root by default, which breaks shim resolution ("unknown command: npx").
+  // It passes PATH through sudo: sudo resets PATH, and Node (installed by nvm) isn't on the
+  // default one, so a bare `sudo npx` fails with "command not found".
+  // persistShellHistory makes bash append each command to HISTFILE as it runs instead of on exit,
+  // so closing a VS Code terminal doesn't lose the session's history. The grep keeps it from
+  // adding the line twice.
   "postCreateCommand": {
-    "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" \"HOME=$HOME\" npx playwright install-deps chromium && npm run test:e2e:setup"
+    "persistShellHistory": "grep -qF 'history -a' ~/.bashrc || echo 'PROMPT_COMMAND=\"history -a${PROMPT_COMMAND:+;$PROMPT_COMMAND}\"' >> ~/.bashrc",
+    "installPlaywright": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup"
+  },
+
+  // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
+  // Claude Code are on the latest release before the first session. A failed or timed-out update
+  // (e.g. offline) doesn't fail the start: it prints the exit code (124 is a timeout) and the
+  // next start tries again. It ends by printing the installed versions. apt installs don't update
+  // themselves, so this is the only place they are upgraded.
+  "postStartCommand": {
+    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq --error-on=any || echo \"apt update failed or timed out (exit $?); GitHub CLI and Claude Code may be out of date\"; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo \"apt upgrade failed or timed out (exit $?)\"; gh --version | head -1; claude --version || true"
   },
 
   // Configure tool-specific properties.
@@ -61,11 +90,12 @@
         "esbenp.prettier-vscode",
         "Supabase.vscode-supabase-extension",
         "redhat.vscode-yaml",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "anthropic.claude-code"
       ]
     }
   },
 
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // Connect as the base image's non-root user.
   "remoteUser": "vscode"
 }
