@@ -15,7 +15,9 @@
     "ghcr.io/devcontainers/features/node:2.1.1": { "version": "24" },
     // Compose isn't used. Skipping it also skips the feature's download from GitHub releases,
     // which fails the whole image build whenever GitHub returns a 5xx.
-    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": { "dockerDashComposeVersion": "none" }
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {
+      "dockerDashComposeVersion": "none"
+    }
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
