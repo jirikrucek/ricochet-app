@@ -70,7 +70,7 @@ jobs:
           git add -A
           git commit -m "chore(deps): update OpenSpec to ${VERSION}"
           git push --force origin "$branch"
-          gh pr create \
+          if ! gh pr create \
             --base "${{ github.event.repository.default_branch }}" \
             --head "$branch" \
             --title "chore(deps): update OpenSpec to ${VERSION}" \
@@ -79,5 +79,13 @@ jobs:
           - Bumps \`@fission-ai/openspec\` in \`package.json\`
           - Refreshes OpenSpec skills via \`npx openspec update\`
 
-          Review the skill diffs and run the Definition of Done checks before merging." \
-            || echo "PR already exists for $branch"
+          Review the skill diffs and run the Definition of Done checks before merging."; then
+            # Tolerate only a re-run that finds its PR already open.
+            open=$(gh pr list --head "$branch" --state open --json number --jq length || echo 0)
+            if [ "${open:-0}" -gt 0 ]; then
+              echo "PR already exists for $branch"
+            else
+              echo "::error::gh pr create failed and no open PR exists for $branch"
+              exit 1
+            fi
+          fi
