@@ -15,7 +15,9 @@
     "ghcr.io/devcontainers/features/node:2.1.1": { "version": "24" },
     // Compose isn't used. Skipping it also skips the feature's download from GitHub releases,
     // which fails the whole image build whenever GitHub returns a 5xx.
-    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": { "dockerDashComposeVersion": "none" }
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {
+      "dockerDashComposeVersion": "none"
+    }
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -38,9 +40,16 @@
   ],
 
   // Docker creates a new volume, and any missing parent folder of its mount point (here
-  // ~/.config), owned by root. Hand them to vscode before anything writes to them. It runs
-  // once, before postCreateCommand, so nothing there races the chown.
-  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude",
+  // ~/.config), owned by root. Hand them, and the node_modules and .playwright-browsers volumes,
+  // to vscode before anything writes to them. It runs once, before updateContentCommand and
+  // postCreateCommand, so nothing there races the chown.
+  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude node_modules .playwright-browsers",
+
+  // Installs the dependencies. VS Code waits for this command (the default "waitFor") before it
+  // connects and starts the extensions. Running npm ci in postCreateCommand instead let the Vitest
+  // extension start against the empty node_modules volume and fail with "Cannot find package
+  // 'picomatch'" until the install finished.
+  "updateContentCommand": "npm ci",
 
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
@@ -52,14 +61,15 @@
     "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
 
-  // Runs once after the container is created.
+  // Runs once after the container is created. VS Code doesn't wait for it, so it runs in parallel
+  // with the extensions starting.
   // installPlaywright installs the OS-level libraries Chromium needs to launch (apt packages
   // aren't in the base image) before downloading Playwright's browser binaries, so Playwright's
   // post-download host-requirements check doesn't fail with a "missing dependencies"
   // warning on every fresh build.
   // It passes PATH through sudo: sudo resets PATH, and Node (installed by nvm) isn't on the
   // default one, so a bare `sudo npx` fails with "command not found".
-  "postCreateCommand": "sudo chown vscode:vscode node_modules .playwright-browsers && npm ci && sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup",
+  "postCreateCommand": "sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup",
 
   // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
   // Claude Code are on the latest release before the first session. A failed or timed-out update
