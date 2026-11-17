@@ -42,6 +42,13 @@ function refuseStatefulPatterns(fixture: string, patterns: RegExp[]) {
   }
 }
 
+/** The part of the Sentry client the fixtures and their own tests reach into. */
+export type SentryClient = {
+  flush(timeout: number): Promise<boolean>;
+  on(hook: 'flush', callback: () => void): unknown;
+  sendEnvelope(envelope: unknown): unknown;
+};
+
 /**
  * The part of the Sentry SDK's global carrier the fixtures reach into. The SDK
  * keeps its state there, keyed by its version, on `window.__SENTRY__`.
@@ -50,9 +57,8 @@ export type SentryCarrier = { version: string } & Record<
   string,
   {
     defaultCurrentScope?: {
-      getClient(): { flush(timeout: number): Promise<boolean> } | undefined;
+      getClient(): SentryClient | undefined;
     };
-    clientToLogBufferMap?: WeakMap<object, object[]>;
   }
 >;
 

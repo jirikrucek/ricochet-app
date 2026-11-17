@@ -131,25 +131,38 @@ test.describe('The page error fixture', () => {
     test.fail();
     await page.goto('/');
 
-    // Put the log straight into the SDK's buffer, where the SDK's own timer
-    // never sends it, so only the fixture's flush at teardown can.
+    // The SDK sends a buffered log when its client flushes. Hook a send onto
+    // the client's flush, so only the fixture's flush at teardown can send it.
+    // The SDK hooks its own log buffer to the flush the same way, but only
+    // when the page captures its first log.
     await page.evaluate(() => {
       const carrier = (window as { __SENTRY__?: SentryCarrier }).__SENTRY__;
-      const sdk = carrier?.[carrier.version];
-      const client = sdk?.defaultCurrentScope?.getClient();
-      if (!sdk || !client) {
+      const client =
+        carrier?.[carrier.version]?.defaultCurrentScope?.getClient();
+      if (!client) {
         throw new Error('No Sentry client on the page.');
       }
-      sdk.clientToLogBufferMap ??= new WeakMap();
-      sdk.clientToLogBufferMap.set(client, [
-        {
-          timestamp: Date.now() / 1000,
-          level: 'error',
-          body: 'logged on purpose',
-          trace_id: '0'.repeat(32),
-          attributes: {},
-        },
-      ]);
+      client.on('flush', () => {
+        client.sendEnvelope([
+          {},
+          [
+            [
+              { type: 'log', item_count: 1 },
+              {
+                items: [
+                  {
+                    timestamp: Date.now() / 1000,
+                    level: 'error',
+                    body: 'logged on purpose',
+                    trace_id: '0'.repeat(32),
+                    attributes: {},
+                  },
+                ],
+              },
+            ],
+          ],
+        ]);
+      });
     });
   });
 
