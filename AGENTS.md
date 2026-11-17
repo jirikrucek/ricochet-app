@@ -49,7 +49,7 @@
 - **observability**: when adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability-standard.md` first
 - **list filters**: when adding or changing filters on a list, read `docs/standards/list-filters-standard.md` first
 
-## Workflows
+## Workflows and Tasks
 
 Skills marked _(human only)_ start only when a human types the slash command: an agent that reaches one names the command to the user and waits.
 
@@ -86,7 +86,7 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Maintenance
 
-| Workflow                 | Skill                                                                      | Reach for it when                                                                                                                                                     |
+| Task                     | Skill                                                                      | Reach for it when                                                                                                                                                     |
 | ------------------------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Diagnose a bug           | `/diagnosing-bugs`                                                         | something is broken, failing, or got slower and the cause is unclear; the fix then enters the change workflow                                                         |
 | Optimize performance     | `/performance-optimization`                                                | a page or query misses a performance target (Core Web Vitals, a budget in the spec); measure first, and the fix enters the change workflow                            |
@@ -97,7 +97,7 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Research
 
-| Workflow  | Skill        | Reach for it when                                                      |
+| Task      | Skill        | Reach for it when                                                      |
 | --------- | ------------ | ---------------------------------------------------------------------- |
 | Research  | `/research`  | you need a cited answer from primary sources, saved as Markdown        |
 | Prototype | `/prototype` | a design question is cheaper to answer with throwaway code than debate |
@@ -105,7 +105,7 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Sessions and Harness
 
-| Workflow         | Skill                     | Reach for it when                                                                       |
+| Task             | Skill                     | Reach for it when                                                                       |
 | ---------------- | ------------------------- | --------------------------------------------------------------------------------------- |
 | Hand-off         | `/handoff` _(human only)_ | a long session should continue in a fresh agent                                         |
 | Retrospective    | `/retro` _(human only)_   | a session is over and you want to improve skills, docs, or `AGENTS.md` for the next one |
