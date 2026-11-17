@@ -25,7 +25,9 @@ rules:
       that get built end-to-end; each slice cuts a narrow but complete path
       through every layer (schema, API, UI, tests), vertical NOT horizontal;
       each slice is demoable/verifiable on its own and sized to fit in a single
-      fresh context window; any prefactoring should be done first
+      fresh context window; any prefactoring is the first slice, the only one
+      exempt from being vertical and demoable, because it changes no behavior
+      and is verified by the existing tests passing unchanged
     - Must ensure tests (unit, integration, and E2E) are always written before
       implementation; follow TDD
     - Must cover every spec scenario by an E2E test named as
