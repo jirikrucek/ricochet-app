@@ -118,6 +118,8 @@ Done when the Definition of Done's final report shows every line OK.
 - Must use Conventional Branch when creating branches
 - Must use /pr skill when writing a PR body
 - Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task
+- Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue
+- Must fix a bug at its root cause: before editing code, name the condition that causes it and how you confirmed it; when you can't, run `/diagnosing-bugs` first
 
 ### Definition of Done
 
