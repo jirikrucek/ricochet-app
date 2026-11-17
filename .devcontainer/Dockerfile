@@ -7,6 +7,13 @@ FROM mcr.microsoft.com/devcontainers/base:resolute
 # rotation needs no change here.
 #   GitHub CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 #   Claude Code: https://code.claude.com/docs/en/setup#install-with-linux-package-managers
+# The same RUN installs what GitHub Copilot's Linux sandbox needs for network access: bubblewrap,
+# slirp4netns (the sandbox's private network), util-linux (unshare, nsenter), iproute2 (ip) and
+# iptables (iptables, ip6tables and their -restore variants). The rest of its requirements come
+# from the container runtime, not packages: /dev/net/tun, the nf_conntrack kernel module and
+# unprivileged user and network namespaces. The docker-in-docker feature runs the container
+# privileged, which provides them.
+#   https://docs.github.com/en/copilot/concepts/about-cloud-and-local-sandboxes
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends ca-certificates curl; \
@@ -21,7 +28,8 @@ RUN set -eux; \
     echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude.ai/claude-code/apt/latest latest main" \
         > /etc/apt/sources.list.d/claude-code.list; \
     apt-get update; \
-    apt-get install -y --no-install-recommends gh claude-code; \
+    apt-get install -y --no-install-recommends gh claude-code \
+        bubblewrap slirp4netns util-linux iproute2 iptables; \
     gh --version; \
     claude --version; \
     rm -rf /var/lib/apt/lists/*
