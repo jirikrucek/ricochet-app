@@ -125,6 +125,7 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 | Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task                     | nothing                                       |
 | Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue           | nothing                                       |
 | Must fix a bug at its root cause: before editing code, name the condition that causes it and how you confirmed it; when you can't, run `/diagnosing-bugs` first | nothing                                       |
+| Must prove a change works on the real artifact before reporting it done: run the feature, read the actual value, inspect the diff                               | nothing                                       |
 | Must reference only files, folders and skills that exist, in docs, skills and specs                                                                             | `npm run docs:check`                          |
 | Must pass untrusted values to workflow `run:` scripts through `env:`, and check out without persisting credentials                                              | `npm run lint:workflows` (zizmor)             |
 | Must keep `w-`, `min-w-`, `max-w-` and `basis-` from `xs` to `xl` on Tailwind's container scale, as Shadcn expects                                              | `src/styles/designTokens.unit.test.ts`        |
