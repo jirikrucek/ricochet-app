@@ -138,16 +138,37 @@ const repository = {
 const checked = tracked.filter((file) =>
   Object.values(kindsOf(file)).some(Boolean),
 );
-const found = checked.flatMap((file) =>
-  findBrokenReferences(
-    {
-      file,
-      text: readFileSync(path.join(root, file), 'utf8'),
-      kinds: kindsOf(file),
-    },
-    repository,
-  ),
-);
+// Claude Code reads a skill from its .claude/skills/<name> symlink, so a
+// relative path in it resolves from there too, as GitHub Copilot's
+// .agents/skills/<name> does: check a skill's links and paths from both.
+function claudeCopyOf(file: string) {
+  const skill = file.match(/^\.agents\/skills\/([^/]+)\//)?.[1];
+  return skill && trackedPaths.has(`.claude/skills/${skill}`)
+    ? file.replace(/^\.agents\//, '.claude/')
+    : undefined;
+}
+
+const found = checked.flatMap((file) => {
+  const text = readFileSync(path.join(root, file), 'utf8');
+  const kinds = kindsOf(file);
+  const claudeCopy = claudeCopyOf(file);
+  return [
+    ...findBrokenReferences({ file, text, kinds }, repository),
+    ...(claudeCopy
+      ? findBrokenReferences(
+          { file: claudeCopy, text, kinds: { ...kinds, skills: false } },
+          repository,
+        )
+          // Only what resolves differently from .claude/: relative paths.
+          .filter(({ reason }) => reason.includes(' at .claude/'))
+          .map((reference) => ({
+            ...reference,
+            file,
+            reason: `${reference.reason}, where Claude Code reads it`,
+          }))
+      : []),
+  ];
+});
 const today = new Date().toISOString().slice(0, 10);
 const { broken, stale } = applyExceptions(found, EXCEPTIONS, today);
 
