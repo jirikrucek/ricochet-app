@@ -26,7 +26,7 @@
 
 - **guides** (`docs/guides/`): how-to guides for codebase tasks
 - **standards** (`docs/standards/`): codebase rules every change must follow
-- **references** (`docs/references/`): production readiness and non-functional requirements checklists; vendored skills reach them through the `.agents/references` symlink, which their upstream relative paths expect
+- **references** (`.agents/references/`): production readiness and non-functional requirements checklists, vendored unedited from `addyosmani/agent-skills` for its skills; Claude Code reaches them through the `.claude/references` symlink
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
 - **ADRs** (`docs/adr/`): architecture and design decisions, indexed with their status in `docs/adr/README.md`
@@ -136,6 +136,8 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 ### Definition of Done
 
 Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
+
+This project's Definition of Done is the Change Workflow above and the phases below. A vendored skill or reference that names a Definition of Done, such as `.agents/references/definition-of-done.md`, means this one.
 
 #### Phase 1: Standards
 
