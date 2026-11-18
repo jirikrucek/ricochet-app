@@ -62,6 +62,26 @@ describe('findBrokenReferences', () => {
     ).toEqual([]);
   });
 
+  it('skips indented fences, and a longer fence holding a shorter one', () => {
+    expect(
+      brokenIn(
+        [
+          '1. Run it:',
+          '   ```bash',
+          '   cat docs/missing.md && /missing-skill',
+          '   ```',
+          '````markdown',
+          '```',
+          '[inner](missing.md)',
+          '```',
+          '[still inside](missing.md)',
+          '````',
+          '[after](gone.md)',
+        ].join('\n'),
+      ),
+    ).toEqual(['11: gone.md']);
+  });
+
   it('finds a skill named as /name or as the `name` skill that is not installed', () => {
     expect(
       brokenIn(

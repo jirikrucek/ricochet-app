@@ -72,9 +72,30 @@ export const NOT_SKILLS: ReadonlyMap<string, string> = new Map([
 
 /** The text with fenced code blocks blanked out, keeping the line numbers. */
 function withoutCodeBlocks(text: string) {
-  return text.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, (block) =>
-    block.replace(/[^\n]/g, ''),
-  );
+  // A fence may be indented (inside a list item) and longer than three
+  // characters (to hold a shorter fence); it closes on a fence of the same
+  // character, at least as long, with nothing after it.
+  let open: { char: string; length: number } | undefined;
+  return text
+    .split('\n')
+    .map((line) => {
+      const fence = line.match(/^\s*(`{3,}|~{3,})(.*)$/);
+      if (!open) {
+        if (!fence) return line;
+        open = { char: fence[1][0], length: fence[1].length };
+        return '';
+      }
+      if (
+        fence &&
+        fence[1][0] === open.char &&
+        fence[1].length >= open.length &&
+        !fence[2].trim()
+      ) {
+        open = undefined;
+      }
+      return '';
+    })
+    .join('\n');
 }
 
 function lineOf(text: string, index: number) {
