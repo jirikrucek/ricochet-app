@@ -70,17 +70,27 @@ jobs:
           VERSION: ${{ steps.detect.outputs.latest }}
         run: |
           branch="chore/update-openspec-${VERSION}"
+          # The checkout keeps no credential, so the dependency installs above
+          # couldn't use it; authenticate only the git calls that need it.
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git_auth=(-c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth")
+          # A branch from an earlier run belongs to its pull request, which may
+          # have commits added since: leave both as they are.
+          if git "${git_auth[@]}" ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::notice::$branch already exists, so it and its pull request are left as they are."
+            exit 0
+          elif [ $? -ne 2 ]; then
+            echo "::error::Could not check whether $branch exists on origin"
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add -A
           git commit -m "chore(deps): update OpenSpec to ${VERSION}"
-          # The checkout keeps no credential, so the dependency installs above
-          # couldn't use it; authenticate only this push.
-          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
-          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" \
-            push --force origin "$branch"
-          if ! gh pr create \
+          # Without --force: if the branch appeared since the check, fail.
+          git "${git_auth[@]}" push origin "$branch"
+          gh pr create \
             --base "$BASE_BRANCH" \
             --head "$branch" \
             --title "chore(deps): update OpenSpec to ${VERSION}" \
@@ -89,13 +99,4 @@ jobs:
           - Bumps \`@fission-ai/openspec\` in \`package.json\`
           - Refreshes OpenSpec skills via \`npx openspec update\`
 
-          Review the skill diffs and run the Definition of Done checks before merging."; then
-            # Tolerate only a re-run that finds its PR already open.
-            open=$(gh pr list --head "$branch" --state open --json number --jq length || echo 0)
-            if [ "${open:-0}" -gt 0 ]; then
-              echo "PR already exists for $branch"
-            else
-              echo "::error::gh pr create failed and no open PR exists for $branch"
-              exit 1
-            fi
-          fi
+          Review the skill diffs and run the Definition of Done checks before merging."

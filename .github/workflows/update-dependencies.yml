@@ -54,27 +54,36 @@ jobs:
           BASE_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           branch="chore/update-dependencies-$(date -u +%Y%m%d)"
+          # The checkout keeps no credential, so the dependency installs above
+          # couldn't use it; authenticate only the git calls that need it.
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git_auth=(-c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth")
+          # A branch from an earlier run belongs to its pull request, which may
+          # have commits added since: leave both as they are.
+          if git "${git_auth[@]}" ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::notice::$branch already exists, so it and its pull request are left as they are."
+            exit 0
+          elif [ $? -ne 2 ]; then
+            echo "::error::Could not check whether $branch exists on origin"
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add package.json package-lock.json
           git commit -m "chore(deps): update dependencies"
-          # The checkout keeps no credential, so the dependency installs above
-          # couldn't use it; authenticate only this push.
-          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
-          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" \
-            push --force origin "$branch"
+          # Without --force: if the branch appeared since the check, fail.
+          git "${git_auth[@]}" push origin "$branch"
           gh pr create \
             --base "$BASE_BRANCH" \
             --head "$branch" \
             --title "chore(deps): update dependencies" \
-            --body "Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the Verification checks workflow." \
-            || echo "PR already exists for $branch"
+            --body "Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the Verification checks workflow."
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       # Pushes made with GITHUB_TOKEN don't trigger pull_request workflows, so start the verification checks explicitly.
       - name: Run verification checks
-        if: steps.detect.outputs.changed == 'true'
+        if: steps.pr.outputs.branch != ''
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.pr.outputs.branch }}
