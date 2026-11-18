@@ -21,7 +21,7 @@
     "supabase:types": "supabase gen types typescript --local > src/db/supabase.types.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:workflows": "docker run --rm -v \"$PWD:/repo:ro\" -w /repo ghcr.io/zizmorcore/zizmor:1.32.0@sha256:3014cc8f68f663935f69b3c3e0e41f5ce102b268d97db13db0f62208747f860d --offline .github/workflows",
+    "lint:workflows": "docker run --rm -v \"$PWD:/repo:ro\" -w /repo ghcr.io/zizmorcore/zizmor:1.32.0@sha256:3014cc8f68f663935f69b3c3e0e41f5ce102b268d97db13db0f62208747f860d --offline .github",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "spec:validate": "openspec validate --all --strict --no-interactive && npm run spec:coverage",

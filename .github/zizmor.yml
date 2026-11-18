@@ -1,8 +1,0 @@
-# zizmor (npm run lint:workflows) audits the GitHub Actions workflows.
-rules:
-  unpinned-uses:
-    config:
-      policies:
-        # Actions are pinned by tag for now; pinning by hash needs an
-        # updater, since Dependabot is off.
-        '*': ref-pin

@@ -23,20 +23,22 @@ jobs:
     timeout-minutes: 5
     steps:
       # The full history, so the check can list the commits since the base.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
 
       # No npm ci: the check needs only Node and git. The checkout of a pull
-      # request is its merge commit, so BRANCH names the branch.
+      # request is its merge commit, so BRANCH names the branch. Dependabot
+      # names its own branches, so only its commits are checked.
       - name: Branch and commit conventions
         env:
           BRANCH: ${{ github.head_ref || github.ref_name }}
+          SKIP_BRANCH_CHECK: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
           BASE_REF: ${{ github.base_ref || github.event.repository.default_branch }}
         run: npm run conventions:check
 
@@ -45,11 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -101,11 +103,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -121,7 +123,7 @@ jobs:
           test -n "$version" || { echo "::error::package-lock.json has no supabase entry"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@1dedf2c611547ede7232d26866dd3c56ab903bbb # v1.7.3
         with:
           version: ${{ steps.supabase-version.outputs.version }}
 
@@ -158,7 +160,7 @@ jobs:
 
       - name: Upload Playwright report
         if: ${{ failure() && steps.setup.outcome == 'success' }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: playwright-report/

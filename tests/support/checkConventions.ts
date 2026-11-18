@@ -7,6 +7,8 @@ import { branchProblem, commitProblem } from './conventions.ts';
 // (default main, preferring origin/main when it exists) to HEAD_REF (default
 // HEAD), merges left out. BRANCH names the branch when HEAD is detached, as
 // in CI, where the checkout is a pull request's merge commit.
+// SKIP_BRANCH_CHECK=true skips the branch name, for a Dependabot pull
+// request, whose branch name Dependabot chooses; its commits are checked.
 
 const git = (...args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -45,9 +47,11 @@ const commits = git(
   });
 
 const problems = [
-  ...[branchProblem(branch)].flatMap((why) =>
-    why ? [`branch ${branch}: ${why}`] : [],
-  ),
+  ...[
+    process.env.SKIP_BRANCH_CHECK === 'true'
+      ? undefined
+      : branchProblem(branch),
+  ].flatMap((why) => (why ? [`branch ${branch}: ${why}`] : [])),
   ...commits.flatMap(({ hash, subject }) => {
     const why = commitProblem(subject);
     return why ? [`commit ${hash} "${subject}": ${why}`] : [];
@@ -63,5 +67,7 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `Branch ${branch} and its ${commits.length} commit(s) since ${base} follow Conventional Branch and Conventional Commits.`,
+  process.env.SKIP_BRANCH_CHECK === 'true'
+    ? `Branch name ${branch} not checked; its ${commits.length} commit(s) since ${base} follow Conventional Commits.`
+    : `Branch ${branch} and its ${commits.length} commit(s) since ${base} follow Conventional Branch and Conventional Commits.`,
 );
