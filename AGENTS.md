@@ -26,7 +26,6 @@
 
 - **guides** (`docs/guides/`): how-to guides for codebase tasks
 - **standards** (`docs/standards/`): codebase rules every change must follow
-- **references** (`docs/references/`): production readiness and non-functional requirements checklists
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
 - **ADRs** (`docs/adr/`): architecture and design decisions, indexed with their status in `docs/adr/README.md`
@@ -49,7 +48,7 @@
 - **observability**: when adding a Supabase call, a new route, or a background/retry path, read `docs/standards/observability-standard.md` first
 - **list filters**: when adding or changing filters on a list, read `docs/standards/list-filters-standard.md` first
 
-## Workflows
+## Workflows and Tasks
 
 Skills marked _(human only)_ start only when a human types the slash command: an agent that reaches one names the command to the user and waits.
 
@@ -86,18 +85,19 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Maintenance
 
-| Workflow                 | Skill                                                                      | Reach for it when                                                                                                                                                     |
+| Task                     | Skill                                                                      | Reach for it when                                                                                                                                                     |
 | ------------------------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Diagnose a bug           | `/diagnosing-bugs`                                                         | something is broken, failing, or got slower and the cause is unclear; the fix then enters the change workflow                                                         |
 | Optimize performance     | `/performance-optimization`                                                | a page or query misses a performance target (Core Web Vitals, a budget in the spec); measure first, and the fix enters the change workflow                            |
 | Improve architecture     | `/improve-codebase-architecture` _(human only)_                            | you want a visual report of which modules are worth deepening first                                                                                                   |
 | Standards and ADRs audit | `/standards-and-adrs-audit` _(human only)_                                 | you want to audit the code against the standards and accepted ADRs, fix the approved violations, and commit                                                           |
 | Security audit           | `/security-and-hardening`                                                  | you want to audit dependencies or supply-chain risk, review an existing input handler or auth flow, or check privacy compliance; fixes then enter the change workflow |
+| Check blast radius       | `/blast-radius` _(human only)_                                             | a diff you don't trust, such as a migration, an RLS policy or a shared `src/ui/` component: find what it breaks beyond the diff, proven by running code               |
 | Validate docs            | `/validate-adrs`, `/validate-guides`, `/validate-standards` _(human only)_ | you changed `docs/adr/`, `docs/guides/`, or `docs/standards/`, or want to check they still hold                                                                       |
 
 ### Research
 
-| Workflow  | Skill        | Reach for it when                                                      |
+| Task      | Skill        | Reach for it when                                                      |
 | --------- | ------------ | ---------------------------------------------------------------------- |
 | Research  | `/research`  | you need a cited answer from primary sources, saved as Markdown        |
 | Prototype | `/prototype` | a design question is cheaper to answer with throwaway code than debate |
@@ -105,23 +105,39 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Sessions and Harness
 
-| Workflow         | Skill                     | Reach for it when                                                                       |
-| ---------------- | ------------------------- | --------------------------------------------------------------------------------------- |
-| Hand-off         | `/handoff` _(human only)_ | a long session should continue in a fresh agent                                         |
-| Retrospective    | `/retro` _(human only)_   | a session is over and you want to improve skills, docs, or `AGENTS.md` for the next one |
-| Write for agents | `/writing-for-agents`     | you create or edit a skill, `AGENTS.md`, or any doc agents read                         |
+| Task                      | Skill                     | Reach for it when                                                                          |
+| ------------------------- | ------------------------- | ------------------------------------------------------------------------------------------ |
+| Hand-off                  | `/handoff` _(human only)_ | a long session should continue in a fresh agent                                            |
+| Retrospective             | `/retro` _(human only)_   | a session is over and you want to improve skills, docs, or `AGENTS.md` for the next one    |
+| Write for agents          | `/writing-for-agents`     | you create or edit a skill, `AGENTS.md`, or any doc agents read                            |
+| Correct repeated mistakes | `/correct` _(human only)_ | agents keep making the same mistake; turn each repeated correction into a check that fails |
 
 ## Rules
 
-- Must use English language when authoring
-- Must use Conventional Commits when creating commit messages
-- Must use Conventional Branch when creating branches
-- Must use /pr skill when writing a PR body
-- Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task
+Each rule names what enforces it. A rule enforced by nothing holds only if you follow it. When the human corrects you for a mistake, fix it and add its rule here; when a rule enforced by nothing is broken again, enforce it with a check (`/correct`).
+
+| Rule                                                                                                                                                            | Enforced by                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Must use English language when authoring                                                                                                                        | nothing                                                                            |
+| Must use Conventional Commits when creating commit messages                                                                                                     | `npm run conventions:check`, and `.github/workflows/pr-title.yml` for the PR title |
+| Must use Conventional Branch when creating branches                                                                                                             | `npm run conventions:check`, except on Dependabot's branches                       |
+| Must use /pr skill when writing a PR body                                                                                                                       | nothing                                                                            |
+| Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task                     | nothing                                                                            |
+| Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue           | nothing                                                                            |
+| Must fix a bug at its root cause: before editing code, name the condition that causes it and how you confirmed it; when you can't, run `/diagnosing-bugs` first | nothing                                                                            |
+| Must prove a change works on the real artifact before reporting it done: run the feature, read the actual value, inspect the diff                               | nothing                                                                            |
+| Must reference only files, folders and skills that exist, in docs, skills and specs                                                                             | `npm run docs:check`                                                               |
+| Must pin each workflow action to a commit, pass untrusted values to `run:` scripts through `env:`, and check out without persisting credentials                 | `npm run lint:workflows` (zizmor)                                                  |
+| Must run a workflow's third-party code (npm, CLIs it installs) in a job with a read-only token, and push or open PRs from a job that runs none                  | nothing                                                                            |
+| Must keep `w-`, `min-w-`, `max-w-` and `basis-` from `xs` to `xl` on Tailwind's container scale, as Shadcn expects                                              | `src/styles/designTokens.unit.test.ts`                                             |
+| Must keep `package-lock.json` in sync with `package.json`                                                                                                       | `npm ci` in the verification checks                                                |
+| Must keep `.devcontainer/devcontainer-lock.json` listing exactly the features of `devcontainer.json`, at their pinned versions                                  | `tests/support/devcontainerLock.unit.test.ts`                                      |
 
 ### Definition of Done
 
 Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
+
+This project's Definition of Done is the Change Workflow above and the phases below. A vendored skill or reference that names a Definition of Done, such as `.agents/references/definition-of-done.md`, means this one.
 
 #### Phase 1: Standards
 
@@ -135,8 +151,11 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 - Run `npm run typecheck` (must pass 0 errors).
 - Run `npm run lint` (must pass 0 errors).
+- Run `npm run lint:workflows` (must pass 0 findings; needs Docker).
 - Run `npm run spec:validate` (must pass 0 errors).
 - Run `npm run design:lint` (must pass 0 errors).
+- Run `npm run docs:check` (must pass 0 errors).
+- Run `npm run conventions:check` (must pass 0 errors).
 - Run `npm run build` (must pass clean).
 - Run `npm run test:all` (must pass 100%).
 - _Self-correction:_ On error, parse stderr, fix code, and retry until clean.
@@ -149,7 +168,10 @@ Output concise status:
 - ADRs: [OK / NOK]
 - Typecheck: [OK / NOK]
 - Lint: [OK / NOK]
+- Workflow Lint: [OK / NOK]
 - Spec Validation: [OK / NOK]
 - Design Lint: [OK / NOK]
+- Docs Check: [OK / NOK]
+- Conventions Check: [OK / NOK]
 - Build: [OK / NOK]
 - Tests: [OK / NOK]

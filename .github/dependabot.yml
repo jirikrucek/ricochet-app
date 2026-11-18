@@ -1,0 +1,22 @@
+# Dependabot only keeps the GitHub Actions current: the workflows pin each
+# action to a commit, which nothing else updates. npm dependencies are
+# updated by .github/workflows/update-dependencies.yml.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '05:13'
+      timezone: Etc/UTC
+    # Take a release only once it is a week old, so a compromised one is
+    # likely found and pulled before it runs here.
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+      include: scope

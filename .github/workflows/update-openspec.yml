@@ -5,9 +5,9 @@ on:
     - cron: '17 3 * * 6' # Saturdays 03:17 UTC (04:17 CET / 05:17 CEST)
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+# Each job gets only what it needs: the update runs third-party code with a
+# read-only token, and the job that pushes runs none of it.
+permissions: {}
 
 concurrency:
   group: update-openspec
@@ -16,18 +16,27 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.package.outputs.changed }}
+      version: ${{ steps.detect.outputs.latest }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          cache: npm
+          # No npm cache: this job runs updated, unreviewed packages, and
+          # the cache it saved would be restored by other workflows.
 
       - name: Detect new OpenSpec release
         id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           latest=$(gh release view --repo Fission-AI/OpenSpec --json tagName --jq .tagName)
           latest="${latest#v}"
@@ -46,46 +55,88 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenSpec $current is the latest release." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Update @fission-ai/openspec
         if: steps.detect.outputs.changed == 'true'
         env:
           VERSION: ${{ steps.detect.outputs.latest }}
-        run: npm install "@fission-ai/openspec@^${VERSION}"
+        run: |
+          npm pkg set "devDependencies.@fission-ai/openspec=^${VERSION}"
+          npm install
 
       - name: Update OpenSpec skills
         if: steps.detect.outputs.changed == 'true'
-        run: npx openspec update
+        run: npx --no-install openspec update
 
-      - name: Open pull request
+      - name: Package the update
+        id: package
         if: steps.detect.outputs.changed == 'true'
         env:
           VERSION: ${{ steps.detect.outputs.latest }}
         run: |
-          branch="chore/update-openspec-${VERSION}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
-          git add -A
-          git commit -m "chore(deps): update OpenSpec to ${VERSION}"
-          git push --force origin "$branch"
-          if ! gh pr create \
-            --base "${{ github.event.repository.default_branch }}" \
-            --head "$branch" \
-            --title "chore(deps): update OpenSpec to ${VERSION}" \
-            --body "Automated update for the [OpenSpec ${VERSION} release](https://github.com/Fission-AI/OpenSpec/releases/tag/v${VERSION}).
-
-          - Bumps \`@fission-ai/openspec\` in \`package.json\`
-          - Refreshes OpenSpec skills via \`npx openspec update\`
-
-          Review the skill diffs and run the Definition of Done checks before merging."; then
-            # Tolerate only a re-run that finds its PR already open.
-            open=$(gh pr list --head "$branch" --state open --json number --jq length || echo 0)
-            if [ "${open:-0}" -gt 0 ]; then
-              echo "PR already exists for $branch"
-            else
-              echo "::error::gh pr create failed and no open PR exists for $branch"
-              exit 1
-            fi
+          git add --all
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenSpec ${VERSION} changed no files." >> "$GITHUB_STEP_SUMMARY"
+          else
+            git diff --cached --binary > "$RUNNER_TEMP/update.patch"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - if: steps.package.outputs.changed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: update-patch
+          path: ${{ runner.temp }}/update.patch
+          if-no-files-found: error
+          retention-days: 1
+
+  open-pr:
+    needs: update
+    if: needs.update.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: update-patch
+          path: ${{ runner.temp }}/update
+
+      # The update job ran third-party code, so its outputs are checked again
+      # before they reach the pull request.
+      - name: Check the update job's outputs
+        env:
+          VERSION: ${{ needs.update.outputs.version }}
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected OpenSpec version from the update job"
+            exit 1
+          fi
+
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          BRANCH: chore/update-openspec-${{ needs.update.outputs.version }}
+          PATCH: ${{ runner.temp }}/update/update.patch
+          TITLE: 'chore(deps): update OpenSpec to ${{ needs.update.outputs.version }}'
+          BODY: |-
+            Automated update for the [OpenSpec ${{ needs.update.outputs.version }} release](https://github.com/Fission-AI/OpenSpec/releases/tag/v${{ needs.update.outputs.version }}).
+
+            - Bumps `@fission-ai/openspec` in `package.json`
+            - Refreshes OpenSpec skills via `npx openspec update`
+
+            Review the skill diffs and run the Definition of Done checks before merging.
+          VERIFY: 'true'
+          ALLOWED_PATHS: .agents/skills/ .claude/skills/ package.json package-lock.json
+        run: bash .github/scripts/open-update-pr.sh

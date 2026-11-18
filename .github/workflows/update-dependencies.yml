@@ -5,10 +5,9 @@ on:
     - cron: '43 3 * * 0' # Sundays 03:43 UTC (04:43 CET / 05:43 CEST)
   workflow_dispatch:
 
-permissions:
-  actions: write
-  contents: write
-  pull-requests: write
+# Each job gets only what it needs: the update runs third-party code with a
+# read-only token, and the job that pushes runs none of it.
+permissions: {}
 
 concurrency:
   group: update-dependencies
@@ -17,15 +16,22 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.package.outputs.changed }}
+      branch: ${{ steps.package.outputs.branch }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          cache: npm
+          # No npm cache: this job runs updated, unreviewed packages, and
+          # the cache it saved would be restored by other workflows.
 
       - name: Install dependencies
         run: npm ci
@@ -36,36 +42,54 @@ jobs:
           npm install
           git diff --stat
 
-      - name: Detect changes
-        id: detect
+      - name: Package the update
+        id: package
         run: |
-          if git diff --quiet -- package.json package-lock.json; then
+          git add package.json package-lock.json
+          if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "All dependencies are up to date (excluding major bumps)." >> "$GITHUB_STEP_SUMMARY"
           else
+            git diff --cached --binary > "$RUNNER_TEMP/update.patch"
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "branch=chore/update-dependencies-$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open pull request
-        id: pr
-        if: steps.detect.outputs.changed == 'true'
-        run: |
-          branch="chore/update-dependencies-$(date -u +%Y%m%d)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
-          git add package.json package-lock.json
-          git commit -m "chore(deps): update dependencies"
-          git push --force origin "$branch"
-          gh pr create \
-            --base "${{ github.event.repository.default_branch }}" \
-            --head "$branch" \
-            --title "chore(deps): update dependencies" \
-            --body "Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the Verification checks workflow." \
-            || echo "PR already exists for $branch"
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - if: steps.package.outputs.changed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: update-patch
+          path: ${{ runner.temp }}/update.patch
+          if-no-files-found: error
+          retention-days: 1
 
-      # Pushes made with GITHUB_TOKEN don't trigger pull_request workflows, so start the verification checks explicitly.
-      - name: Run verification checks
-        if: steps.detect.outputs.changed == 'true'
-        run: gh workflow run verification-checks.yml --ref "${{ steps.pr.outputs.branch }}"
+  open-pr:
+    needs: update
+    if: needs.update.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: update-patch
+          path: ${{ runner.temp }}/update
+
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          BRANCH: ${{ needs.update.outputs.branch }}
+          PATCH: ${{ runner.temp }}/update/update.patch
+          TITLE: 'chore(deps): update dependencies'
+          BODY: Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the Verification checks workflow.
+          VERIFY: 'true'
+          ALLOWED_PATHS: package.json package-lock.json
+        run: bash .github/scripts/open-update-pr.sh

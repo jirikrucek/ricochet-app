@@ -52,6 +52,7 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 ## Test quality
 
+- A test asserts what the code's users can observe (a role, a size, a returned value), so it goes red when that behaviour breaks and stays green when only the internals change. Before relying on a new guard, break the behaviour it guards and watch it go red. A test that sets up the fix itself proves nothing: the sheet internals test once added the workaround class it was meant to guard, and passed with the bug.
 - Mock external I/O only (a CLI call, `fetch`), never the unit under test.
 - Every test has a non-trivial assertion. No `expect(true).toBe(true)` and no empty test bodies.
 - No skipped tests (`it.skip`, `describe.skip`, `test.skip`) in committed code.

@@ -21,10 +21,13 @@
     "supabase:types": "supabase gen types typescript --local > src/db/supabase.types.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:workflows": "docker run --rm -v \"$PWD:/repo:ro\" -w /repo ghcr.io/zizmorcore/zizmor:1.32.0@sha256:3014cc8f68f663935f69b3c3e0e41f5ce102b268d97db13db0f62208747f860d --offline .github",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "spec:validate": "openspec validate --all --strict --no-interactive && npm run spec:coverage",
     "spec:coverage": "node tests/support/checkScenarioCoverage.ts",
+    "docs:check": "node tests/support/checkDocReferences.ts",
+    "conventions:check": "node tests/support/checkConventions.ts",
     "design:lint": "design.md lint DESIGN.md"
   },
   "dependencies": {
@@ -72,6 +75,7 @@
     "jsdom": "^30.1.3",
     "lint-staged": "^17.6.1",
     "prettier": "^3.10.1",
+    "skills": "^1.9.0",
     "supabase": "^2.122.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.73.0",
