@@ -26,7 +26,6 @@
 
 - **guides** (`docs/guides/`): how-to guides for codebase tasks
 - **standards** (`docs/standards/`): codebase rules every change must follow
-- **references** (`.agents/references/`): production readiness and non-functional requirements checklists, vendored unedited from `addyosmani/agent-skills` for its skills; Claude Code reaches them through the `.claude/references` symlink
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
 - **ADRs** (`docs/adr/`): architecture and design decisions, indexed with their status in `docs/adr/README.md`
