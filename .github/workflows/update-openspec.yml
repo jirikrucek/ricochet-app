@@ -16,10 +16,10 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -28,6 +28,8 @@ jobs:
 
       - name: Detect new OpenSpec release
         id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           latest=$(gh release view --repo Fission-AI/OpenSpec --json tagName --jq .tagName)
           latest="${latest#v}"
@@ -52,7 +54,9 @@ jobs:
         if: steps.detect.outputs.changed == 'true'
         env:
           VERSION: ${{ steps.detect.outputs.latest }}
-        run: npm install "@fission-ai/openspec@^${VERSION}"
+        # Installing the new release is this step's purpose; the detect step
+        # accepts only an x.y.z version.
+        run: npm install "@fission-ai/openspec@^${VERSION}" # zizmor: ignore[adhoc-packages]
 
       - name: Update OpenSpec skills
         if: steps.detect.outputs.changed == 'true'
@@ -61,6 +65,8 @@ jobs:
       - name: Open pull request
         if: steps.detect.outputs.changed == 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
           VERSION: ${{ steps.detect.outputs.latest }}
         run: |
           branch="chore/update-openspec-${VERSION}"
@@ -69,9 +75,13 @@ jobs:
           git checkout -b "$branch"
           git add -A
           git commit -m "chore(deps): update OpenSpec to ${VERSION}"
-          git push --force origin "$branch"
+          # The checkout keeps no credential, so the dependency installs above
+          # couldn't use it; authenticate only this push.
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" \
+            push --force origin "$branch"
           if ! gh pr create \
-            --base "${{ github.event.repository.default_branch }}" \
+            --base "$BASE_BRANCH" \
             --head "$branch" \
             --title "chore(deps): update OpenSpec to ${VERSION}" \
             --body "Automated update for the [OpenSpec ${VERSION} release](https://github.com/Fission-AI/OpenSpec/releases/tag/v${VERSION}).
