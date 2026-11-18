@@ -114,13 +114,21 @@ Done when the Definition of Done's final report shows every line OK.
 
 ## Rules
 
-- Must use English language when authoring
-- Must use Conventional Commits when creating commit messages
-- Must use Conventional Branch when creating branches
-- Must use /pr skill when writing a PR body
-- Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task
-- Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue
-- Must fix a bug at its root cause: before editing code, name the condition that causes it and how you confirmed it; when you can't, run `/diagnosing-bugs` first
+Each rule names what enforces it. A rule enforced by nothing holds only if you follow it. When the human corrects you for a mistake, fix it and add its rule here; when a rule enforced by nothing is broken again, enforce it with a check (`/correct`).
+
+| Rule                                                                                                                                                            | Enforced by                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| Must use English language when authoring                                                                                                                        | nothing                                |
+| Must use Conventional Commits when creating commit messages                                                                                                     | nothing                                |
+| Must use Conventional Branch when creating branches                                                                                                             | nothing                                |
+| Must use /pr skill when writing a PR body                                                                                                                       | nothing                                |
+| Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task                     | nothing                                |
+| Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue           | nothing                                |
+| Must fix a bug at its root cause: before editing code, name the condition that causes it and how you confirmed it; when you can't, run `/diagnosing-bugs` first | nothing                                |
+| Must reference only files, folders and skills that exist, in docs, skills and specs                                                                             | `npm run docs:check`                   |
+| Must pass untrusted values to workflow `run:` scripts through `env:`, and check out without persisting credentials                                              | `npm run lint:workflows` (zizmor)      |
+| Must keep `w-`, `min-w-`, `max-w-` and `basis-` from `xs` to `xl` on Tailwind's container scale, as Shadcn expects                                              | `src/styles/designTokens.unit.test.ts` |
+| Must keep `package-lock.json` in sync with `package.json`                                                                                                       | `npm ci` in the verification checks    |
 
 ### Definition of Done
 
