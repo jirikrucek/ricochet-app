@@ -34,13 +34,12 @@ jobs:
 
       # No npm ci: the check needs only Node and git. The checkout of a pull
       # request is its merge commit, so BRANCH names the branch. Dependabot
-      # names its own branches, so only its commits are checked. The PR
-      # title is checked too: a squash merge can make it the commit on main.
+      # names its own branches, so only its commits are checked. The PR title
+      # is checked by pr-title.yml, which also runs when the title is edited.
       - name: Branch and commit conventions
         env:
           BRANCH: ${{ github.head_ref || github.ref_name }}
           SKIP_BRANCH_CHECK: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
           BASE_REF: ${{ github.base_ref || github.event.repository.default_branch }}
         run: npm run conventions:check
 
