@@ -32,6 +32,8 @@ export type BrokenReference = {
   line: number;
   reference: string;
   reason: string;
+  /** For a link or path, where it resolves, relative to the root. */
+  resolved?: string;
 };
 
 /**
@@ -159,13 +161,24 @@ export function findBrokenReferences(
   const { file, kinds } = document;
   const text = withoutCodeBlocks(document.text);
   const broken: BrokenReference[] = [];
-  const report = (index: number, reference: string, reason: string) =>
-    broken.push({ file, line: lineOf(text, index), reference, reason });
+  const report = (
+    index: number,
+    reference: string,
+    reason: string,
+    resolved?: string,
+  ) =>
+    broken.push({
+      file,
+      line: lineOf(text, index),
+      reference,
+      reason,
+      ...(resolved && { resolved }),
+    });
 
   if (kinds.links) {
     for (const { index, reference, resolved } of linkTargets(text, file)) {
       if (!repository.exists(resolved)) {
-        report(index, reference, `no file at ${resolved}`);
+        report(index, reference, `no file at ${resolved}`, resolved);
       }
     }
   }
@@ -188,7 +201,7 @@ export function findBrokenReferences(
       kinds.paths,
     )) {
       if (!repository.exists(resolved)) {
-        report(index, reference, `no file or folder at ${resolved}`);
+        report(index, reference, `no file or folder at ${resolved}`, resolved);
       }
     }
   }

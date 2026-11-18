@@ -103,7 +103,7 @@ function isIgnored(relativePath: string) {
     // Silent: for a path outside the repository git prints a fatal error.
     execFileSync(
       'git',
-      ['-C', root, 'check-ignore', '-q', '--no-index', relativePath],
+      ['-C', root, 'check-ignore', '-q', '--no-index', '--', relativePath],
       { stdio: 'ignore' },
     );
     return true;
@@ -160,7 +160,7 @@ const found = checked.flatMap((file) => {
           repository,
         )
           // Only what resolves differently from .claude/: relative paths.
-          .filter(({ reason }) => reason.includes(' at .claude/'))
+          .filter(({ resolved }) => resolved?.startsWith('.claude/'))
           .map((reference) => ({
             ...reference,
             file,
