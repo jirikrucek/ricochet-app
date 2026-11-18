@@ -124,7 +124,7 @@ jobs:
           test -n "$version" || { echo "::error::package-lock.json has no supabase entry"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - uses: supabase/setup-cli@1dedf2c611547ede7232d26866dd3c56ab903bbb # v1.7.3
+      - uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
         with:
           version: ${{ steps.supabase-version.outputs.version }}
 
