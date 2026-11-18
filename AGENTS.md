@@ -105,11 +105,12 @@ Done when the Definition of Done's final report shows every line OK.
 
 ### Sessions and Harness
 
-| Task             | Skill                     | Reach for it when                                                                       |
-| ---------------- | ------------------------- | --------------------------------------------------------------------------------------- |
-| Hand-off         | `/handoff` _(human only)_ | a long session should continue in a fresh agent                                         |
-| Retrospective    | `/retro` _(human only)_   | a session is over and you want to improve skills, docs, or `AGENTS.md` for the next one |
-| Write for agents | `/writing-for-agents`     | you create or edit a skill, `AGENTS.md`, or any doc agents read                         |
+| Task                      | Skill                     | Reach for it when                                                                          |
+| ------------------------- | ------------------------- | ------------------------------------------------------------------------------------------ |
+| Hand-off                  | `/handoff` _(human only)_ | a long session should continue in a fresh agent                                            |
+| Retrospective             | `/retro` _(human only)_   | a session is over and you want to improve skills, docs, or `AGENTS.md` for the next one    |
+| Write for agents          | `/writing-for-agents`     | you create or edit a skill, `AGENTS.md`, or any doc agents read                            |
+| Correct repeated mistakes | `/correct` _(human only)_ | agents keep making the same mistake; turn each repeated correction into a check that fails |
 
 ## Rules
 
