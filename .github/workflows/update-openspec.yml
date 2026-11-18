@@ -104,7 +104,17 @@ jobs:
           name: update-patch
           path: ${{ runner.temp }}/update
 
-      # The version was accepted only as x.y.z in the update job.
+      # The update job ran third-party code, so its outputs are checked again
+      # before they reach the pull request.
+      - name: Check the update job's outputs
+        env:
+          VERSION: ${{ needs.update.outputs.version }}
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected OpenSpec version from the update job"
+            exit 1
+          fi
+
       - name: Open pull request
         env:
           GH_TOKEN: ${{ github.token }}
@@ -120,4 +130,5 @@ jobs:
 
             Review the skill diffs and run the Definition of Done checks before merging.
           VERIFY: 'true'
+          ALLOWED_PATHS: .agents/skills/ .claude/skills/ package.json package-lock.json
         run: bash .github/scripts/open-update-pr.sh

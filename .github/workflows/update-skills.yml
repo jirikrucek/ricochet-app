@@ -107,7 +107,17 @@ jobs:
           name: update-patch
           path: ${{ runner.temp }}/update
 
-      # The references commit was accepted only as a full SHA in the update job.
+      # The update job ran third-party code, so its outputs are checked again
+      # before they reach the pull request.
+      - name: Check the update job's outputs
+        env:
+          REFERENCES_SHA: ${{ needs.update.outputs.references-sha }}
+        run: |
+          if ! [[ "$REFERENCES_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Unexpected references commit from the update job"
+            exit 1
+          fi
+
       - name: Open pull request
         env:
           GH_TOKEN: ${{ github.token }}
@@ -120,4 +130,5 @@ jobs:
 
             Review the skill diffs before merging: they change what agents do. The Verification checks workflow runs `npm run docs:check`, which fails on a reference an updated skill broke, or on a doc check exception the update made stale.
           VERIFY: 'true'
+          ALLOWED_PATHS: .agents/skills/ .agents/references/ .claude/skills/ skills-lock.json
         run: bash .github/scripts/open-update-pr.sh

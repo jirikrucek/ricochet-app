@@ -90,4 +90,5 @@ jobs:
           TITLE: 'chore(deps): update dependencies'
           BODY: Automated dependency update (major version bumps are skipped). Typecheck, Lint, Build and Tests run in the Verification checks workflow.
           VERIFY: 'true'
+          ALLOWED_PATHS: package.json package-lock.json
         run: bash .github/scripts/open-update-pr.sh

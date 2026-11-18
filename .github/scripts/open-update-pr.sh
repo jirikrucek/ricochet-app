@@ -9,14 +9,24 @@
 #   GH_TOKEN     token with contents and pull-requests write
 #                (and actions write when VERIFY is true)
 #   BASE_BRANCH  branch the pull request targets
-#   BRANCH       branch to create; validated by the update job
+#   BRANCH       branch to create, chore/update-<what>-<date or version>
 #   PATCH        the update job's patch (git diff --cached --binary)
+#   ALLOWED_PATHS
+#                space-separated files and folders (ending in /) the patch
+#                may change; any other path fails the run
 #   TITLE        commit message and pull request title
 #   BODY         pull request body
 #   VERIFY       true to start the Verification checks on the branch, as
 #                pushes made with GITHUB_TOKEN don't start them
 
 set -euo pipefail
+
+# The update job ran third-party code, so its branch name and patch are as
+# untrusted as that code: check both before they reach git.
+if ! [[ "$BRANCH" =~ ^chore/update-[a-z]+-[0-9a-z.]+$ ]]; then
+  echo "::error::Unexpected branch name from the update job"
+  exit 1
+fi
 
 auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
 # GitHub masks the token in logs, but not its base64 form.
@@ -44,6 +54,22 @@ git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git checkout -b "$BRANCH"
 git apply --index "$PATCH"
+read -r -a allowed <<< "$ALLOWED_PATHS"
+outside=()
+while IFS= read -r path; do
+  ok=false
+  for entry in "${allowed[@]}"; do
+    if [ "$path" = "$entry" ] || { [[ "$entry" == */ ]] && [[ "$path" == "$entry"* ]]; }; then
+      ok=true
+      break
+    fi
+  done
+  $ok || outside+=("$path")
+done < <(git diff --cached --name-only)
+if [ "${#outside[@]}" -gt 0 ]; then
+  echo "::error::The update changes paths outside ${ALLOWED_PATHS}: ${outside[*]}"
+  exit 1
+fi
 git commit -m "$TITLE"
 # Without --force: if the branch appeared since the check, fail.
 git "${git_auth[@]}" push origin "$BRANCH"
