@@ -20,6 +20,7 @@ import {
 // as /players; backticked paths in the docs that describe the repository as
 // it is now, and only file paths in skills, which name example folders, not
 // in ADRs, which name old paths on purpose.
+// .agents/references/ isn't checked: it holds upstream files, unedited.
 
 const root = path.resolve(
   process.argv[2] ?? path.join(import.meta.dirname, '../..'),
@@ -30,7 +31,7 @@ const LINKS =
 const SKILLS =
   /^AGENTS\.md$|^(\.agents\/skills|docs\/guides|docs\/standards|openspec\/schemas)\/.*\.(md|ya?ml)$|^openspec\/config\.yaml$/;
 const ALL_PATHS =
-  /^AGENTS\.md$|^docs\/(guides|standards|references)\/.*\.md$|^openspec\/config\.yaml$/;
+  /^AGENTS\.md$|^docs\/(guides|standards)\/.*\.md$|^openspec\/config\.yaml$/;
 const FILE_PATHS = /^\.agents\/skills\/.*\.md$/;
 
 function kindsOf(file: string): ReferenceKinds {
