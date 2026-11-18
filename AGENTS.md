@@ -119,8 +119,8 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 | Rule                                                                                                                                                            | Enforced by                            |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
 | Must use English language when authoring                                                                                                                        | nothing                                |
-| Must use Conventional Commits when creating commit messages                                                                                                     | nothing                                |
-| Must use Conventional Branch when creating branches                                                                                                             | nothing                                |
+| Must use Conventional Commits when creating commit messages                                                                                                     | `npm run conventions:check`            |
+| Must use Conventional Branch when creating branches                                                                                                             | `npm run conventions:check`            |
 | Must use /pr skill when writing a PR body                                                                                                                       | nothing                                |
 | Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task                     | nothing                                |
 | Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue           | nothing                                |
@@ -150,6 +150,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 - Run `npm run spec:validate` (must pass 0 errors).
 - Run `npm run design:lint` (must pass 0 errors).
 - Run `npm run docs:check` (must pass 0 errors).
+- Run `npm run conventions:check` (must pass 0 errors).
 - Run `npm run build` (must pass clean).
 - Run `npm run test:all` (must pass 100%).
 - _Self-correction:_ On error, parse stderr, fix code, and retry until clean.
@@ -166,5 +167,6 @@ Output concise status:
 - Spec Validation: [OK / NOK]
 - Design Lint: [OK / NOK]
 - Docs Check: [OK / NOK]
+- Conventions Check: [OK / NOK]
 - Build: [OK / NOK]
 - Tests: [OK / NOK]

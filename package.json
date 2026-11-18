@@ -27,6 +27,7 @@
     "spec:validate": "openspec validate --all --strict --no-interactive && npm run spec:coverage",
     "spec:coverage": "node tests/support/checkScenarioCoverage.ts",
     "docs:check": "node tests/support/checkDocReferences.ts",
+    "conventions:check": "node tests/support/checkConventions.ts",
     "design:lint": "design.md lint DESIGN.md"
   },
   "dependencies": {
