@@ -16,6 +16,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     outputs:
@@ -53,6 +54,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenSpec $current is the latest release." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Update @fission-ai/openspec
@@ -87,7 +89,9 @@ jobs:
     needs: update
     if: needs.update.outputs.changed == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:
@@ -115,4 +119,5 @@ jobs:
             - Refreshes OpenSpec skills via `npx openspec update`
 
             Review the skill diffs and run the Definition of Done checks before merging.
+          VERIFY: 'true'
         run: bash .github/scripts/open-update-pr.sh

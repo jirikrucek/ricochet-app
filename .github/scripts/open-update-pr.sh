@@ -24,10 +24,17 @@ echo "::add-mask::$auth"
 git_auth=(-c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth")
 
 # A branch from an earlier run belongs to its pull request, which may have
-# commits added since: leave both as they are.
+# commits added since: leave both as they are. A branch without one is left
+# by a run that failed after its push; it may hold an older update, so a
+# human decides, and the run fails until then.
 if git "${git_auth[@]}" ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
-  echo "::notice::$BRANCH already exists, so it and its pull request are left as they are."
-  exit 0
+  prs=$(gh pr list --head "$BRANCH" --state all --json number --jq length)
+  if [ "$prs" -gt 0 ]; then
+    echo "::notice::$BRANCH already exists with its pull request, so both are left as they are."
+    exit 0
+  fi
+  echo "::error::$BRANCH exists without a pull request. Open one for it, or delete the branch so the next run recreates it."
+  exit 1
 elif [ $? -ne 2 ]; then
   echo "::error::Could not check whether $BRANCH exists on origin"
   exit 1

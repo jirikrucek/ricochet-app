@@ -92,6 +92,7 @@ jobs:
     needs: update
     if: needs.update.outputs.changed == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       actions: write
       contents: write
