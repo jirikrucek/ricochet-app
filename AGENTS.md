@@ -26,7 +26,7 @@
 
 - **guides** (`docs/guides/`): how-to guides for codebase tasks
 - **standards** (`docs/standards/`): codebase rules every change must follow
-- **references** (`docs/references/`): production readiness and non-functional requirements checklists
+- **references** (`docs/references/`): production readiness and non-functional requirements checklists; vendored skills reach them through the `.agents/references` symlink, which their upstream relative paths expect
 - **glossary** (`glossary/`): business and technical terms (created or updated using /glossary skill)
 - **specifications** (`openspec/`): required product behavior in `specs/` and proposed changes in `changes/` (created or updated using /openspec-* skills)
 - **ADRs** (`docs/adr/`): architecture and design decisions, indexed with their status in `docs/adr/README.md`
