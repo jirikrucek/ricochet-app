@@ -57,6 +57,35 @@
   --container-app-shell: 1280px;
   --container-form-field: 240px;
 
+  /*
+   * Tailwind looks a width utility's name up in --spacing-* before
+   * --container-*, so the spacing tokens above would make max-w-sm 8px
+   * instead of 24rem (#89, #92). These keep w-, min-w-, max-w- and basis-
+   * from xs to xl on Tailwind's container scale, as Shadcn and the Tailwind
+   * docs expect. size-*, h-* and the spacing utilities still use the
+   * spacing tokens.
+   */
+  --width-xs: var(--container-xs);
+  --width-sm: var(--container-sm);
+  --width-md: var(--container-md);
+  --width-lg: var(--container-lg);
+  --width-xl: var(--container-xl);
+  --min-width-xs: var(--container-xs);
+  --min-width-sm: var(--container-sm);
+  --min-width-md: var(--container-md);
+  --min-width-lg: var(--container-lg);
+  --min-width-xl: var(--container-xl);
+  --max-width-xs: var(--container-xs);
+  --max-width-sm: var(--container-sm);
+  --max-width-md: var(--container-md);
+  --max-width-lg: var(--container-lg);
+  --max-width-xl: var(--container-xl);
+  --flex-basis-xs: var(--container-xs);
+  --flex-basis-sm: var(--container-sm);
+  --flex-basis-md: var(--container-md);
+  --flex-basis-lg: var(--container-lg);
+  --flex-basis-xl: var(--container-xl);
+
   /* Breakpoints (DESIGN.md: mobile < 744px) */
   --breakpoint-tablet: 744px;
 

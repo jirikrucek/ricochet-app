@@ -26,6 +26,8 @@ The "no custom hex values" rule governs UI styling. Vendored artwork rendered as
 | `{rounded.sm}` | `var(--radius-sm)` / `rounded-sm` |
 | `{typography.body-md}` | `var(--text-body-md)` / `text-body-md` / `type-body-md` |
 
+The width utilities `w-`, `min-w-`, `max-w-` and `basis-` named `xs` to `xl` keep Tailwind's container scale (`max-w-sm` is 24rem), as Shadcn expects, even though spacing tokens share those names; a unit test guards it. For a width of a spacing token, use `size-*` or `w-(--spacing-sm)`.
+
 Prefer Tailwind classes backed by the theme tokens. Inline `style={{ ... }}` is only acceptable when a CSS property cannot be expressed cleanly with Tailwind utilities or the shared typography primitives.
 
 ## Typography primitives

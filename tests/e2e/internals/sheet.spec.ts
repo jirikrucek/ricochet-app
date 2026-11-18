@@ -34,9 +34,7 @@ test.describe('Sheet width at the sm breakpoint and wider', () => {
       await openMenu(page);
       await menu(page).evaluate((element, sheetSide) => {
         element.classList.remove('max-w-80', 'data-[side=right]:sm:max-w-80');
-        element.classList.add(
-          `data-[side=${sheetSide}]:sm:max-w-(--container-sm)`,
-        );
+        element.classList.add(`data-[side=${sheetSide}]:sm:max-w-sm`);
         element.setAttribute('data-side', sheetSide);
       }, side);
 

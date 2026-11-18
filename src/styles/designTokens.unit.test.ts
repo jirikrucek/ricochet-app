@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
+import { compile } from 'tailwindcss';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 
@@ -54,4 +56,71 @@ describe('globals.css matches DESIGN.md', () => {
 
     expect(actual).toEqual(expected);
   });
+});
+
+// Tailwind looks a width utility's name up in --spacing-* before
+// --container-*, so a spacing token named xs to xl turned max-w-sm into 8px
+// (#89, #92). globals.css points these names back at the container scale.
+describe('width utilities use the Tailwind container scale', () => {
+  const containerWidths = {
+    xs: '20rem',
+    sm: '24rem',
+    md: '28rem',
+    lg: '32rem',
+    xl: '36rem',
+  };
+  const utilities = [
+    { prefix: 'w', property: 'width' },
+    { prefix: 'min-w', property: 'min-width' },
+    { prefix: 'max-w', property: 'max-width' },
+    { prefix: 'basis', property: 'flex-basis' },
+  ];
+  const require = createRequire(import.meta.url);
+
+  async function build(candidates: string[]) {
+    const compiler = await compile(css, {
+      base: path.join(root, 'src/styles'),
+      // Only Tailwind itself matters here; the font stylesheets are skipped.
+      loadStylesheet: async (id, base) =>
+        id === 'tailwindcss'
+          ? {
+              path: require.resolve('tailwindcss/index.css'),
+              base,
+              content: readFileSync(
+                require.resolve('tailwindcss/index.css'),
+                'utf8',
+              ),
+            }
+          : { path: id, base, content: '' },
+    });
+    return compiler.build(candidates);
+  }
+
+  function resolve(output: string, value: string): string {
+    const variable = value.match(/^var\((--[\w-]+)\)$/)?.[1];
+    if (!variable) return value;
+    const definition = output.match(
+      new RegExp(`(?<![\\w-])${variable}:\\s*([^;]+);`),
+    )?.[1];
+    return definition ? resolve(output, definition.trim()) : value;
+  }
+
+  it.each(utilities)(
+    '$prefix-xs to $prefix-xl',
+    async ({ prefix, property }) => {
+      const output = await build(
+        Object.keys(containerWidths).map((name) => `${prefix}-${name}`),
+      );
+      const actual = Object.fromEntries(
+        Object.keys(containerWidths).map((name) => {
+          const rule = output.match(
+            new RegExp(`\\.${prefix}-${name} \\{\\s*${property}: ([^;]+);`),
+          )?.[1];
+          return [name, rule && resolve(output, rule)];
+        }),
+      );
+
+      expect(actual).toEqual(containerWidths);
+    },
+  );
 });
