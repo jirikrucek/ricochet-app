@@ -51,6 +51,12 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run lint
 
+      # zizmor, through Docker: template injection, persisted credentials and
+      # other unsafe patterns in these workflows.
+      - name: Workflow lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run lint:workflows
+
       - name: Spec validation
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run spec:validate

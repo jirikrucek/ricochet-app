@@ -138,6 +138,7 @@ Execute phases in sequence before concluding any change to the codebase (feature
 
 - Run `npm run typecheck` (must pass 0 errors).
 - Run `npm run lint` (must pass 0 errors).
+- Run `npm run lint:workflows` (must pass 0 findings; needs Docker).
 - Run `npm run spec:validate` (must pass 0 errors).
 - Run `npm run design:lint` (must pass 0 errors).
 - Run `npm run docs:check` (must pass 0 errors).
@@ -153,6 +154,7 @@ Output concise status:
 - ADRs: [OK / NOK]
 - Typecheck: [OK / NOK]
 - Lint: [OK / NOK]
+- Workflow Lint: [OK / NOK]
 - Spec Validation: [OK / NOK]
 - Design Lint: [OK / NOK]
 - Docs Check: [OK / NOK]
