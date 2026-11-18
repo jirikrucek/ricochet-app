@@ -54,9 +54,9 @@ jobs:
         if: steps.detect.outputs.changed == 'true'
         env:
           VERSION: ${{ steps.detect.outputs.latest }}
-        # Installing the new release is this step's purpose; the detect step
-        # accepts only an x.y.z version.
-        run: npm install "@fission-ai/openspec@^${VERSION}" # zizmor: ignore[adhoc-packages]
+        run: |
+          npm pkg set "devDependencies.@fission-ai/openspec=^${VERSION}"
+          npm install
 
       - name: Update OpenSpec skills
         if: steps.detect.outputs.changed == 'true'
