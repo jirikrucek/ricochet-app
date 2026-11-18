@@ -93,6 +93,7 @@ Done when the Definition of Done's final report shows every line OK.
 | Improve architecture     | `/improve-codebase-architecture` _(human only)_                            | you want a visual report of which modules are worth deepening first                                                                                                   |
 | Standards and ADRs audit | `/standards-and-adrs-audit` _(human only)_                                 | you want to audit the code against the standards and accepted ADRs, fix the approved violations, and commit                                                           |
 | Security audit           | `/security-and-hardening`                                                  | you want to audit dependencies or supply-chain risk, review an existing input handler or auth flow, or check privacy compliance; fixes then enter the change workflow |
+| Check blast radius       | `/blast-radius` _(human only)_                                             | a diff you don't trust, such as a migration, an RLS policy or a shared `src/ui/` component: find what it breaks beyond the diff, proven by running code               |
 | Validate docs            | `/validate-adrs`, `/validate-guides`, `/validate-standards` _(human only)_ | you changed `docs/adr/`, `docs/guides/`, or `docs/standards/`, or want to check they still hold                                                                       |
 
 ### Research

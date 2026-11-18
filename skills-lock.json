@@ -13,6 +13,12 @@
       "skillPath": ".agents/skills/architectural-decision-records/SKILL.md",
       "computedHash": "a37299fb4dea30791e4797766ed7e3a015df5082c96a617d643d7a870626c775"
     },
+    "blast-radius": {
+      "source": "backnotprop/pstack",
+      "sourceType": "github",
+      "skillPath": "skills/blast-radius/SKILL.md",
+      "computedHash": "f9ec7353939c4449f2edb1cd195049f477b9ba6c0a869de75c7b440e27295f01"
+    },
     "c4-diagrams": {
       "source": "intent-driven-dev/intent-driven-template",
       "sourceType": "github",
