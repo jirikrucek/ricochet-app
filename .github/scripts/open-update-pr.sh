@@ -56,7 +56,9 @@ git checkout -b "$BRANCH"
 git apply --index "$PATCH"
 read -r -a allowed <<< "$ALLOWED_PATHS"
 outside=()
-while IFS= read -r path; do
+# --no-renames lists both sides of a rename, so a file can't be moved out
+# of a path outside the list; -z keeps unusual names unquoted.
+while IFS= read -r -d '' path; do
   ok=false
   for entry in "${allowed[@]}"; do
     if [ "$path" = "$entry" ] || { [[ "$entry" == */ ]] && [[ "$path" == "$entry"* ]]; }; then
@@ -65,7 +67,7 @@ while IFS= read -r path; do
     fi
   done
   $ok || outside+=("$path")
-done < <(git diff --cached --name-only)
+done < <(git diff --cached --name-only --no-renames -z)
 if [ "${#outside[@]}" -gt 0 ]; then
   echo "::error::The update changes paths outside ${ALLOWED_PATHS}: ${outside[*]}"
   exit 1
