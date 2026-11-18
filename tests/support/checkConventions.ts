@@ -9,6 +9,8 @@ import { branchProblem, commitProblem } from './conventions.ts';
 // in CI, where the checkout is a pull request's merge commit.
 // SKIP_BRANCH_CHECK=true skips the branch name, for a Dependabot pull
 // request, whose branch name Dependabot chooses; its commits are checked.
+// PR_TITLE, when set, is checked as a commit subject too: a squash merge
+// can take it as the commit message on main.
 
 const git = (...args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -46,12 +48,16 @@ const commits = git(
     return { hash, subject: subject.join(' ') };
   });
 
+const prTitle = process.env.PR_TITLE;
+const titleWhy = prTitle ? commitProblem(prTitle) : undefined;
+
 const problems = [
   ...[
     process.env.SKIP_BRANCH_CHECK === 'true'
       ? undefined
       : branchProblem(branch),
   ].flatMap((why) => (why ? [`branch ${branch}: ${why}`] : [])),
+  ...(titleWhy ? [`pull request title "${prTitle}": ${titleWhy}`] : []),
   ...commits.flatMap(({ hash, subject }) => {
     const why = commitProblem(subject);
     return why ? [`commit ${hash} "${subject}": ${why}`] : [];
@@ -60,7 +66,7 @@ const problems = [
 
 if (problems.length > 0) {
   console.error(
-    `The branch or its commits break the conventions in AGENTS.md. Rename the branch (git branch -m) or reword the commits (git rebase), then push again:`,
+    `The branch or its commits break the conventions in AGENTS.md. Rename the branch (git branch -m), reword the commits (git rebase) or edit the pull request title, then push again:`,
   );
   for (const problem of problems) console.error(`  ${problem}`);
   process.exit(1);
