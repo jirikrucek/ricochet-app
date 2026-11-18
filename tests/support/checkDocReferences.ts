@@ -100,7 +100,12 @@ function isTracked(relativePath: string) {
 // supabase/data/, counts as existing: a fresh checkout doesn't have it yet.
 function isIgnored(relativePath: string) {
   try {
-    git('check-ignore', '-q', '--no-index', relativePath);
+    // Silent: for a path outside the repository git prints a fatal error.
+    execFileSync(
+      'git',
+      ['-C', root, 'check-ignore', '-q', '--no-index', relativePath],
+      { stdio: 'ignore' },
+    );
     return true;
   } catch {
     return false;
