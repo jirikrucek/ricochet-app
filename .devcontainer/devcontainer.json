@@ -48,9 +48,10 @@
 
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
-  // Shell history stays in its default place in the home volume, so it survives a rebuild too.
+  // Keep shell history out of the persisted home volume to reduce secret retention across rebuilds.
   "remoteEnv": {
-    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}"
+    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}",
+    "HISTFILE": "/tmp/.bash_history"
   },
 
   // Runs once after the container is created. VS Code doesn't wait for it, so it runs in parallel
