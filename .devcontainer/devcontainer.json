@@ -26,39 +26,31 @@
   // container's own Docker, and forwarding them keeps the URLs the same on the host.
   "forwardPorts": [5173, 54321, 54322, 54323, 54324],
 
-  // Keep node_modules and .playwright-browsers in container-only named volumes. The repo is bind-mounted from the
-  // host, and npm only installs native optional deps (e.g. @rolldown/binding-*) for the OS it
-  // runs on, so sharing node_modules between macOS and Linux breaks Vite/Vitest on one side.
-  // Playwright has the same problem: it marks a browser folder as installed per version, so a
-  // macOS host would skip downloading its own build once the container installed the Linux one
-  // into the shared folder.
+  // Open the repo with "Dev Containers: Clone Repository in Container Volume": the checkout lives
+  // in a Docker volume, not on the host, so node_modules and .playwright-browsers (Linux builds)
+  // are never shared with macOS and need no volumes of their own. Don't open a host checkout
+  // with "Reopen in Container": npm installs native optional deps (e.g. @rolldown/binding-*)
+  // only for the OS it runs on, so a shared node_modules breaks Vite/Vitest on one side.
+  // The whole home folder is one named volume, so Claude Code and GitHub CLI logins (~/.claude,
+  // ~/.claude.json, ~/.config/gh) survive a rebuild. Docker fills a new volume from the image's
+  // /home/vscode, ownership included, so no chown is needed. It's filled only once: dotfiles the
+  // image changes later reach the container only after the volume is deleted.
+  // ${devcontainerId} is stable across rebuilds and unique per workspace.
   "mounts": [
-    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=${localWorkspaceFolderBasename}-playwright-browsers,target=${containerWorkspaceFolder}/.playwright-browsers,type=volume",
-    "source=${localWorkspaceFolderBasename}-claude-config,target=/home/vscode/.claude,type=volume",
-    "source=${localWorkspaceFolderBasename}-gh-config,target=/home/vscode/.config/gh,type=volume"
+    "source=ricochet-app-home-${devcontainerId},target=/home/vscode,type=volume"
   ],
-
-  // Docker creates a new volume, and any missing parent folder of its mount point (here
-  // ~/.config), owned by root. Hand them, and the node_modules and .playwright-browsers volumes,
-  // to vscode before anything writes to them. It runs once, before updateContentCommand and
-  // postCreateCommand, so nothing there races the chown.
-  "onCreateCommand": "sudo chown vscode:vscode /home/vscode/.config /home/vscode/.config/gh /home/vscode/.claude node_modules .playwright-browsers",
 
   // Installs the dependencies. VS Code waits for this command (the default "waitFor") before it
   // connects and starts the extensions. Running npm ci in postCreateCommand instead let the Vitest
-  // extension start against the empty node_modules volume and fail with "Cannot find package
+  // extension start against an empty node_modules and fail with "Cannot find package
   // 'picomatch'" until the install finished.
   "updateContentCommand": "npm ci",
 
   // Puts project CLIs (openspec, supabase, ...) on PATH, so agents and terminals can run them
   // bare. The OpenSpec skills call `openspec` directly and pre-approve only `Bash(openspec:*)`.
-  // CLAUDE_CONFIG_DIR keeps Claude Code's ~/.claude.json inside the ~/.claude volume too, so
-  // login and onboarding state survive a rebuild. Bash history is deliberately not persisted: a
-  // secret typed or pasted into a terminal (an API key) must not outlive the container.
+  // Shell history stays in its default place in the home volume, so it survives a rebuild too.
   "remoteEnv": {
-    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}",
-    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+    "PATH": "${containerWorkspaceFolder}/node_modules/.bin:${containerEnv:PATH}"
   },
 
   // Runs once after the container is created. VS Code doesn't wait for it, so it runs in parallel
