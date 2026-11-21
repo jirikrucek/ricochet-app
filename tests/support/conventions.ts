@@ -48,6 +48,8 @@ const commitPattern = new RegExp(
 // The subjects `git revert` writes: Revert "<subject>", and Reapply
 // "<subject>" when it reverts a revert.
 const gitRevertPattern = /^(?:Revert|Reapply) ".+"$/;
+const copilotAutofixCoauthorPattern =
+  /^Co-authored-by: Copilot Autofix powered by AI <[^<>\s]+@users\.noreply\.github\.com>$/m;
 
 /** Why a branch name breaks Conventional Branch, or undefined if it doesn't. */
 export function branchProblem(branch: string): string | undefined {
@@ -58,8 +60,13 @@ export function branchProblem(branch: string): string | undefined {
 }
 
 /** Why a commit subject breaks Conventional Commits, or undefined. */
-export function commitProblem(subject: string): string | undefined {
-  if (commitPattern.test(subject) || gitRevertPattern.test(subject)) {
+export function commitProblem(subject: string, body = ''): string | undefined {
+  if (
+    commitPattern.test(subject) ||
+    gitRevertPattern.test(subject) ||
+    (subject === 'Potential fix for pull request finding' &&
+      copilotAutofixCoauthorPattern.test(body))
+  ) {
     return undefined;
   }
   return `expected <type>[(scope)][!]: <description>, with a type of ${COMMIT_TYPES.join(', ')}`;

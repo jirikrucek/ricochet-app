@@ -58,4 +58,28 @@ describe('commitProblem', () => {
   ])('rejects %s', (subject) => {
     expect(commitProblem(subject)).toMatch(/^expected <type>/);
   });
+
+  it("accepts Copilot Autofix's generated subject with its co-author trailer", () => {
+    expect(
+      commitProblem(
+        'Potential fix for pull request finding',
+        'Co-authored-by: Copilot Autofix powered by AI <62310815+github-advanced-security[bot]@users.noreply.github.com>',
+      ),
+    ).toBeUndefined();
+  });
+
+  it("rejects Copilot Autofix's generated subject without its co-author trailer", () => {
+    expect(commitProblem('Potential fix for pull request finding')).toMatch(
+      /^expected <type>/,
+    );
+  });
+
+  it('rejects other nonconforming subjects with the Copilot Autofix trailer', () => {
+    expect(
+      commitProblem(
+        'Potential fix',
+        'Co-authored-by: Copilot Autofix powered by AI <62310815+github-advanced-security[bot]@users.noreply.github.com>',
+      ),
+    ).toMatch(/^expected <type>/);
+  });
 });

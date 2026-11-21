@@ -32,19 +32,21 @@ if (branch === 'HEAD') {
   process.exit(1);
 }
 
-const commits = git(
+const commitFields = git(
   'log',
   '--no-merges',
-  '--format=%h %s',
+  '--format=%h%x00%s%x00%b%x00',
   '--end-of-options',
   `${base}..${head}`,
-)
-  .split('\n')
-  .filter(Boolean)
-  .map((line) => {
-    const [hash, ...subject] = line.split(' ');
-    return { hash, subject: subject.join(' ') };
+).split('\0');
+const commits: { hash: string; subject: string; body: string }[] = [];
+for (let index = 0; index + 2 < commitFields.length; index += 3) {
+  commits.push({
+    hash: commitFields[index].trim(),
+    subject: commitFields[index + 1],
+    body: commitFields[index + 2],
   });
+}
 
 const problems = [
   ...[
@@ -52,8 +54,8 @@ const problems = [
       ? undefined
       : branchProblem(branch),
   ].flatMap((why) => (why ? [`branch ${branch}: ${why}`] : [])),
-  ...commits.flatMap(({ hash, subject }) => {
-    const why = commitProblem(subject);
+  ...commits.flatMap(({ hash, subject, body }) => {
+    const why = commitProblem(subject, body);
     return why ? [`commit ${hash} "${subject}": ${why}`] : [];
   }),
 ];
