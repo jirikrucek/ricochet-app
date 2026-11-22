@@ -15,6 +15,7 @@ import {
   type Requirement,
   type SpecRequirements,
 } from './scenarioCoverage.ts';
+import { findRepoRoot } from './repoRoot.ts';
 
 // Fails when a spec scenario in force (the main specs with every active
 // change applied) has no E2E test titled with its name, in a describe
@@ -25,7 +26,7 @@ import {
 // An active change whose proposal isn't written yet has no delta specs, so
 // it is skipped, and the run names it.
 
-const root = path.resolve(import.meta.dirname, '..');
+const root = findRepoRoot(import.meta.dirname);
 
 function runJson<T>(bin: string, args: string[]): T {
   const output = execFileSync(path.join(root, 'node_modules/.bin', bin), args, {

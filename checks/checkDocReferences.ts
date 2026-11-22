@@ -8,6 +8,7 @@ import {
   type Exception,
   type ReferenceKinds,
 } from './docReferences.ts';
+import { findRepoRoot } from './repoRoot.ts';
 
 // Fails when a doc, skill or spec references a file, folder or skill that
 // doesn't exist. Checks the tracked files of the repository at the given
@@ -22,9 +23,7 @@ import {
 // in ADRs, which name old paths on purpose.
 // .agents/references/ isn't checked: it holds upstream files, unedited.
 
-const root = path.resolve(
-  process.argv[2] ?? path.join(import.meta.dirname, '..'),
-);
+const root = path.resolve(process.argv[2] ?? findRepoRoot(import.meta.dirname));
 
 const LINKS =
   /^(AGENTS|CLAUDE|DESIGN|README)\.md$|^(docs|glossary|\.agents\/skills|openspec\/specs|openspec\/schemas)\/.*\.md$/;
