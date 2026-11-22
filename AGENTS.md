@@ -131,7 +131,7 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 | Must run a workflow's third-party code (npm, CLIs it installs) in a job with a read-only token, and push or open PRs from a job that runs none                  | nothing                                                                            |
 | Must keep `w-`, `min-w-`, `max-w-` and `basis-` from `xs` to `xl` on Tailwind's container scale, as Shadcn expects                                              | `src/styles/designTokens.unit.test.ts`                                             |
 | Must keep `package-lock.json` in sync with `package.json`                                                                                                       | `npm ci` in the verification checks                                                |
-| Must keep `.devcontainer/devcontainer-lock.json` listing exactly the features of `devcontainer.json`, at their pinned versions                                  | `tests/support/devcontainerLock.unit.test.ts`                                      |
+| Must keep `.devcontainer/devcontainer-lock.json` listing exactly the features of `devcontainer.json`, at their pinned versions                                  | `checks/devcontainerLock.unit.test.ts`                                             |
 
 ### Definition of Done
 

@@ -8,7 +8,7 @@
     "prettier --write",
     "eslint --fix"
   ],
-  "tests/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,css,html}": [
+  "{tests,checks}/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,css,html}": [
     "prettier --write",
     "eslint --fix"
   ]

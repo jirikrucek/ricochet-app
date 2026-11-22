@@ -31,4 +31,4 @@ jobs:
       - name: Pull request title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: node tests/support/checkPrTitle.ts
+        run: node checks/checkPrTitle.ts

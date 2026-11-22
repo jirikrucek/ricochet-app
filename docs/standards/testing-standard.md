@@ -6,7 +6,7 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 | Level | Files | Data | Reaches Supabase |
 | --- | --- | --- | --- |
-| Unit | `src/**/*.unit.test.ts(x)`, `tests/support/**/*.unit.test.ts` | **Mock data** built in the test or in a test helper | Never |
+| Unit | `src/**/*.unit.test.ts(x)`, `tests/support/**/*.unit.test.ts`, `checks/**/*.unit.test.ts` | **Mock data** built in the test or in a test helper | Never |
 | Integration | `src/**/*.integration.test.ts` | **Seed data** in the local Supabase | Local only |
 | E2E | `tests/e2e/**/*.spec.ts` | **Seed data** in the local Supabase | Local only |
 

@@ -25,7 +25,7 @@ import {
 // An active change whose proposal isn't written yet has no delta specs, so
 // it is skipped, and the run names it.
 
-const root = path.resolve(import.meta.dirname, '../..');
+const root = path.resolve(import.meta.dirname, '..');
 
 function runJson<T>(bin: string, args: string[]): T {
   const output = execFileSync(path.join(root, 'node_modules/.bin', bin), args, {

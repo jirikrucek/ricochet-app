@@ -6,6 +6,7 @@
   "include": [
     "*.config.ts",
     "tests",
+    "checks",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     // Global declarations that tests reach only through the app code they

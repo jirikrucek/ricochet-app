@@ -11,7 +11,11 @@ export const unitProjects: TestProjectInlineConfiguration[] = [
     extends: true,
     test: {
       name: 'unit',
-      include: ['src/**/*.unit.test.ts', 'tests/support/**/*.unit.test.ts'],
+      include: [
+        'src/**/*.unit.test.ts',
+        'tests/support/**/*.unit.test.ts',
+        'checks/**/*.unit.test.ts',
+      ],
       environment: 'node',
     },
   },

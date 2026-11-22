@@ -25,9 +25,9 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "spec:validate": "openspec validate --all --strict --no-interactive && npm run spec:coverage",
-    "spec:coverage": "node tests/support/checkScenarioCoverage.ts",
-    "docs:check": "node tests/support/checkDocReferences.ts",
-    "conventions:check": "node tests/support/checkConventions.ts",
+    "spec:coverage": "node checks/checkScenarioCoverage.ts",
+    "docs:check": "node checks/checkDocReferences.ts",
+    "conventions:check": "node checks/checkConventions.ts",
     "design:lint": "design.md lint DESIGN.md"
   },
   "dependencies": {

@@ -23,11 +23,11 @@ Every E2E test fails on a console error, an uncaught error, or a report to Sentr
 
 ## `npm run spec:coverage` fails
 
-The check (`tests/support/checkScenarioCoverage.ts`, also run by `npm run spec:validate`) reads the specs with the OpenSpec CLI and the tests with `playwright test --list`, and fails in one of these ways:
+The check (`checks/checkScenarioCoverage.ts`, also run by `npm run spec:validate`) reads the specs with the OpenSpec CLI and the tests with `playwright test --list`, and fails in one of these ways:
 
 - **A scenario has no E2E test, or an E2E test covers no scenario**: follow the **Spec scenarios** rules in `docs/standards/testing-standard.md`. The failure lists each scenario as `spec › requirement › scenario` and each test as `file › describe › title`.
-- **Every test in `tests/e2e/internals/` is listed as covering no scenario**: the check reads each test's file from the title Playwright gives the file's suite in its JSON report, a path relative to `tests/e2e`. If a Playwright upgrade changed that title, update `isInternalsTest` in `tests/support/scenarioCoverage.ts`. The check fails closed, so no test goes unchecked meanwhile.
-- **"openspec status lists no proposal artifact"**: the OpenSpec CLI or the change schema no longer names the proposal `proposal`. Update `isProposalDone` in `tests/support/scenarioCoverage.ts` to the new schema.
+- **Every test in `tests/e2e/internals/` is listed as covering no scenario**: the check reads each test's file from the title Playwright gives the file's suite in its JSON report, a path relative to `tests/e2e`. If a Playwright upgrade changed that title, update `isInternalsTest` in `checks/scenarioCoverage.ts`. The check fails closed, so no test goes unchecked meanwhile.
+- **"openspec status lists no proposal artifact"**: the OpenSpec CLI or the change schema no longer names the proposal `proposal`. Update `isProposalDone` in `checks/scenarioCoverage.ts` to the new schema.
 
 ## Base UI and React Hook Form in tests
 
