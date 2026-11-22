@@ -32,7 +32,8 @@ type ViewRow = { view_name: string; security_invoker: boolean };
 function queryLocal<TRow>(sql: string): TRow[] {
   const output = execFileSync(
     'npx',
-    ['supabase', 'db', 'query', '--local', '-o', 'json', sql],
+    // `--no-install`: fail without node_modules rather than run an unpinned CLI.
+    ['--no-install', 'supabase', 'db', 'query', '--local', '-o', 'json', sql],
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
   );
   const parsed = JSON.parse(output) as TRow[] | { rows?: TRow[] };
