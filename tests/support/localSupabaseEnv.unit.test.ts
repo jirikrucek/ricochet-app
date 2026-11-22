@@ -18,6 +18,9 @@ function statusOutput(fields: Record<string, string>) {
   });
 }
 
+const npxMissingCli =
+  'npm error npx canceled due to missing packages and no YES option: ["supabase@3.2.0"]';
+
 describe('localSupabaseEnv', () => {
   beforeEach(() => {
     execFileSync.mockReset();
@@ -75,6 +78,16 @@ describe('localSupabaseEnv', () => {
     expect(() => localSupabaseEnv()).toThrow(
       /local Supabase is not running.*npx supabase start/is,
     );
+  });
+
+  it('tells you to run npm ci when the Supabase CLI is not installed', () => {
+    execFileSync.mockImplementation(() => {
+      throw Object.assign(new Error('Command failed: npx'), {
+        stderr: npxMissingCli,
+      });
+    });
+
+    expect(() => localSupabaseEnv()).toThrow(/not installed.*npm ci/is);
   });
 
   it('fails with a clear message when the status lacks the publishable key', () => {
@@ -146,5 +159,18 @@ describe('ensureLocalSupabaseRunning', () => {
       '--no-install supabase status -o json',
       '--no-install supabase start',
     ]);
+  });
+
+  it('does not try to start Supabase when the CLI is not installed', () => {
+    execFileSync.mockImplementation(() => {
+      throw Object.assign(new Error('Command failed: npx'), {
+        stderr: npxMissingCli,
+      });
+    });
+
+    expect(() => ensureLocalSupabaseRunning()).toThrow(
+      /not installed.*npm ci/is,
+    );
+    expect(commands()).toEqual(['--no-install supabase status -o json']);
   });
 });
