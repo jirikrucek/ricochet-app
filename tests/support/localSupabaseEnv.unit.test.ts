@@ -37,7 +37,7 @@ describe('localSupabaseEnv', () => {
     });
     expect(execFileSync).toHaveBeenCalledWith(
       'npx',
-      ['supabase', 'status', '-o', 'json'],
+      ['--no-install', 'supabase', 'status', '-o', 'json'],
       expect.objectContaining({ encoding: 'utf8' }),
     );
   });
@@ -108,12 +108,12 @@ describe('ensureLocalSupabaseRunning', () => {
 
     ensureLocalSupabaseRunning();
 
-    expect(commands()).toEqual(['supabase status -o json']);
+    expect(commands()).toEqual(['--no-install supabase status -o json']);
   });
 
   it('starts Supabase when it is not running', () => {
     execFileSync.mockImplementation((_command: string, args: string[]) => {
-      if (args[1] === 'status')
+      if (args.includes('status'))
         throw Object.assign(new Error('Command failed: supabase status'), {
           stderr: 'No such container: supabase_db_ricochet-app\nTry rerunning',
         });
@@ -128,7 +128,10 @@ describe('ensureLocalSupabaseRunning', () => {
       ),
     );
 
-    expect(commands()).toEqual(['supabase status -o json', 'supabase start']);
+    expect(commands()).toEqual([
+      '--no-install supabase status -o json',
+      '--no-install supabase start',
+    ]);
   });
 
   it('fails with a clear message when Supabase cannot be started', () => {
@@ -139,6 +142,9 @@ describe('ensureLocalSupabaseRunning', () => {
     expect(() => ensureLocalSupabaseRunning()).toThrow(
       /could not start the local Supabase.*check that Docker is running/is,
     );
-    expect(commands()).toEqual(['supabase status -o json', 'supabase start']);
+    expect(commands()).toEqual([
+      '--no-install supabase status -o json',
+      '--no-install supabase start',
+    ]);
   });
 });

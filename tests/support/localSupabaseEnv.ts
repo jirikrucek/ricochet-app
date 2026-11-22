@@ -12,6 +12,10 @@ export type LocalSupabaseEnv = {
 
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
+// `--no-install` makes npx fail when node_modules has no `supabase`, instead of
+// downloading the latest CLI from the registry in place of the pinned one.
+const SUPABASE_CLI = ['--no-install', 'supabase'];
+
 const NOT_RUNNING_MESSAGE =
   'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/testing-guide.md).';
 const START_FAILED_MESSAGE =
@@ -20,7 +24,7 @@ const START_FAILED_MESSAGE =
 function readStatus(): Record<string, unknown> {
   let output: string;
   try {
-    output = execFileSync('npx', ['supabase', 'status', '-o', 'json'], {
+    output = execFileSync('npx', [...SUPABASE_CLI, 'status', '-o', 'json'], {
       encoding: 'utf8',
       // The CLI prints notices (stopped services, updates) on stderr.
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -95,7 +99,7 @@ export function ensureLocalSupabaseRunning() {
     `Local Supabase is not running (supabase status: ${failure}). Starting it with \`npx supabase start\`; the first start downloads the images and can take several minutes.`,
   );
   try {
-    execFileSync('npx', ['supabase', 'start'], { stdio: 'inherit' });
+    execFileSync('npx', [...SUPABASE_CLI, 'start'], { stdio: 'inherit' });
   } catch (error) {
     throw new Error(START_FAILED_MESSAGE, { cause: error });
   }
