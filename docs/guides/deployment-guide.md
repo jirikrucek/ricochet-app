@@ -35,12 +35,12 @@ Preview deployments show a "Preview" badge next to the logo in the top nav. The 
 
 A migration, and the data the app needs in it, are not part of the Vercel deploy. They reach the Preview and Production Supabase projects by hand, so run them in this order. A frontend that is deployed first shows its error state until the table exists and holds rows.
 
-Once per machine, authenticate: `npx supabase login`. The CLI acts on one linked project at a time: `npx supabase link --project-ref <ref>` (the ref is in the Supabase dashboard URL) switches it. The link lives in the gitignored `supabase/.temp/`, and the `--linked` flag on `db push` and `db query` below makes them act on it.
+Once per machine, authenticate: `npx supabase login`. The CLI acts on one linked project at a time: `npx supabase link --project-ref <ref>` (the ref is in the Supabase dashboard URL) switches it. The link lives in the gitignored `supabase/.temp/`, and the `--remote` flag on `db push` and `db query` below makes them act on it. Without `--remote` they act on the local database. Both ask before changing the linked project, and pressing Enter declines.
 
 To apply a database change to a project:
 
-- Apply the migrations: `npx supabase db push --linked`.
-- Load the production data. The scripts live in the gitignored `supabase/data/` and are idempotent (`insert … on conflict`, relying on the table's natural key), so running one again is safe. Run each script against the linked project: `npx supabase db query -f ./supabase/data/<script>.sql --linked`. Never run one against a local or CI database (see `docs/standards/testing-standard.md`).
+- Apply the migrations: `npx supabase db push --remote`.
+- Load the production data. The scripts live in the gitignored `supabase/data/` and are idempotent (`insert … on conflict`, relying on the table's natural key), so running one again is safe. Run each script against the linked project: `npx supabase db query -f ./supabase/data/<script>.sql --remote`. Never run one against a local or CI database, which is what the command does if `--remote` is left out (see `docs/standards/testing-standard.md`).
 
 Release in this order:
 

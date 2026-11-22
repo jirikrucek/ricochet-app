@@ -4,8 +4,9 @@ import { describe, expect, it } from 'vitest';
 // Row-Level Security is the only access boundary for the browser's
 // publishable key (docs/standards/security-standard.md), so every table in
 // `public` must have it enabled. The publishable key can't read the catalog,
-// so this asks the local database through the Supabase CLI. `--local` keeps
-// it off the hosted projects (ADR 0011).
+// so this asks the local database through the Supabase CLI, which targets it
+// by default. Never pass `--remote` here: it would point the query at a hosted
+// project (ADR 0011).
 const tablesSql = `
   select c.relname as table_name, c.relrowsecurity as rls_enabled
   from pg_class c
@@ -33,7 +34,7 @@ function queryLocal<TRow>(sql: string): TRow[] {
   const output = execFileSync(
     'npx',
     // `--no-install`: fail without node_modules rather than run an unpinned CLI.
-    ['--no-install', 'supabase', 'db', 'query', '--local', '-o', 'json', sql],
+    ['--no-install', 'supabase', 'db', 'query', '-o', 'json', sql],
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
   );
   const parsed = JSON.parse(output) as TRow[] | { rows?: TRow[] };
