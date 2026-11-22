@@ -6,7 +6,10 @@ vi.mock('node:child_process', () => ({
   execFileSync: (...args: unknown[]) => execFileSync(...args),
 }));
 
-import { localSupabaseEnv } from './localSupabaseEnv';
+import {
+  ensureLocalSupabaseRunning,
+  localSupabaseEnv,
+} from './localSupabaseEnv';
 
 function statusOutput(fields: Record<string, string>) {
   return JSON.stringify({
@@ -80,5 +83,62 @@ describe('localSupabaseEnv', () => {
     );
 
     expect(() => localSupabaseEnv()).toThrow(/PUBLISHABLE_KEY/);
+  });
+});
+
+describe('ensureLocalSupabaseRunning', () => {
+  beforeEach(() => {
+    execFileSync.mockReset();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  function commands() {
+    return execFileSync.mock.calls.map(([, args]) =>
+      (args as string[]).join(' '),
+    );
+  }
+
+  it('does not start Supabase when it is already running', () => {
+    execFileSync.mockReturnValue(
+      statusOutput({
+        API_URL: 'http://127.0.0.1:54321',
+        PUBLISHABLE_KEY: 'sb_publishable_local',
+      }),
+    );
+
+    ensureLocalSupabaseRunning();
+
+    expect(commands()).toEqual(['supabase status -o json']);
+  });
+
+  it('starts Supabase when it is not running', () => {
+    execFileSync.mockImplementation((_command: string, args: string[]) => {
+      if (args[1] === 'status')
+        throw Object.assign(new Error('Command failed: supabase status'), {
+          stderr: 'No such container: supabase_db_ricochet-app\nTry rerunning',
+        });
+      return '';
+    });
+
+    ensureLocalSupabaseRunning();
+
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringContaining(
+        '(supabase status: No such container: supabase_db_ricochet-app)',
+      ),
+    );
+
+    expect(commands()).toEqual(['supabase status -o json', 'supabase start']);
+  });
+
+  it('fails with a clear message when Supabase cannot be started', () => {
+    execFileSync.mockImplementation(() => {
+      throw new Error('Cannot connect to the Docker daemon');
+    });
+
+    expect(() => ensureLocalSupabaseRunning()).toThrow(
+      /could not start the local Supabase.*check that Docker is running/is,
+    );
+    expect(commands()).toEqual(['supabase status -o json', 'supabase start']);
   });
 });

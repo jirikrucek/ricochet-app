@@ -56,7 +56,7 @@ ricochet-app/
 ├── tests/
 │   ├── e2e/                    # Playwright specs and their shared fixture (fixtures.ts)
 │   │   └── internals/          # Internals tests: how the app or its test setup is built, covered by no spec scenario
-│   └── support/                # Test tooling that tests and test configs import: local Supabase env helpers for Vitest and Playwright, the preview server's headers, the Sentry envelope reader
+│   └── support/                # Test tooling that tests, test configs and test scripts use: local Supabase env helpers for Vitest and Playwright, the start step the test scripts run, the preview server's headers, the Sentry envelope reader
 ├── checks/                     # Repository checks that enforce the rules in AGENTS.md, run by npm scripts or CI, with their unit tests: the spec scenario coverage check, the doc reference check, the branch, commit and pull request title conventions checks, the dev container lockfile check
 ├── glossary/                   # Domain and technical terms
 ├── docs/

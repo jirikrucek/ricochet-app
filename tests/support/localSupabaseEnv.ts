@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 // The only way a test reaches a database (docs/standards/testing-standard.md, ADR 0011).
 // Reads the running local Supabase from the CLI instead of from .env* files,
 // so a developer's .env.local pointing at a hosted project can't leak in.
+// It also starts the local Supabase for the test scripts that need it.
 
 export type LocalSupabaseEnv = {
   VITE_SUPABASE_URL: string;
@@ -13,6 +14,8 @@ const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
 const NOT_RUNNING_MESSAGE =
   'Local Supabase is not running. Integration and E2E tests need it: start Docker, then run `npx supabase start` (see docs/guides/testing-guide.md).';
+const START_FAILED_MESSAGE =
+  'Could not start the local Supabase. Integration and E2E tests need it: check that Docker is running, read the `supabase start` output above for the reason, then rerun the tests (see docs/guides/testing-guide.md).';
 
 function readStatus(): Record<string, unknown> {
   let output: string;
@@ -59,4 +62,41 @@ export function localSupabaseEnv(): LocalSupabaseEnv {
     VITE_SUPABASE_URL: url,
     VITE_SUPABASE_PUBLISHABLE_KEY: publishableKey,
   };
+}
+
+// Why `supabase status` failed, in one line, or undefined when it runs.
+function statusFailure(): string | undefined {
+  try {
+    readStatus();
+    return undefined;
+  } catch (error) {
+    const cause = error instanceof Error ? error.cause : undefined;
+    const stderr = (cause as { stderr?: unknown } | undefined)?.stderr;
+    const reason =
+      typeof stderr === 'string' && stderr.trim() !== ''
+        ? stderr
+        : cause instanceof Error
+          ? cause.message
+          : String(cause);
+    return reason.trim().split('\n')[0];
+  }
+}
+
+// Run by the test:integration and test:e2e scripts (startLocalSupabase.ts)
+// before their runner, so a fresh dev container needs no manual
+// `supabase start`. It runs outside the runners because Playwright starts its
+// web server, whose timeout a first start (image pulls) exceeds, before its
+// global setup.
+export function ensureLocalSupabaseRunning() {
+  const failure = statusFailure();
+  if (failure === undefined) return;
+
+  console.log(
+    `Local Supabase is not running (supabase status: ${failure}). Starting it with \`npx supabase start\`; the first start downloads the images and can take several minutes.`,
+  );
+  try {
+    execFileSync('npx', ['supabase', 'start'], { stdio: 'inherit' });
+  } catch (error) {
+    throw new Error(START_FAILED_MESSAGE, { cause: error });
+  }
 }

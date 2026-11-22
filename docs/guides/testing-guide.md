@@ -43,8 +43,8 @@ The UI primitives come from Base UI ([ADR 0015](../adr/ADR0015-shadcn-components
 Integration and E2E tests run against a local Supabase loaded with the migrations and the fictional **seed data** in `supabase/seed.sql`. Unit tests don't need it. In every environment:
 
 - Docker must be running.
-- Start Supabase once before the tests: `npx supabase start`. It keeps running until `npx supabase stop`.
-- `npm run test:integration`, `npm run test:e2e` and `npm run test:all` fail fast with "Local Supabase is not running" when it isn't started.
+- `npm run test:integration`, `npm run test:e2e` and `npm run test:all` start Supabase when it isn't running: `tests/support/startLocalSupabase.ts` runs `npx supabase start` before the test runner, and does nothing when Supabase already runs. The first start downloads the images and can take several minutes. Supabase keeps running until `npx supabase stop`.
+- If Docker isn't running, those scripts fail fast with "Could not start the local Supabase". Running `vitest` or `playwright test` directly starts nothing: they fail fast with "Local Supabase is not running" until you run `npx supabase start`.
 
 How the tests get the connection: `tests/support/localSupabaseEnv.ts` runs `supabase status -o json` and takes its `API_URL` and `PUBLISHABLE_KEY`. It refuses any host other than `127.0.0.1` or `localhost`. Both are resolved when a run starts, not when a config loads, so unit tests and `playwright test --list` need no Supabase. A Vitest global setup (`tests/support/vitestLocalSupabase.ts`) puts the values in the process environment for the integration project. Playwright does the same with a global setup for the specs, and `tests/support/runWithLocalSupabaseEnv.ts` builds and serves the app with them. Process variables take precedence over `.env*` files, so your `.env.local` doesn't affect test runs, even if it points at the shared project. The rule for connection settings is in `docs/standards/testing-standard.md`.
 
@@ -55,7 +55,7 @@ To restore the seed data, for example after editing `supabase/seed.sql` or a mig
 ```sh
 npm ci
 npm run test:e2e:setup   # downloads Chromium into .playwright-browsers
-npx supabase start       # needs Docker Desktop (or another Docker engine) running
+# needs Docker Desktop (or another Docker engine) running; starts Supabase if needed
 npm run test:e2e
 ```
 
@@ -63,7 +63,7 @@ If `.playwright-browsers` was filled by an older dev container (Linux build), de
 
 ## Dev container (Ubuntu)
 
-Open the repo with **Dev Containers: Clone Repository in Container Volume**, so the checkout (with `node_modules` and `.playwright-browsers`) lives in a Docker volume and the host and the container never share binaries. Don't use **Reopen in Container** on a host checkout. The container setup runs in two steps: `updateContentCommand` runs `npm ci` (VS Code waits for it before starting the extensions), and `postCreateCommand` installs the system libraries Chromium needs and runs `npm run test:e2e:setup` (VS Code does not wait for it, so Playwright tests can fail with a missing-browser error until it finishes). If `npm ci` fails, the container opens in recovery mode: read the creation log, fix the cause, and rebuild. `/home/vscode` is a named volume, so the Claude Code and GitHub CLI logins survive a rebuild. The container runs its own Docker engine (the `docker-in-docker` feature), so start Supabase inside it with `npx supabase start`, then run `npm run test:e2e`.
+Open the repo with **Dev Containers: Clone Repository in Container Volume**, so the checkout (with `node_modules` and `.playwright-browsers`) lives in a Docker volume and the host and the container never share binaries. Don't use **Reopen in Container** on a host checkout. The container setup runs in two steps: `updateContentCommand` runs `npm ci` (VS Code waits for it before starting the extensions), and `postCreateCommand` installs the system libraries Chromium needs and runs `npm run test:e2e:setup` (VS Code does not wait for it, so Playwright tests can fail with a missing-browser error until it finishes). If `npm ci` fails, the container opens in recovery mode: read the creation log, fix the cause, and rebuild. `/home/vscode` is a named volume, so the Claude Code and GitHub CLI logins survive a rebuild. The container runs its own Docker engine (the `docker-in-docker` feature), so after a rebuild it has no Supabase containers; `npm run test:e2e` (or `test:integration`, `test:all`) starts them on its first run.
 
 ## GitHub Actions
 
