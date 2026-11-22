@@ -2,12 +2,12 @@
 
 - Status: Accepted
 - Created: 2026-11-08
-- Updated: 2026-11-08
+- Updated: 2026-11-22
 - Supersedes: ADR 0007
 
 ## Context
 
-App code runs in the browser and must not use Node APIs. Tests, test tooling and the root `*.config.ts` files run in Node and need Node types. One TypeScript config can't serve both, so the code is type-checked with two.
+App code runs in the browser and must not use Node APIs. Tests, test tooling, repository checks and the root `*.config.ts` files run in Node and need Node types. One TypeScript config can't serve both, so the code is type-checked with two.
 
 ADR 0007 made `tsconfig.json` the app config and added `tsconfig.node.json` for the Node code, with no TypeScript project references. The command line checked both, but the editor's TypeScript server reads only the `tsconfig.json` nearest to a file. Test and config files weren't in it, so the editor opened them with default settings: `@/` imports didn't resolve, and the editor showed errors that `npm run typecheck` didn't, and missed some it did.
 
@@ -18,7 +18,7 @@ The editor follows a `tsconfig.json`'s `references` to find the config that incl
 Split the TypeScript config into three files:
 
 - `tsconfig.app.json` covers the app code under `src/`, without its test files, and loads only `vite/client` types, so app code can't use Node APIs.
-- `tsconfig.node.json` extends it and adds Node types. It covers `tests/`, the test files under `src/` and the root `*.config.ts` files.
+- `tsconfig.node.json` extends it and adds Node types. It covers `tests/`, `checks/`, the test files under `src/` and the root `*.config.ts` files.
 - `tsconfig.json` is a solution-style config: `"files": []` and `references` to the two configs above, so the editor opens each file with the config that includes it. It also repeats the `@/` entry of `compilerOptions.paths`, because the shadcn CLI reads only this file to resolve `components.json` aliases.
 
 `npm run typecheck` runs `tsc --noEmit -p` on each of the two configs. The references only pick a config per file. They don't link packages, and nothing builds with `tsc -b`.

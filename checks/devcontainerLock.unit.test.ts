@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 // hand edits to devcontainer.json left it describing other features (#34,
 // #35, ae23238, afabb95). The Dev Containers CLI looks a feature's lock
 // entry up by its exact id, so the two files must list the same ids.
-const root = path.resolve(import.meta.dirname, '../..');
+const root = path.resolve(import.meta.dirname, '..');
 
 function readJsonc(file: string) {
   const { config, error } = ts.parseConfigFileTextToJson(

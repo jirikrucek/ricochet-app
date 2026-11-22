@@ -56,15 +56,16 @@ ricochet-app/
 ├── tests/
 │   ├── e2e/                    # Playwright specs and their shared fixture (fixtures.ts)
 │   │   └── internals/          # Internals tests: how the app or its test setup is built, covered by no spec scenario
-│   └── support/                # Test tooling: local Supabase env helpers for Vitest and Playwright, the spec scenario coverage check, the doc reference check, the branch, commit and pull request title conventions checks, the dev container lockfile check, the preview server's headers, the Sentry envelope reader
+│   └── support/                # Test tooling that tests and test configs import: local Supabase env helpers for Vitest and Playwright, the preview server's headers, the Sentry envelope reader
+├── checks/                     # Repository checks that enforce the rules in AGENTS.md, run by npm scripts or CI, with their unit tests: the spec scenario coverage check, the doc reference check, the branch, commit and pull request title conventions checks, the dev container lockfile check
 ├── glossary/                   # Domain and technical terms
 ├── docs/
 └── openspec/
 ```
 
-Config files (TypeScript, ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root. `tsconfig.app.json` covers the app; `tsconfig.node.json` covers what runs in Node: tests, `tests/support/` and the `*.config.ts` files. `tsconfig.json` references the two and repeats the `@/` path for the shadcn CLI ([ADR 0025](../adr/ADR0025-type-check-app-and-node-code-with-separate-configs.md)).
+Config files (TypeScript, ESLint, Vite, Vitest, Playwright, Tailwind, `components.json`, `vercel.json`) sit at the repository root. `tsconfig.app.json` covers the app; `tsconfig.node.json` covers what runs in Node: tests, `tests/support/`, `checks/` and the `*.config.ts` files. `tsconfig.json` references the two and repeats the `@/` path for the shadcn CLI ([ADR 0025](../adr/ADR0025-type-check-app-and-node-code-with-separate-configs.md)).
 
-Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`). Only Playwright e2e specs live under a separate `tests/e2e/` folder.
+Unit and integration tests stay colocated with the source they test (`*.unit.test.ts`, `*.integration.test.ts`). Only Playwright e2e specs live under a separate `tests/e2e/` folder. A check that enforces a repository rule, rather than testing app code, goes in `checks/`, even when it is written as a unit test.
 
 Any layer can have subfolders to organize its code, such as `domain/types/` or `domain/utils/`. They carry no import rules of their own: lint checks the layer as a whole. Add them when a folder grows, not before. The exception is `data-access/api/`, which is a layer of its own.
 

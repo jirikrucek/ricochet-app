@@ -23,7 +23,7 @@ import {
 // .agents/references/ isn't checked: it holds upstream files, unedited.
 
 const root = path.resolve(
-  process.argv[2] ?? path.join(import.meta.dirname, '../..'),
+  process.argv[2] ?? path.join(import.meta.dirname, '..'),
 );
 
 const LINKS =
@@ -185,7 +185,7 @@ if (broken.length > 0) {
 if (stale.length > 0) {
   if (broken.length > 0) console.error('');
   console.error(
-    `${stale.length} exception(s) in tests/support/checkDocReferences.ts no longer apply. Delete each, or fix its reference:`,
+    `${stale.length} exception(s) in checks/checkDocReferences.ts no longer apply. Delete each, or fix its reference:`,
   );
   for (const { exception, why } of stale) {
     console.error(`  ${exception.file}  ${exception.reference}  (${why})`);

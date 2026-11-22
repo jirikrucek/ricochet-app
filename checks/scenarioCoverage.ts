@@ -165,7 +165,7 @@ export function isProposalDone({ artifacts }: ChangeStatus): boolean {
   if (!proposal) {
     const found = artifacts.map(({ id }) => id).join(', ') || 'none';
     throw new Error(
-      `openspec status lists no proposal artifact (found: ${found}). Update isProposalDone in tests/support/scenarioCoverage.ts to the new schema.`,
+      `openspec status lists no proposal artifact (found: ${found}). Update isProposalDone in checks/scenarioCoverage.ts to the new schema.`,
     );
   }
   return proposal.status === 'done';

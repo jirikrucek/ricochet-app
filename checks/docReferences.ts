@@ -189,7 +189,7 @@ export function findBrokenReferences(
       report(
         index,
         reference,
-        `no skill named ${name} in .agents/skills/; if /${name} is not a skill, add it to NOT_SKILLS in tests/support/docReferences.ts`,
+        `no skill named ${name} in .agents/skills/; if /${name} is not a skill, add it to NOT_SKILLS in checks/docReferences.ts`,
       );
     }
   }
