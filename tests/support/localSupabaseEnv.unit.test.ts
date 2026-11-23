@@ -8,6 +8,7 @@ vi.mock('node:child_process', () => ({
 
 import {
   ensureLocalSupabaseRunning,
+  localSupabaseDbUrl,
   localSupabaseEnv,
 } from './localSupabaseEnv';
 
@@ -96,6 +97,63 @@ describe('localSupabaseEnv', () => {
     );
 
     expect(() => localSupabaseEnv()).toThrow(/PUBLISHABLE_KEY/);
+  });
+});
+
+describe('localSupabaseDbUrl', () => {
+  beforeEach(() => {
+    execFileSync.mockReset();
+  });
+
+  it('returns DB_URL from supabase status', () => {
+    execFileSync.mockReturnValue(statusOutput({}));
+
+    expect(localSupabaseDbUrl()).toBe(
+      'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+    );
+    expect(execFileSync).toHaveBeenCalledWith(
+      'npx',
+      ['--no-install', 'supabase', 'status', '-o', 'json'],
+      expect.objectContaining({ encoding: 'utf8' }),
+    );
+  });
+
+  it('accepts localhost as the host', () => {
+    execFileSync.mockReturnValue(
+      statusOutput({
+        DB_URL: 'postgresql://postgres:postgres@localhost:54322/postgres',
+      }),
+    );
+
+    expect(localSupabaseDbUrl()).toContain('@localhost:');
+  });
+
+  it.each([
+    'postgresql://postgres:secret@db.abcdefgh.supabase.co:5432/postgres',
+    'postgresql://postgres:postgres@192.168.1.10:54322/postgres',
+    'postgresql://postgres:postgres@127.0.0.1.example.com:54322/postgres',
+  ])('refuses the non-local host in %s', (dbUrl) => {
+    execFileSync.mockReturnValue(statusOutput({ DB_URL: dbUrl }));
+
+    expect(() => localSupabaseDbUrl()).toThrow(
+      /refusing to run tests against a non-local Supabase/i,
+    );
+  });
+
+  it('fails with a clear message when the status lacks DB_URL', () => {
+    execFileSync.mockReturnValue(JSON.stringify({}));
+
+    expect(() => localSupabaseDbUrl()).toThrow(/DB_URL/);
+  });
+
+  it('fails with a clear message when Supabase is not running', () => {
+    execFileSync.mockImplementation(() => {
+      throw new Error('Command failed: supabase status');
+    });
+
+    expect(() => localSupabaseDbUrl()).toThrow(
+      /local Supabase is not running.*npx supabase start/is,
+    );
   });
 });
 
