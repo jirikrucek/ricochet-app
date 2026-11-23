@@ -62,22 +62,36 @@ function requireField(status: Record<string, unknown>, field: string) {
   return value;
 }
 
-export function localSupabaseEnv(): LocalSupabaseEnv {
-  const status = readStatus();
-  const url = requireField(status, 'API_URL');
-  const publishableKey = requireField(status, 'PUBLISHABLE_KEY');
-
+function requireLocalHost(url: string) {
   const { hostname } = new URL(url);
   if (!LOCAL_HOSTS.has(hostname)) {
     throw new Error(
       `Refusing to run tests against a non-local Supabase (${hostname}). Tests may only reach 127.0.0.1 or localhost.`,
     );
   }
+}
+
+export function localSupabaseEnv(): LocalSupabaseEnv {
+  const status = readStatus();
+  const url = requireField(status, 'API_URL');
+  const publishableKey = requireField(status, 'PUBLISHABLE_KEY');
+
+  requireLocalHost(url);
 
   return {
     VITE_SUPABASE_URL: url,
     VITE_SUPABASE_PUBLISHABLE_KEY: publishableKey,
   };
+}
+
+// The local Postgres URL, for tests that query the database directly instead
+// of through the API (the RLS test). Same host check as `localSupabaseEnv`.
+export function localSupabaseDbUrl(): string {
+  const url = requireField(readStatus(), 'DB_URL');
+
+  requireLocalHost(url);
+
+  return url;
 }
 
 // Why `supabase status` failed, in one line, or undefined when it runs.

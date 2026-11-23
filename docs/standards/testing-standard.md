@@ -27,7 +27,7 @@ Rules for what data each test level may use, how tests reach a database, and how
 
 ## Reaching the database
 
-- Every test that reaches a database gets its URL and publishable key from `tests/support/localSupabaseEnv.ts`. It reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`.
+- Every test that reaches a database gets its URL and publishable key, or the Postgres `DB_URL` for a test that queries the database directly, from `tests/support/localSupabaseEnv.ts`. It reads `supabase status -o json` and refuses any host other than `127.0.0.1` or `localhost`.
 - The Vitest integration project and Playwright (its global setup and the web server wrapper) put those values in the process environment. Process variables take precedence over `.env*` files, so a `.env.local` pointing at a shared project can't reach a test run.
 - A test that reaches a database never hand-writes connection settings (URLs, keys), in the test or in a config.
 

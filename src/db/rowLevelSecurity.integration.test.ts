@@ -1,12 +1,15 @@
 import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
+// eslint-disable-next-line no-restricted-imports -- `@/` maps to src/ only, and tests/support/ sits outside it
+import { localSupabaseDbUrl } from '../../tests/support/localSupabaseEnv';
 
 // Row-Level Security is the only access boundary for the browser's
 // publishable key (docs/standards/security-standard.md), so every table in
 // `public` must have it enabled. The publishable key can't read the catalog,
-// so this asks the local database through the Supabase CLI, which targets it
-// by default. Never pass `--remote` here: it would point the query at a hosted
-// project (ADR 0011).
+// so this asks the local database through the Supabase CLI. The target is the
+// `DB_URL` that `localSupabaseDbUrl` reads from `supabase status` and checks
+// for a local host, passed as `--remote=<url>` (ADR 0011). Never pass a bare
+// `--remote`: it targets the linked, hosted project.
 const tablesSql = `
   select c.relname as table_name, c.relrowsecurity as rls_enabled
   from pg_class c
@@ -34,7 +37,19 @@ function queryLocal<TRow>(sql: string): TRow[] {
   const output = execFileSync(
     'npx',
     // `--no-install`: fail without node_modules rather than run an unpinned CLI.
-    ['--no-install', 'supabase', 'db', 'query', '-o', 'json', sql],
+    [
+      '--no-install',
+      'supabase',
+      'db',
+      'query',
+      `--remote=${localSupabaseDbUrl()}`,
+      // A URL counts as a hosted target, which asks for a confirmation that
+      // piped input can't answer; a read-only transaction skips it.
+      '--read-only',
+      '-o',
+      'json',
+      sql,
+    ],
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
   );
   const parsed = JSON.parse(output) as TRow[] | { rows?: TRow[] };
