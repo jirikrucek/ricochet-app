@@ -2,9 +2,9 @@
 {
   "name": "ricochet-app",
   // The Dockerfile builds on the Ubuntu base image and installs GitHub CLI and Claude Code from
-  // their apt repositories. They aren't features: a feature bakes a fixed version into the cached
-  // image layer, which only a no-cache rebuild refreshes, while apt can upgrade them on every
-  // start (postStartCommand).
+  // their apt repositories (OpenCode comes from npm, see postStartCommand). They aren't features: a
+  // feature bakes a fixed version into the cached image layer, which only a no-cache rebuild
+  // refreshes, while apt can upgrade them on every start (postStartCommand).
   "build": {
     "dockerfile": "Dockerfile"
   },
@@ -31,9 +31,9 @@
   // are never shared with macOS and need no volumes of their own. Don't open a host checkout
   // with "Reopen in Container": npm installs native optional deps (e.g. @rolldown/binding-*)
   // only for the OS it runs on, so a shared node_modules breaks Vite/Vitest on one side.
-  // The whole home folder is one named volume, so Claude Code and GitHub CLI logins (~/.claude,
-  // ~/.claude.json, ~/.config/gh) survive a rebuild. Docker fills a new volume from the image's
-  // /home/vscode, ownership included, so no chown is needed. It's filled only once: dotfiles the
+  // The whole home folder is one named volume, so Claude Code, GitHub CLI and OpenCode logins
+  // (~/.claude, ~/.claude.json, ~/.config/gh, ~/.local/share/opencode) survive a rebuild. Docker
+  // fills a new volume from the image's /home/vscode, ownership included, so no chown is needed. It's filled only once: dotfiles the
   // image changes later reach the container only after the volume is deleted.
   // ${devcontainerId} is stable across rebuilds and unique per workspace.
   "mounts": [
@@ -64,13 +64,19 @@
   // default one, so a bare `sudo npx` fails with "command not found".
   "postCreateCommand": "sudo env \"PATH=$PATH\" npx playwright install-deps chromium && npm run test:e2e:setup",
 
-  // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI and
-  // Claude Code are on the latest release before the first session. A failed or timed-out update
-  // (e.g. offline) doesn't fail the start: it prints the exit code (124 is a timeout) and the
-  // next start tries again. It ends by printing the installed versions. apt installs don't update
-  // themselves, so this is the only place they are upgraded.
+  // Runs on every container start, including restarts that don't rebuild it, so GitHub CLI, Claude
+  // Code and OpenCode are on the latest release before the first session. A failed or timed-out
+  // update (e.g. offline) doesn't fail the start: it prints the exit code (124 is a timeout) and
+  // the next start tries again. Each task ends by printing the installed version. apt installs
+  // don't update themselves, so this is the only place they are upgraded.
+  // OpenCode has no apt repository, so it comes from npm (`@opencode/cli`, the 2.x package
+  // line). The Node feature installs after the image build, so the Dockerfile can't run npm:
+  // the install happens here instead. The global prefix is in the nvm directory, which the
+  // vscode user owns, so it needs no sudo. Its login and config live in ~/.local/share/opencode
+  // and ~/.config/opencode, inside the home volume, so they survive a rebuild.
   "postStartCommand": {
-    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq --error-on=any || echo \"apt update failed or timed out (exit $?); GitHub CLI and Claude Code may be out of date\"; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo \"apt upgrade failed or timed out (exit $?)\"; gh --version | head -1; claude --version || true"
+    "updateGhAndClaude": "sudo timeout 120 apt-get update -qq --error-on=any || echo \"apt update failed or timed out (exit $?); GitHub CLI and Claude Code may be out of date\"; sudo timeout 300 apt-get install -y -qq --only-upgrade gh claude-code || echo \"apt upgrade failed or timed out (exit $?)\"; gh --version | head -1; claude --version || true",
+    "updateOpenCode": "timeout 300 npm install -g --no-fund --no-audit --loglevel=error @opencode/cli@latest || echo \"OpenCode install failed or timed out (exit $?); it may be missing or out of date\"; opencode --version || true"
   },
 
   // Configure tool-specific properties.
