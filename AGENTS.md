@@ -121,7 +121,6 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 | Must use English language when authoring                                                                                                                        | nothing                                                                            |
 | Must use Conventional Commits when creating commit messages                                                                                                     | `npm run conventions:check`, and `.github/workflows/pr-title.yml` for the PR title |
 | Must use Conventional Branch when creating branches                                                                                                             | `npm run conventions:check`, except on Dependabot's branches                       |
-| Must post the workflow checklist comment on the issue before the first edit                                                                                     | nothing                                                                            |
 | Must use /pr skill when writing a PR body                                                                                                                       | nothing                                                                            |
 | Must read the accepted ADRs (see `docs/adr/README.md`) that touch the area you're about to work in before exploring the codebase for a task                     | nothing                                                                            |
 | Must keep each change to the smallest diff that resolves its issue; record anything else you spot (refactors, renames, cleanups) as a follow-up issue           | nothing                                                                            |
@@ -130,9 +129,7 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 | Must reference only files, folders and skills that exist, in docs, skills and specs                                                                             | `npm run docs:check`                                                               |
 | Must pin each workflow action to a commit, pass untrusted values to `run:` scripts through `env:`, and check out without persisting credentials                 | `npm run lint:workflows` (zizmor)                                                  |
 | Must run a workflow's third-party code (npm, CLIs it installs) in a job with a read-only token, and push or open PRs from a job that runs none                  | nothing                                                                            |
-| Must keep `w-`, `min-w-`, `max-w-` and `basis-` from `xs` to `xl` on Tailwind's container scale, as Shadcn expects                                              | `src/styles/designTokens.unit.test.ts`                                             |
 | Must keep `package-lock.json` in sync with `package.json`                                                                                                       | `npm ci` in the verification checks                                                |
-| Must keep `.devcontainer/devcontainer-lock.json` listing exactly the features of `devcontainer.json`, at their pinned versions                                  | `checks/devcontainerLock.unit.test.ts`                                             |
 
 ### Definition of Done
 
