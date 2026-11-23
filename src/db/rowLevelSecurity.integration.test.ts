@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
+// eslint-disable-next-line no-restricted-imports -- `@/` maps to src/ only, and tests/support/ sits outside it
 import { localSupabaseDbUrl } from '../../tests/support/localSupabaseEnv';
 
 // Row-Level Security is the only access boundary for the browser's
