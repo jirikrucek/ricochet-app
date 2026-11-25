@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "OpenCode for .github/workflows/opencode-review.yml, installed with npm ci from the lockfile. Bump it with: npm install --prefix .github/opencode --save-exact @opencode/cli@<version>",
+  "dependencies": {
+    "@opencode/cli": "2.4.1"
+  }
+}

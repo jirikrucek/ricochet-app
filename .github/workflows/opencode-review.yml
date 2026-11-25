@@ -1,0 +1,138 @@
+name: OpenCode review
+
+# Reviews each pull request with OpenCode on the OpenCode Go subscription and
+# posts the findings as one review comment. The agent only reads: it can't
+# edit, push, approve or request changes.
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+# Each job gets only what it needs: the review runs third-party code
+# (OpenCode, prompted by the pull request) with a read-only token, and the
+# job that posts runs none of it.
+permissions: {}
+
+concurrency:
+  group: opencode-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # A model of the Go subscription (`opencode models opencode-go`), with its
+  # reasoning effort after the #.
+  MODEL: opencode-go/gpt-6-luna#high
+
+jobs:
+  review:
+    # Only branches of this repository, which only people with write access
+    # can push: fork pull requests get no secrets. Drafts wait until they are
+    # ready, and Dependabot's pull requests have no access to the secret.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && !github.event.pull_request.draft
+      && github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      # The head commit, not the merge commit, so the review's line numbers
+      # are the ones the pull request's diff shows. The full history, so the
+      # diff can start at the merge base.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      # From its own lockfile, so the version and its hash are pinned, and
+      # outside the checkout the agent reads.
+      - name: Install OpenCode
+        run: |
+          mkdir "$RUNNER_TEMP/opencode"
+          cp .github/opencode/package.json .github/opencode/package-lock.json "$RUNNER_TEMP/opencode/"
+          npm ci --prefix "$RUNNER_TEMP/opencode" --no-fund --no-audit
+          echo "$RUNNER_TEMP/opencode/node_modules/.bin" >> "$GITHUB_PATH"
+
+      # The agent may read any file in the checkout. A symlink could point
+      # outside it (/proc/self/environ holds the API key) and OpenCode follows
+      # symlinks, so remove them all: the agent can't create new ones.
+      - name: Prepare the review
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          find . -type l -not -path './.git/*' -print -delete
+          git diff --no-color "$BASE_SHA...$HEAD_SHA" -- . ':(exclude)package-lock.json' > "$RUNNER_TEMP/pr.diff"
+          git diff --stat "$BASE_SHA...$HEAD_SHA"
+
+      # The agent's tools and permissions come from review-agent.json alone:
+      # the checkout's own OpenCode config (opencode.json, .opencode/) is
+      # ignored, so the pull request can't grant itself more.
+      - name: Review
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENCODE_DISABLE_PROJECT_CONFIG: 'true'
+          OPENCODE_DISABLE_AUTOUPDATE: 'true'
+        run: |
+          test -n "$OPENCODE_API_KEY" || { echo "::error::Add the OpenCode Go API key as the OPENCODE_API_KEY repository secret"; exit 1; }
+          OPENCODE_CONFIG_CONTENT=$(cat .github/opencode/review-agent.json)
+          export OPENCODE_CONFIG_CONTENT
+          timeout 900 opencode run --standalone --archived --agent reviewer \
+            --model "$MODEL" --format json --title "PR review" \
+            --file "$RUNNER_TEMP/pr.diff" \
+            "$(cat .github/opencode/review-prompt.md)" > "$RUNNER_TEMP/events.jsonl"
+
+          node .github/scripts/extract-review.mjs "$RUNNER_TEMP/events.jsonl" "$RUNNER_TEMP/review.json"
+
+          # A pull request could talk the model into echoing the key; never
+          # hand it over to the job that posts.
+          if grep -qF -e "$OPENCODE_API_KEY" "$RUNNER_TEMP/review.json"; then
+            echo "::error::The reply contains the API key; not posting it"
+            exit 1
+          fi
+
+          # Go reports no cost per request, so show the tokens the run used.
+          jq -rs '[.[] | select(.type == "step_finish") | .part.tokens] as $t
+            | "`\(env.MODEL)`: \($t | map(.input) | add) input, \($t | map(.cache.read // 0) | add) cache read, \($t | map(.output + .reasoning) | add) output tokens"' \
+            "$RUNNER_TEMP/events.jsonl" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: opencode-review
+          path: |
+            ${{ runner.temp }}/review.json
+            ${{ runner.temp }}/pr.diff
+          if-no-files-found: error
+          retention-days: 1
+
+  post:
+    needs: review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: opencode-review
+          path: ${{ runner.temp }}/opencode-review
+
+      - name: Post the review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REVIEW_FILE: ${{ runner.temp }}/opencode-review/review.json
+          DIFF_FILE: ${{ runner.temp }}/opencode-review/pr.diff
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: .github/scripts/post-review.sh
