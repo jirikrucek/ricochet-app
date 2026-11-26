@@ -13,9 +13,10 @@ export type ReferenceKinds = {
   /** Skills, named as `/skill-name` or as "the `skill-name` skill". */
   skills: boolean;
   /**
-   * Paths in backticks, such as `docs/guides/testing-guide.md` or
-   * `../references/x.md`: `all` checks files and folders, `files` only
-   * files (with an extension), for docs whose folders are often examples.
+   * Paths in backticks, such as `docs/guides/testing-guide.md`,
+   * `../references/x.md` or a skill's own `references/x.md`: `all` checks
+   * files and folders, `files` only files (with an extension), for docs
+   * whose folders are often examples.
    */
   paths: 'all' | 'files' | false;
 };
@@ -50,7 +51,8 @@ export type Exception = {
 };
 
 // Top-level folders whose paths a doc names; a backticked path counts only
-// when it starts with one of them, or with ../.
+// when it starts with one of them, or with ../ or references/, which resolve
+// from the document's folder.
 const REPOSITORY_FOLDERS = [
   '.agents/',
   '.claude/',
@@ -136,7 +138,8 @@ function pathTargets(text: string, file: string, scope: 'all' | 'files') {
   return [...text.matchAll(/`([^`\s]+)`/g)].flatMap((match) => {
     // Drop a line number or an anchor: `src/main.tsx:12`, `x.md#part`.
     const target = match[1].replace(/[:#].*$/, '');
-    const relative = target.startsWith('../');
+    const relative =
+      target.startsWith('../') || target.startsWith('references/');
     if (!relative && !REPOSITORY_FOLDERS.some((f) => target.startsWith(f))) {
       return [];
     }
