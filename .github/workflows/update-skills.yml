@@ -22,7 +22,6 @@ jobs:
     outputs:
       changed: ${{ steps.package.outputs.changed }}
       branch: ${{ steps.package.outputs.branch }}
-      references-sha: ${{ steps.references.outputs.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -47,34 +46,13 @@ jobs:
           DO_NOT_TRACK: '1'
         run: npx --no-install skills update --project --yes
 
-      # .agents/references/ holds addyosmani/agent-skills references/,
-      # unedited, for its skills; the skills CLI doesn't update them.
-      - name: Update references
-        id: references
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          sha=$(gh api repos/addyosmani/agent-skills/commits/main --jq .sha)
-          # The commit comes from another repository: accept only a full SHA
-          # before it reaches URLs, outputs or the PR.
-          if ! [[ "$sha" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::Unexpected commit SHA for addyosmani/agent-skills"
-            exit 1
-          fi
-          for file in .agents/references/*.md; do
-            curl --fail --silent --show-error --location --retry 3 \
-              --output "$file" \
-              "https://raw.githubusercontent.com/addyosmani/agent-skills/$sha/references/${file##*/}"
-          done
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
-
       - name: Package the update
         id: package
         run: |
           git add --all .agents .claude skills-lock.json
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "All agent skills and references are up to date." >> "$GITHUB_STEP_SUMMARY"
+            echo "All agent skills are up to date." >> "$GITHUB_STEP_SUMMARY"
           else
             git diff --cached --stat
             git diff --cached --binary > "$RUNNER_TEMP/update.patch"
@@ -109,28 +87,17 @@ jobs:
           name: update-patch
           path: ${{ runner.temp }}/update
 
-      # The update job ran third-party code, so its outputs are checked again
-      # before they reach the pull request.
-      - name: Check the update job's outputs
-        env:
-          REFERENCES_SHA: ${{ needs.update.outputs.references-sha }}
-        run: |
-          if ! [[ "$REFERENCES_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::Unexpected references commit from the update job"
-            exit 1
-          fi
-
       - name: Open pull request
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.event.repository.default_branch }}
           BRANCH: ${{ needs.update.outputs.branch }}
           PATCH: ${{ runner.temp }}/update/update.patch
-          TITLE: 'chore(skills): update agent skills and references'
+          TITLE: 'chore(skills): update agent skills'
           BODY: |-
-            Automated update of the skills in `skills-lock.json` from their upstream repositories, and of `.agents/references/` from [addyosmani/agent-skills@${{ needs.update.outputs.references-sha }}](https://github.com/addyosmani/agent-skills/tree/${{ needs.update.outputs.references-sha }}/references).
+            Automated update of the skills in `skills-lock.json` from their upstream repositories.
 
             Review the skill diffs before merging: they change what agents do. The Verification checks workflow runs `npm run docs:check`, which fails on a reference an updated skill broke, or on a doc check exception the update made stale.
           VERIFY: 'true'
-          ALLOWED_PATHS: .agents/skills/ .agents/references/ .claude/skills/ skills-lock.json
+          ALLOWED_PATHS: .agents/skills/ .claude/skills/ skills-lock.json
         run: bash .github/scripts/open-update-pr.sh

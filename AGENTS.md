@@ -136,7 +136,7 @@ Each rule names what enforces it. A rule enforced by nothing holds only if you f
 
 Execute phases in sequence before concluding any change to the codebase (feature, bug fix, or refactor).
 
-This project's Definition of Done is the Change Workflow above and the phases below. A vendored skill or reference that names a Definition of Done, such as `.agents/references/definition-of-done.md`, means this one.
+This project's Definition of Done is the Change Workflow above and the phases below. A vendored skill or reference that names a Definition of Done, such as `.agents/skills/shipping-and-launch/references/shared/definition-of-done.md`, means this one.
 
 #### Phase 1: Standards
 
