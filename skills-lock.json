@@ -19,8 +19,8 @@
       "source": "backnotprop/pstack",
       "sourceType": "github",
       "skillPath": "skills/blast-radius/SKILL.md",
-      "computedHash": "f9ec7353939c4449f2edb1cd195049f477b9ba6c0a869de75c7b440e27295f01",
-      "commit": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
+      "computedHash": "0757c44120a174426d00dc1d5f30dcc0c69b13e39fa406038b427aad090a915e",
+      "commit": "c81f1bf680803f9e3f0cade6adb62593f43fb61f"
     },
     "c4-diagrams": {
       "source": "intent-driven-dev/intent-driven-template",
@@ -33,8 +33,8 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/code-review-and-quality/SKILL.md",
-      "computedHash": "a63e1874fa8f1ee04194868f9b8ba18133aa20464586369f3eedb8df6000a0cc",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "c04b5cb0f38ea3aec41b0219478124a9b38d467c3cecd82cdf0ad694d9403628",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "code-simplification": {
       "source": "addyosmani/agent-skills",
@@ -54,8 +54,8 @@
       "source": "backnotprop/pstack",
       "sourceType": "github",
       "skillPath": "skills/correct/SKILL.md",
-      "computedHash": "63f55b279f1298d3cabe91999063920cdc2a2f16a671cb8fbd87ddecc7fde216",
-      "commit": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
+      "computedHash": "0b186b59c59cee41abc67839a426d5b2ca2504746c9ec704d2ce1dd2414818e1",
+      "commit": "c81f1bf680803f9e3f0cade6adb62593f43fb61f"
     },
     "diagnosing-bugs": {
       "source": "mattpocock/skills",
@@ -68,8 +68,8 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/frontend-ui-engineering/SKILL.md",
-      "computedHash": "1bea3daa371bfb466445f5a33ee063f2aadf27469b2308a340e803398bcb4251",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "ed0577a6473f4c90b809115925b34402658d320a4da3e47a7614fbe6733a1a82",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "gherkin-authoring": {
       "source": "intent-driven-dev/intent-driven-template",
@@ -82,8 +82,8 @@
       "source": "intent-driven-dev/intent-driven-template",
       "sourceType": "github",
       "skillPath": ".agents/skills/glossary/SKILL.md",
-      "computedHash": "952203e5e4a1edd3d661af27b25aca804b10e21cef2e59a56d7a09cb8e82fcd7",
-      "commit": "b5bda460a2180a55fc508fdedc4ef058d95355db"
+      "computedHash": "8fde0ff4f1d7e7d3f85ff5514775fc537c162fdf6b2368a97f2b72cb8de8ea2c",
+      "commit": "1d57f2c292459767df95516733700b0c29f94c2b"
     },
     "grilling": {
       "source": "mattpocock/skills",
@@ -110,15 +110,15 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/observability-and-instrumentation/SKILL.md",
-      "computedHash": "71661b8e1558d7eed8cdf93bfb731da1c3afed9b895b049ecf92792af0d8a364",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "3720071b84c8ee80bd5649dbc66da14a5a7b94262c672ca56bcb5b7480b463c4",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "performance-optimization": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/performance-optimization/SKILL.md",
-      "computedHash": "cfa0c39804554198a33e3beb2b0f920a1b468bb2e066822e1d08f4abeda3db33",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "5408f84feeed8c4e5abf5ee6b557e6d4e22a838c95e9d98bf64f49f4d1d16c7e",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "pr": {
       "source": "mattpocock/skills",
@@ -152,8 +152,8 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/security-and-hardening/SKILL.md",
-      "computedHash": "9bfc78e1ee2e23f3d226f610d8ed8e0cf6fb4f7e90a44db0a41b636735a24767",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "208e6266166f4a97792a391487f8df528c6a02ad70a0a86ada699836b2a70730",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "shadcn": {
       "source": "shadcn/ui",
@@ -166,8 +166,8 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/shipping-and-launch/SKILL.md",
-      "computedHash": "ae9b095cfb74edd0d2b63c24aaca99e5a2f95b50527a7508841b501eabd3820a",
-      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee"
+      "computedHash": "19d787c1f9daaf7a2982cd181dbed5f014d2fc208a8b2f37a550a594f83ed9c3",
+      "commit": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74"
     },
     "supabase": {
       "source": "supabase/agent-skills",
