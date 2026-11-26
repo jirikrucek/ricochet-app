@@ -19,8 +19,8 @@
       "source": "backnotprop/pstack",
       "sourceType": "github",
       "skillPath": "skills/blast-radius/SKILL.md",
-      "computedHash": "f9ec7353939c4449f2edb1cd195049f477b9ba6c0a869de75c7b440e27295f01",
-      "commit": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
+      "computedHash": "0757c44120a174426d00dc1d5f30dcc0c69b13e39fa406038b427aad090a915e",
+      "commit": "c81f1bf680803f9e3f0cade6adb62593f43fb61f"
     },
     "c4-diagrams": {
       "source": "intent-driven-dev/intent-driven-template",
@@ -54,8 +54,8 @@
       "source": "backnotprop/pstack",
       "sourceType": "github",
       "skillPath": "skills/correct/SKILL.md",
-      "computedHash": "63f55b279f1298d3cabe91999063920cdc2a2f16a671cb8fbd87ddecc7fde216",
-      "commit": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
+      "computedHash": "0b186b59c59cee41abc67839a426d5b2ca2504746c9ec704d2ce1dd2414818e1",
+      "commit": "c81f1bf680803f9e3f0cade6adb62593f43fb61f"
     },
     "diagnosing-bugs": {
       "source": "mattpocock/skills",
@@ -82,8 +82,8 @@
       "source": "intent-driven-dev/intent-driven-template",
       "sourceType": "github",
       "skillPath": ".agents/skills/glossary/SKILL.md",
-      "computedHash": "952203e5e4a1edd3d661af27b25aca804b10e21cef2e59a56d7a09cb8e82fcd7",
-      "commit": "b5bda460a2180a55fc508fdedc4ef058d95355db"
+      "computedHash": "8fde0ff4f1d7e7d3f85ff5514775fc537c162fdf6b2368a97f2b72cb8de8ea2c",
+      "commit": "1d57f2c292459767df95516733700b0c29f94c2b"
     },
     "grilling": {
       "source": "mattpocock/skills",
