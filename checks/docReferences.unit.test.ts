@@ -17,6 +17,7 @@ const repository = {
       'docs/guides/testing-guide.md',
       'docs/references/',
       'docs/references/accessibility-checklist.md',
+      '.agents/skills/frontend-ui-engineering/references/shared/accessibility-checklist.md',
     ].includes(relativePath),
   skills: new Set(['pr', 'code-health']),
 };
@@ -140,6 +141,21 @@ describe('findBrokenReferences', () => {
         },
       ),
     ).toEqual(['2: ../../references/accessibility-checklist.md']);
+  });
+
+  it("resolves a skill's own references/ paths from the document", () => {
+    expect(
+      brokenIn(
+        [
+          'See `references/shared/accessibility-checklist.md`.',
+          'See `references/shared/security-checklist.md#owasp`.',
+        ].join('\n'),
+        {
+          file: '.agents/skills/frontend-ui-engineering/SKILL.md',
+          kinds: { links: true, skills: true, paths: 'files' },
+        },
+      ),
+    ).toEqual(['2: references/shared/security-checklist.md#owasp']);
   });
 });
 

@@ -21,7 +21,6 @@ import { findRepoRoot } from './repoRoot.ts';
 // as /players; backticked paths in the docs that describe the repository as
 // it is now, and only file paths in skills, which name example folders, not
 // in ADRs, which name old paths on purpose.
-// .agents/references/ isn't checked: it holds upstream files, unedited.
 
 const root = path.resolve(process.argv[2] ?? findRepoRoot(import.meta.dirname));
 
